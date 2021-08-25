@@ -1,0 +1,22 @@
+import { NestFactory } from "@nestjs/core";
+import { DocumentBuilder, SwaggerModule } from "@nestjs/swagger";
+import { AppModule } from "./app.module";
+
+(async function start (){
+    const PORT = process.env.PORT || 5000;
+    const app = await NestFactory.create(AppModule)
+    app.setGlobalPrefix('api');
+
+    {
+        const config = new DocumentBuilder()
+            .setTitle('НПО АВТОМАТИВ')
+            .setDescription('Документация взаимодействия с APi приложения Системы атоматизации производства НПО Автоматив')
+            .setVersion('0.0.1')
+            .addTag('NPO')
+            .build()
+        const document = SwaggerModule.createDocument(app, config)
+        SwaggerModule.setup('/api/docs/', app, document)
+    }
+
+    await app.listen(PORT, () => console.log(`Server running on port: ${PORT}`))
+})()
