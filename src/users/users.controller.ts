@@ -25,8 +25,8 @@ export class UsersController {
 
     @ApiOperation({summary: 'Получение всех пользователей'})
     @ApiResponse({status: 200, type: [User]})
-    @Roles("ADMIN")
-    @UseGuards(RolesGuard)
+    //@Roles("ADMIN")
+    //@UseGuards(RolesGuard)
     @Get()
     getAll() {
         return this.userService.getUser();
@@ -41,8 +41,8 @@ export class UsersController {
 
     @ApiOperation({summary: 'Выдача ролей'})
     @ApiResponse({status: 200})
-    @Roles("ADMIN")
-    @UseGuards(RolesGuard)
+    //@Roles("ADMIN")
+    //@UseGuards(RolesGuard)
     @Post('/role')
     addRole(@Body() dto: AddRoleDto) {
         return this.userService.addRole(dto)
@@ -50,8 +50,8 @@ export class UsersController {
 
     @ApiOperation({summary: 'Бан пользоватиелей'})
     @ApiResponse({status: 200})
-    @Roles("ADMIN")
-    @UseGuards(RolesGuard)
+    //@Roles("ADMIN")
+    //@UseGuards(RolesGuard)
     @Post('/ban')
     banUser(@Body() dto: BanUserDto) {
         return this.userService.ban(dto)

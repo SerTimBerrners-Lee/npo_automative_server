@@ -1,7 +1,8 @@
-import { Body, Controller, Get, Param, Post } from '@nestjs/common';
+import { Body, Controller, Delete, Get, Param, Post, Put } from '@nestjs/common';
 import { CreateRoleDto } from './dto/create-role.dto';
 import { RolesService } from './roles.service';
 import { ApiTags } from '@nestjs/swagger';
+import { UpdateRoleDto } from './dto/update-role.dto';
 
 @ApiTags('Роли пользователей')
 @Controller('roles')
@@ -16,5 +17,21 @@ export class RolesController {
     @Get('/:value')
     getByValue(@Param('value') value: string) {
         return this.roleService.getRoleByValue(value);
+    }
+
+    @Get()
+    getAllUser() {
+        return this.roleService.getAllRoles()
+    }
+
+    @Delete('/:id')
+    removeRoleById(@Param('id') id: number) {
+        return this.roleService.removeRoleById(id)
+    }
+    
+    @Post('/update')
+    updateRoleByPk(@Body() dto: UpdateRoleDto) {
+        console.log(dto)
+        return this.roleService.updateRoleByPk(dto)
     }
 }

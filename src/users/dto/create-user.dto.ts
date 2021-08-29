@@ -11,4 +11,10 @@ export class CreateUserDto {
     @IsString({message: 'Должно быть строкой'})
     @Length(4, 16, {message: 'Не меньше 4 и не больше 16'})
     readonly password: string;
+    @ApiProperty({example: 'Петров Виталий Валентинович', description: 'ФИО'})
+    @IsString({message: 'Должно быть строкой'})
+    readonly initial: string;
+    @ApiProperty({example: '001', description: 'Табельный номер'})
+    @IsString({message: 'Должно быть строкой'})
+    readonly tabel: string
 }

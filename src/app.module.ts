@@ -11,7 +11,7 @@ import { AvatarsModule } from './avatars/avatars.module';
 import { Avatars } from "./avatars/avatars.model";
 import { FilesModule } from './files/files.module';
 import { ServeStaticModule } from "@nestjs/serve-static";
-import { join } from "path/posix";
+import { join } from "path";
 
 @Module({
     controllers: [],

@@ -19,7 +19,7 @@ export class Avatars extends Model<Avatars, AvatarsCreationAttrs> {
     @ApiProperty({example: 'Название записи', description: 'Заголовок'})
     @Column({type: DataType.STRING, unique: true, allowNull: false})
     title: string;      
-    @ApiProperty({example: '12345678', description: 'Пароль пользователя'})
+    @ApiProperty({example: '12345678', description: 'Содержимое поста'})
     @Column({type: DataType.STRING, allowNull: false})
     content: string;
 
