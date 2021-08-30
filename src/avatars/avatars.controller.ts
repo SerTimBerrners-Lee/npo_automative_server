@@ -8,7 +8,7 @@ export class AvatarsController {
 
     constructor(private avatarService: AvatarsService) {}
 
-    @Post()
+    @Post() 
     @UseInterceptors(FileInterceptor('image'))
     createAvatars(@Body() dto: CreateAvatarsDto,
                 @UploadedFile() image) {

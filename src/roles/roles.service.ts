@@ -20,6 +20,12 @@ export class RolesService {
         return role;
     }
 
+    async getRoleByPk(id: string) {
+        const role = await this.roleReprository.findByPk(id)
+
+        return role
+    }
+
     async updateRoleByPk(dto: UpdateRoleDto) {
         const role = await this.roleReprository.findByPk(dto.id)
         

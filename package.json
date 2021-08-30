@@ -50,6 +50,7 @@
     "@nestjs/testing": "^8.0.0",
     "@types/express": "^4.17.13",
     "@types/jest": "^27.0.1",
+    "@types/multer": "^1.4.7",
     "@types/node": "^16.7.5",
     "@types/sequelize": "^4.28.10",
     "@types/supertest": "^2.0.11",

@@ -1,17 +1,26 @@
-import { Body, Controller, Get, Param, Post, Delete, UseGuards, UsePipes } from '@nestjs/common';
+import { Body, 
+    Controller, 
+    Get, 
+    Param, 
+    Post, 
+    Delete, 
+    UsePipes, 
+    UseInterceptors, 
+    UploadedFile, 
+    UploadedFiles} from '@nestjs/common';
 import { ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UsersService } from './users.service';
 import { User } from './users.model';
-import { Roles } from 'src/auth/role-auth.decorator';
-import { RolesGuard } from 'src/auth/roles.guard';
 import { AddRoleDto } from './dto/add-role.dto';
 import { BanUserDto } from './dto/ban-user.dto';
 import { ValidationPipe } from 'src/pipes/validation.pipe';
+import { FileFieldsInterceptor, FileInterceptor } from '@nestjs/platform-express';
+import _ from 'lodash';
 
 @ApiTags('Пользователи')
 @Controller('users')
-export class UsersController {
+export class UsersController { 
 
     constructor(private userService: UsersService) {}
 
@@ -19,8 +28,15 @@ export class UsersController {
     @ApiResponse({status: 200, type: User})
     @UsePipes(ValidationPipe)
     @Post()
-    create(@Body() userDto: CreateUserDto) {
-        return this.userService.createUser(userDto);
+    //@UseInterceptors(FileInterceptor('file'))
+    @UseInterceptors(FileFieldsInterceptor([
+        {name: 'image', maxCount: 1}
+    ]))
+    createUser(
+        @Body() userDto: CreateUserDto, 
+        @UploadedFiles() files: { image?: Express.Multer.File[] }
+    ) {
+        return this.userService.createUser(userDto, files);
     }
 
     @ApiOperation({summary: 'Получение всех пользователей'})

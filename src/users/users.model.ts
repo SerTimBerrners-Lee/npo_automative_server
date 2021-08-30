@@ -5,10 +5,10 @@ import { Role } from "src/roles/roles.model";
 import { UserRoles } from "src/roles/user-roles.model";
 
 interface UserCreationAttrs {
-    email: string;
     password: string;
     initial: string;
     tabel: string;
+    image: string;
 }
 
 @Table({tableName: 'users'})
@@ -33,6 +33,10 @@ export class User extends Model<User, UserCreationAttrs> {
     @ApiProperty({example: '02.12.2021', description: 'Дата увольнения с работы'})
     @Column({type: DataType.STRING, allowNull: true})
     dateUnWork: string; 
+
+    @ApiProperty({example: '02.12.1990', description: 'Дата увольнения с работы'})
+    @Column({type: DataType.STRING, allowNull: true})
+    birthday: string; 
 
     @ApiProperty({example: 'Петров В.В.', description: 'Логин'})
     @Column({type: DataType.STRING, allowNull: true})
