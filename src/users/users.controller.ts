@@ -6,7 +6,6 @@ import { Body,
     Delete, 
     UsePipes, 
     UseInterceptors, 
-    UploadedFile, 
     UploadedFiles} from '@nestjs/common';
 import { ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger';
 import { CreateUserDto } from './dto/create-user.dto';
@@ -15,8 +14,8 @@ import { User } from './users.model';
 import { AddRoleDto } from './dto/add-role.dto';
 import { BanUserDto } from './dto/ban-user.dto';
 import { ValidationPipe } from 'src/pipes/validation.pipe';
-import { FileFieldsInterceptor, FileInterceptor } from '@nestjs/platform-express';
-import _ from 'lodash';
+import { FileFieldsInterceptor } from '@nestjs/platform-express';
+import _ from 'lodash'; 
 
 @ApiTags('Пользователи')
 @Controller('users')
@@ -30,11 +29,12 @@ export class UsersController {
     @Post()
     //@UseInterceptors(FileInterceptor('file'))
     @UseInterceptors(FileFieldsInterceptor([
-        {name: 'image', maxCount: 1}
+        {name: 'image', maxCount: 1},
+        {name: 'document', maxCount: 20}
     ]))
     createUser(
         @Body() userDto: CreateUserDto, 
-        @UploadedFiles() files: { image?: Express.Multer.File[] }
+        @UploadedFiles() files: { image?: Express.Multer.File[], document?: Express.Multer.File[] }
     ) {
         return this.userService.createUser(userDto, files);
     }
@@ -42,7 +42,7 @@ export class UsersController {
     @ApiOperation({summary: 'Получение всех пользователей'})
     @ApiResponse({status: 200, type: [User]})
     //@Roles("ADMIN")
-    //@UseGuards(RolesGuard)
+    //@UseGuards(RolesGuard) 
     @Get()
     getAll() {
         return this.userService.getUser();
@@ -73,3 +73,4 @@ export class UsersController {
         return this.userService.ban(dto)
     }
 }
+ 

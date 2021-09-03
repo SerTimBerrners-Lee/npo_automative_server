@@ -24,7 +24,7 @@ export class CreateUserDto {
     readonly login: string; 
 
     @ApiProperty({example: '1', description: 'Идентификатор роли'})
-    readonly roles: string; 
+    readonly roles: string;  
 
     @ApiProperty({example: 'г. Псков., Инженерная ул., д. 2', description: 'Постоянный адрес проживания'})
     readonly adress: string; 

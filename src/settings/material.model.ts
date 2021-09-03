@@ -1,0 +1,47 @@
+import { ApiProperty } from "@nestjs/swagger";
+import { Model, Column, DataType, Table, BelongsTo, ForeignKey } from "sequelize-typescript";
+
+interface MaterialCreationAttrs {
+    name: string;
+}
+
+@Table({tableName: 'material'})
+export class Material extends Model<Material, MaterialCreationAttrs> {
+
+    @ApiProperty({example: '1', description: 'Уникальный идентификатор'})
+    @Column({type: DataType.INTEGER, unique: true, autoIncrement: true, primaryKey: true})
+    id: number;
+
+    @ApiProperty({example: 'квадратный миллиметр', description: 'Полная запись единиц измерений'})
+    @Column({type: DataType.STRING, allowNull: false})
+    name: string;    
+
+    @ApiProperty({example: '{edizmId: 10, znach: 2}', description: 'Запись значений'})
+    @Column({type: DataType.ARRAY(DataType.STRING), allowNull: true})
+    length: any;    
+
+    @ApiProperty({example: '{edizmId: 10, znach: 2}', description: 'Запись значений'})
+    @Column({type: DataType.ARRAY(DataType.STRING), allowNull: true})
+    width: any;    
+
+    @ApiProperty({example: '{edizmId: 10, znach: 2}', description: 'Запись значений'})
+    @Column({type: DataType.ARRAY(DataType.STRING), allowNull: true})
+    height: any;   
+
+    @ApiProperty({example: '{edizmId: 10, znach: 2}', description: 'Запись значений'})
+    @Column({type: DataType.ARRAY(DataType.STRING), allowNull: true})
+    wallThickness: any;   
+
+    @ApiProperty({example: '{edizmId: 10, znach: 2}', description: 'Запись значений'})
+    @Column({type: DataType.ARRAY(DataType.STRING), allowNull: true})
+    outsideDiametr: any; 
+    
+    @ApiProperty({example: '{edizmId: 10, znach: 2}', description: 'Запись значений'})
+    @Column({type: DataType.ARRAY(DataType.STRING), allowNull: true})
+    thickness: any;   
+
+    @ApiProperty({example: '{edizmId: 10, znach: 2}', description: 'Запись значений'})
+    @Column({type: DataType.ARRAY(DataType.STRING), allowNull: true})
+    areaCrossSectional: any;   
+
+}    

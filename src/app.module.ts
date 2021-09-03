@@ -12,6 +12,11 @@ import { Avatars } from "./avatars/avatars.model";
 import { FilesModule } from './files/files.module';
 import { ServeStaticModule } from "@nestjs/serve-static";
 import { join } from "path";
+import { DocumentsModule } from './documents/documents.module';
+import { Documents } from "./documents/documents.model";
+import { DocumentsUser } from "./documents/documents-user.model";
+import { SettingsModule } from './settings/settings.module';
+import { Sequelize } from "sequelize";
 
 @Module({
     controllers: [],
@@ -30,14 +35,24 @@ import { join } from "path";
             username: process.env.POSTGRES_USER,
             password: process.env.POSTGRES_PASSWORD,
             database: process.env.POSTGRES_DB,
-            models: [User, Role, UserRoles, Avatars],
+            models: [
+                User, 
+                Role, 
+                UserRoles, 
+                Avatars, 
+                Documents, 
+                DocumentsUser
+            ],
             autoLoadModels: true,
           }),
+          
         UsersModule,
         RolesModule,
         AuthModule,
         AvatarsModule,
         FilesModule,
+        DocumentsModule,
+        SettingsModule,
     ]
 })
 
