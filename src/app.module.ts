@@ -16,7 +16,14 @@ import { DocumentsModule } from './documents/documents.module';
 import { Documents } from "./documents/documents.model";
 import { DocumentsUser } from "./documents/documents-user.model";
 import { SettingsModule } from './settings/settings.module';
-import { Sequelize } from "sequelize";
+import { DocumentsMaterial } from "./documents/documents-material.model";
+import { PodPodMaterial } from "./settings/pod-pod-material.model";
+import { NodePodPodMaterial } from "./settings/node-pod-pod-material.model";
+import { PodMaterial } from "./settings/pod-material.model";
+import { Edizm } from "./settings/edizm.model";
+import { MatPodMat } from "./settings/mat-pod-mat.model";
+import { Material } from "./settings/material.model";
+import { TypeEdizm } from "./settings/type-edizm.model";
 
 @Module({
     controllers: [],
@@ -41,7 +48,15 @@ import { Sequelize } from "sequelize";
                 UserRoles, 
                 Avatars, 
                 Documents, 
-                DocumentsUser
+                DocumentsUser,
+                DocumentsMaterial,
+                PodPodMaterial,
+                NodePodPodMaterial,
+                PodMaterial,
+                Edizm,
+                MatPodMat,
+                Material,
+                TypeEdizm
             ],
             autoLoadModels: true,
           }),

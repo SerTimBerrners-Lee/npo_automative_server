@@ -1,8 +1,10 @@
 import { ApiProperty } from "@nestjs/swagger";
-import { Model, Column, DataType, Table, BelongsTo, ForeignKey } from "sequelize-typescript";
+import { Model, Column, DataType, Table, BelongsTo, ForeignKey, BelongsToMany } from "sequelize-typescript";
+import { MatPodMat } from "./mat-pod-mat.model";
+import { PodMaterial } from "./pod-material.model";
 
 interface MaterialCreationAttrs {
-    name: string;
+    name: string; 
 }
 
 @Table({tableName: 'material'})
@@ -43,5 +45,8 @@ export class Material extends Model<Material, MaterialCreationAttrs> {
     @ApiProperty({example: '{edizmId: 10, znach: 2}', description: 'Запись значений'})
     @Column({type: DataType.ARRAY(DataType.STRING), allowNull: true})
     areaCrossSectional: any;   
+
+    @BelongsToMany(() => PodMaterial, () => MatPodMat)
+    podMaterials: PodMaterial[];
 
 }    

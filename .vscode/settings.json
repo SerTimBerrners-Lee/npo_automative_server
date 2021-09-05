@@ -1,0 +1,14 @@
+{
+    "sqltools.connections": [
+        {
+            "previewLimit": 50,
+            "server": "localhost",
+            "port": 5432,
+            "driver": "AWS Redshift",
+            "name": "localhost",
+            "database": "npo_automative",
+            "username": "npo",
+            "password": "5513"
+        }
+    ]
+}

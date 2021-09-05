@@ -50,7 +50,7 @@ export class DocumentsService {
             }
             fs.writeFileSync(path.join(filePath, pathName), file.buffer)
 
-            const document = this.createDocument({
+            const document = await this.createDocument({
                     name: origName, 
                     path: (folderToSave + '/' + pathName), 
                     nameInstans: nameInstans,
@@ -58,7 +58,6 @@ export class DocumentsService {
                     version: version,
                     type: type
             })
-            
             return document
         } catch(e) {
             throw new HttpException('Произошла ошибка при записи файла', HttpStatus.INTERNAL_SERVER_ERROR)

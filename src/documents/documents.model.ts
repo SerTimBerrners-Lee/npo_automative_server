@@ -2,6 +2,8 @@ import { Model, Column, DataType, Table, BelongsToMany } from "sequelize-typescr
 import { ApiProperty } from "@nestjs/swagger";
 import { User } from "src/users/users.model";
 import { DocumentsUser } from "./documents-user.model";
+import { PodPodMaterial } from "src/settings/pod-pod-material.model";
+import { DocumentsMaterial } from "./documents-material.model";
 
 interface DocumentsCreationAttrs {
     name: string; 
@@ -44,5 +46,8 @@ export class Documents extends Model<Documents, DocumentsCreationAttrs> {
 
     @BelongsToMany(() => User, () => DocumentsUser)
     users: User[];
+
+    @BelongsToMany(() => PodPodMaterial, () => DocumentsMaterial)
+    materials: PodPodMaterial[];
 
 }

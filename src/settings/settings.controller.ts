@@ -1,7 +1,10 @@
-import { Body, Controller, Delete, Get, Param, Post } from '@nestjs/common';
+import { Body, Controller, Delete, Get, Param, Post, UploadedFiles, UseInterceptors } from '@nestjs/common';
+import { FileFieldsInterceptor } from '@nestjs/platform-express';
 import { ApiOperation, ApiTags } from '@nestjs/swagger';
 import { CreateEdizmDto } from './dto/create-edizm.dto';
 import { CreateMaterialDto } from './dto/create-material.dto';
+import { CreatePodMaterialDto } from './dto/create-pod-material.dto';
+import { CreatePodPodMaterial } from './dto/create-pod-pod-material.dto';
 import { CreateTypeEdizmDto } from './dto/create-type-edizm.dto';
 import { UpdateEdizmDto } from './dto/update-edizm.dto';
 import { UpdateMaterialDto } from './dto/update-material.dto';
@@ -70,5 +73,63 @@ export class SettingsController {
     @Delete('/material/:id')
     removeMaterial(@Param('id') id: number) {
         return this.settingsService.removeMaterial(id)
+    }
+
+    @ApiOperation({summary: 'Создаем под тип материала'})
+    @Post('/material/podtype')
+    createPodMaterial(@Body() dto: CreatePodMaterialDto) {
+        console.log(dto)
+        return this.settingsService.createPodMaterial(dto)
+    }
+
+    @ApiOperation({summary: 'Удаляем под тип материала'})
+    @Delete('/material/podtype/:id')
+    removePodMaterial(@Param('id') id: number) {
+        return this.settingsService.removePodMaterial(id)
+    }
+    
+    @ApiOperation({summary: 'Обновляем подтип материала'})
+    @Post('/material/podtype/update')
+    updatePodTypeMaterial(@Body() dto: CreatePodMaterialDto) {
+        return this.settingsService.updatePodTypeMaterial(dto)
+    }
+
+    @ApiOperation({summary: 'Создаем подтип подтипа материала'})
+    @UseInterceptors(FileFieldsInterceptor([
+        {name: 'document', maxCount: 40}
+    ]))
+    @Post('/material/podpodtype/')
+    crteatePodPodMaterial(@Body() dto: CreatePodPodMaterial, @UploadedFiles() files: { document?: Express.Multer.File[]} ) {
+        return this.settingsService.createAndUpdatePodPodMaterial(dto, files)
+    }
+
+    @ApiOperation({summary: 'get all typeMaterials'})
+    @Get('/materials/typematerial')
+    getAllPodTypeMaterial() {
+        return this.settingsService.getAllPodTypeMaterial()
+    }
+
+    @ApiOperation({summary: 'get all pod typeMaterials'})
+    @Get('/materials/podtypematerial')
+    getPodPodMaterial() {
+        return this.settingsService.getPodPodMaterial()
+    }
+
+    @ApiOperation({summary: 'get one pod typeMaterials'})
+    @Get('/materials/typematerial/:id')
+    getPodMaterialById(@Param('id') id: number) {
+        return this.settingsService.getPodMaterialById(id)
+    }
+
+    @ApiOperation({summary: 'Удаляем под подтип материала'})
+    @Delete('/material/podpodtype/:id')
+    removePPMaterial(@Param('id') id: number) {
+        return this.settingsService.removePPMById(id)
+    }
+    
+    @ApiOperation({summary: 'Добавляем подтип материала в архив'})
+    @Get('/material/podpodtype/:id')
+    banPPM(@Param('id') id: number) {
+        return this.settingsService.banPPMById(id)
     }
 } 
