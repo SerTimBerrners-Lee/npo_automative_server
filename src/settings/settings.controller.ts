@@ -132,4 +132,10 @@ export class SettingsController {
     banPPM(@Param('id') id: number) {
         return this.settingsService.banPPMById(id)
     }
+
+    @ApiOperation({summary: 'Получаем один Полдтип материала со всеми полями'})
+    @Get('/material/podpodtype/get/:id')
+    getOnePPT(@Param('id') id: number) {
+        return this.settingsService.getOnePPT(id)
+    }
 } 

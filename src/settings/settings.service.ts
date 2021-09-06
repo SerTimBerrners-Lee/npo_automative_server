@@ -1,6 +1,7 @@
 import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
 import { InjectModel } from '@nestjs/sequelize';
 import { where } from 'sequelize';
+import { Documents } from 'src/documents/documents.model';
 import { DocumentsService } from 'src/documents/documents.service';
 import { CreateEdizmDto } from './dto/create-edizm.dto';
 import { CreateMaterialDto } from './dto/create-material.dto';
@@ -22,6 +23,7 @@ export class SettingsService {
         @InjectModel(Material) private materialReprository: typeof Material,
         @InjectModel(PodMaterial) private podMaterialReprository: typeof PodMaterial,
         @InjectModel(PodPodMaterial) private podPodMaterialReprository: typeof PodPodMaterial,
+        @InjectModel(Documents) private documentsReprository: typeof Documents,
         private documentsService: DocumentsService
     ) {}
 
@@ -39,6 +41,29 @@ export class SettingsService {
     }
 
     async getAllTypeEdizm() {
+        // Проверяем типы если их нет - создаем
+        let types = await this.typeEdizmReprositoy.findOne({where: {name: 'Экономические единицы'}})
+        if(!types)
+            await this.typeEdizmReprositoy.create({name: 'Экономические единицы'})
+        types = await this.typeEdizmReprositoy.findOne({where: {name: 'Единицы времени'}})
+        if(!types)
+            await this.typeEdizmReprositoy.create({name: 'Единицы времени'})
+        types = await this.typeEdizmReprositoy.findOne({where: {name: 'Технические единицы'}})
+        if(!types)
+            await this.typeEdizmReprositoy.create({name: 'Технические единицы'})
+        types = await this.typeEdizmReprositoy.findOne({where: {name: 'Единицы массы'}})
+        if(!types)
+            await this.typeEdizmReprositoy.create({name: 'Единицы массы'})
+        types = await this.typeEdizmReprositoy.findOne({where: {name: 'Единицы объема'}})
+        if(!types)
+            await this.typeEdizmReprositoy.create({name: 'Единицы объема'})
+        types = await this.typeEdizmReprositoy.findOne({where: {name: 'Единицы площади'}})
+        if(!types)
+        await this.typeEdizmReprositoy.create({name: 'Единицы площади'})
+        types = await this.typeEdizmReprositoy.findOne({where: {name: 'Единицы длины'}})
+        if(!types)
+            await this.typeEdizmReprositoy.create({name: 'Единицы длины'})
+
         const eType = await this.typeEdizmReprositoy.findAll()
         return eType
     }
@@ -97,13 +122,8 @@ export class SettingsService {
         return result
     }
 
-    async createOrUpdateMaterial(dto: CreateMaterialDto, id: number, update: boolean = false, type: string = 'material') {
+    async createOrUpdateMaterial(dto: CreateMaterialDto, id: number, update: boolean = false) {
         let material: any
-        if(type == 'material') {
-            material = await this.materialReprository.findByPk(id)
-        } else if(type == 'podPodMaterial') {
-            material = await this.podPodMaterialReprository.findByPk(id)
-        }
         if(!material)
             throw new HttpException('Произошла проблема при запросе к базе данных', HttpStatus.BAD_REQUEST)
 
@@ -206,9 +226,10 @@ export class SettingsService {
 
     async createAndUpdatePodPodMaterial(dto: CreatePodPodMaterial, files: any) {
         let podPodMaterial: any
-        console.log(dto)
-        if(typeof dto.id == 'number') {
+
+        if(Number(dto.id)) {
             podPodMaterial = await this.podPodMaterialReprository.findByPk(dto.id)
+            podPodMaterial.name = dto.name
         } else {
             podPodMaterial = await this.podPodMaterialReprository.create({ name: dto.name})
         }
@@ -217,7 +238,9 @@ export class SettingsService {
         if(!podPodMaterial || !podMaterials) 
             throw new HttpException('Не удалось создать запись ', HttpStatus.BAD_REQUEST)
   
-        podPodMaterial.edizmId = dto.edizmId
+        if(Number(dto.edizmId))
+            podPodMaterial.edizmId = Number(dto.edizmId)
+            
         if(dto.description)
                 podPodMaterial.description = dto.description
 
@@ -237,32 +260,75 @@ export class SettingsService {
         } else 
             podPodMaterial.metrMass = null
 
-        // let updatePodPodMaterial : any
-        // typeof dto.id != 'number' ?
-        //     updatePodPodMaterial = await this.createOrUpdateMaterial(dto, podPodMaterial.id, false, 'podPodMaterial')
-        //     :
-        //     updatePodPodMaterial = await this.createOrUpdateMaterial(dto, podPodMaterial.id, true, 'podPodMaterial' )
+        let [length, width, height, wallThickness, outsideDiametr, thickness, areaCrossSectional, length_ez, width_ez, height_ez, wallThickness_ez, outsideDiametr_ez, thickness_ez, areaCrossSectional_ez]: any[] = []
+        length = JSON.parse(dto.length)
+        width = JSON.parse(dto.width)
+        height = JSON.parse(dto.height)
+        wallThickness = JSON.parse(dto.wallThickness)
+        outsideDiametr = JSON.parse(dto.outsideDiametr)
+        thickness = JSON.parse(dto.thickness)
+        areaCrossSectional = JSON.parse(dto.areaCrossSectional)
 
-        if(typeof dto.id != 'number') {
+        if(length && length.edizmId && length.znach) {
+            if(length_ez = await this.edizmReprository.findByPk(length.edizmId))
+                podPodMaterial.length = [{edizmId: length_ez, znach: length.znach}]
+        } else 
+            podPodMaterial.length = null
+
+        if(width && width.edizmId && width.znach) {
+            if(width_ez = await this.edizmReprository.findByPk(width.edizmId))
+                podPodMaterial.width = [{edizmId: width_ez, znach: width.znach}]
+        } else 
+            podPodMaterial.width = null
+
+        if(height && height.edizmId && height.znach) {
+            if(height_ez = await this.edizmReprository.findByPk(height.edizmId))
+                podPodMaterial.height = [{edizmId: height_ez, znach: height.znach}]
+        } else 
+            podPodMaterial.height = null
+
+        if(wallThickness && wallThickness.edizmId && wallThickness.znach) {
+            if(wallThickness_ez = await this.edizmReprository.findByPk(wallThickness.edizmId))
+                podPodMaterial.wallThickness = [{edizmId: wallThickness_ez, znach: wallThickness.znach}]
+        } else 
+            podPodMaterial.wallThickness = null
+        if(outsideDiametr && outsideDiametr.edizmId && outsideDiametr.znach) {
+            if(outsideDiametr_ez = await this.edizmReprository.findByPk(outsideDiametr.edizmId))
+                podPodMaterial.outsideDiametr = [{edizmId: outsideDiametr_ez, znach: outsideDiametr.znach}]
+        } else 
+            podPodMaterial.outsideDiametr = null
+        if(thickness && thickness.edizmId && thickness.znach) {
+            if(thickness_ez = await this.edizmReprository.findByPk(thickness.edizmId))
+                podPodMaterial.thickness = [{edizmId: thickness_ez, znach: thickness.znach}]
+        } else 
+            podPodMaterial.thickness = null
+        if(areaCrossSectional && areaCrossSectional.edizmId && areaCrossSectional.znach) {
+            if(areaCrossSectional_ez = await this.edizmReprository.findByPk(areaCrossSectional.edizmId))
+                podPodMaterial.areaCrossSectional = [{edizmId: areaCrossSectional_ez, znach: areaCrossSectional.znach}]
+        } else 
+            podPodMaterial.areaCrossSectional = null
+
+        if(!Number(dto.edizmId)) {
             await podMaterials.$add('podPodMaterials', podPodMaterial.id)
             await podMaterials.save() 
         }   
 
         if(dto.docs) {
-            console.log(Object.values(JSON.parse(dto.docs)))
-            let docs = Object.values(JSON.parse(dto.docs))
+            let docs: any = Object.values(JSON.parse(dto.docs))
             let i = 0
             for(let document of files.document) {
                 let res = await this.documentsService.saveDocument(
                     document, 
-                    // docs[i].nameInstans, 
-                    // docs[i].type,
-                    // docs[i].version,
-                    // docs[i].description,
-                    // docs[i].name
+                    docs[i].nameInstans, 
+                    docs[i].type,
+                    docs[i].version,
+                    docs[i].description,
+                    docs[i].name
                 )
-                console.log(res.id)
-                console.log(res)
+                if(res.id) {
+                    let docId = await this.documentsReprository.findByPk(res.id)
+                    await podPodMaterial.$add('documents', docId.id)
+                }
                 i++
             }
         }
@@ -296,5 +362,11 @@ export class SettingsService {
             return PPM
         }
             
+    }
+
+    async getOnePPT(id: number) {
+        const PPM = await this.podPodMaterialReprository.findByPk(id, {include: {all: true}})
+        if(PPM)
+            return PPM
     }
 }

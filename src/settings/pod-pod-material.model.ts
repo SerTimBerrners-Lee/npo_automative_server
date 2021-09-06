@@ -3,7 +3,6 @@ import { Model, Column, DataType, Table, BelongsTo, ForeignKey, BelongsToMany, H
 import { DocumentsMaterial } from "src/documents/documents-material.model";
 import { Documents } from "src/documents/documents.model";
 import { Edizm } from "./edizm.model";
-import { MatPodMat } from "./mat-pod-mat.model";
 import { NodePodPodMaterial } from "./node-pod-pod-material.model";
 import { PodMaterial } from "./pod-material.model";
 
@@ -34,7 +33,7 @@ export class PodPodMaterial extends Model<PodPodMaterial, PodPodMaterialCreation
     materials: PodMaterial[];
 
     @BelongsToMany(() => Documents, () => DocumentsMaterial)
-    douments: Documents[];
+    documents: Documents[];
  
     @ForeignKey(() => Edizm)
     @Column({type: DataType.INTEGER})

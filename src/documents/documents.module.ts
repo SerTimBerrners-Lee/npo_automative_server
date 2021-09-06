@@ -15,6 +15,7 @@ import { DocumentsService } from './documents.service';
     imports: [
         SequelizeModule.forFeature([Documents, User, DocumentsUser, DocumentsMaterial, PodPodMaterial]),
         forwardRef(() => UsersModule),
+        
     ],
     exports: [
         DocumentsService
