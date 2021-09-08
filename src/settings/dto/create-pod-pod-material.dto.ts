@@ -9,8 +9,8 @@ export class CreatePodPodMaterial {
     readonly docs: string;
     @ApiProperty({example: 1, description: 'Id подтипа материала к которой принадлежит'})
     readonly podTypeId: number;  
-    @ApiProperty({example: 1, description: 'Id ЕИ к которой принадлежит'})
-    readonly edizmId: number;  
+    @ApiProperty({example: '{"edizmId": 1, "znach": 123}', description: 'Id ЕИ к которой принадлежит'})
+    readonly kolvo: string;  
 
     @ApiProperty({example: '{"edizmId": 1, "znach": 123}', description: 'Срок поставки'})
     readonly deliveryTime: string; 

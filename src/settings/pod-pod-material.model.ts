@@ -35,49 +35,46 @@ export class PodPodMaterial extends Model<PodPodMaterial, PodPodMaterialCreation
     @BelongsToMany(() => Documents, () => DocumentsMaterial)
     documents: Documents[];
  
-    @ForeignKey(() => Edizm)
-    @Column({type: DataType.INTEGER})
-    edizmId: number;
-
-    @BelongsTo(() => Edizm)
-    edizm: Edizm;
+    @ApiProperty({example: '{edizmId: 10, znach: 2}', description: 'Срок поставки'})
+    @Column({type: DataType.STRING, allowNull: true})
+    kolvo: any; 
 
     @ApiProperty({example: 'материал железо', description: 'Описание материала'})
     @Column({type: DataType.STRING, allowNull: true})
     description: string; 
 
     @ApiProperty({example: '{edizmId: 10, znach: 2}', description: 'Срок поставки'})
-    @Column({type: DataType.ARRAY(DataType.STRING), allowNull: true})
+    @Column({type: DataType.STRING, allowNull: true})
     metrMass: any; 
 
     @ApiProperty({example: '{edizmId: 10, znach: 2}', description: 'Запись значений'})
-    @Column({type: DataType.ARRAY(DataType.STRING), allowNull: true})
+    @Column({type: DataType.STRING, allowNull: true})
     length: any;    
 
     @ApiProperty({example: '{edizmId: 10, znach: 2}', description: 'Запись значений'})
-    @Column({type: DataType.ARRAY(DataType.STRING), allowNull: true})
+    @Column({type: DataType.STRING, allowNull: true})
     width: any;    
 
     @ApiProperty({example: '{edizmId: 10, znach: 2}', description: 'Запись значений'})
-    @Column({type: DataType.ARRAY(DataType.STRING), allowNull: true})
+    @Column({type: DataType.STRING, allowNull: true})
     height: any;   
 
     @ApiProperty({example: '{edizmId: 10, znach: 2}', description: 'Запись значений'})
-    @Column({type: DataType.ARRAY(DataType.STRING), allowNull: true})
+    @Column({type: DataType.STRING, allowNull: true})
     wallThickness: any;   
 
     @ApiProperty({example: '{edizmId: 10, znach: 2}', description: 'Запись значений'})
-    @Column({type: DataType.ARRAY(DataType.STRING), allowNull: true})
+    @Column({type: DataType.STRING, allowNull: true})
     outsideDiametr: any; 
     
     @ApiProperty({example: '{edizmId: 10, znach: 2}', description: 'Запись значений'})
-    @Column({type: DataType.ARRAY(DataType.STRING), allowNull: true})
+    @Column({type: DataType.STRING, allowNull: true})
     thickness: any;   
 
     @ApiProperty({example: '{edizmId: 10, znach: 2}', description: 'Запись значений'})
-    @Column({type: DataType.ARRAY(DataType.STRING), allowNull: true})
+    @Column({type: DataType.STRING, allowNull: true})
     areaCrossSectional: any;   
-    // После привязывать файлы и Поставщиков 
+    // После привязывать Поставщиков 
     // История изменений также прикрепляется сюда при изменении фала 
 
 }    

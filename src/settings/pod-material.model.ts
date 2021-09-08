@@ -21,7 +21,7 @@ export class PodMaterial extends Model<PodMaterial, PodMaterialCreationAttrs> {
     name: string;    
 
     @ApiProperty({example: '{edizmId: 10, znach: 2}', description: 'Запись значений'})
-    @Column({type: DataType.ARRAY(DataType.STRING), allowNull: true})
+    @Column({type: DataType.STRING, allowNull: true})
     density: any; 
 
     @BelongsToMany(() => PodPodMaterial, () => NodePodPodMaterial)

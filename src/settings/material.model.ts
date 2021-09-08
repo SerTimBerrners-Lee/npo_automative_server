@@ -19,31 +19,31 @@ export class Material extends Model<Material, MaterialCreationAttrs> {
     name: string;    
 
     @ApiProperty({example: '{edizmId: 10, znach: 2}', description: 'Запись значений'})
-    @Column({type: DataType.ARRAY(DataType.STRING), allowNull: true})
+    @Column({type: DataType.STRING, allowNull: true})
     length: any;    
 
     @ApiProperty({example: '{edizmId: 10, znach: 2}', description: 'Запись значений'})
-    @Column({type: DataType.ARRAY(DataType.STRING), allowNull: true})
+    @Column({type: DataType.STRING, allowNull: true})
     width: any;    
 
     @ApiProperty({example: '{edizmId: 10, znach: 2}', description: 'Запись значений'})
-    @Column({type: DataType.ARRAY(DataType.STRING), allowNull: true})
+    @Column({type: DataType.STRING, allowNull: true})
     height: any;   
 
     @ApiProperty({example: '{edizmId: 10, znach: 2}', description: 'Запись значений'})
-    @Column({type: DataType.ARRAY(DataType.STRING), allowNull: true})
+    @Column({type: DataType.STRING, allowNull: true})
     wallThickness: any;   
 
     @ApiProperty({example: '{edizmId: 10, znach: 2}', description: 'Запись значений'})
-    @Column({type: DataType.ARRAY(DataType.STRING), allowNull: true})
+    @Column({type: DataType.STRING, allowNull: true})
     outsideDiametr: any; 
     
     @ApiProperty({example: '{edizmId: 10, znach: 2}', description: 'Запись значений'})
-    @Column({type: DataType.ARRAY(DataType.STRING), allowNull: true})
+    @Column({type: DataType.STRING, allowNull: true})
     thickness: any;   
 
     @ApiProperty({example: '{edizmId: 10, znach: 2}', description: 'Запись значений'})
-    @Column({type: DataType.ARRAY(DataType.STRING), allowNull: true})
+    @Column({type: DataType.STRING, allowNull: true})
     areaCrossSectional: any;   
 
     @BelongsToMany(() => PodMaterial, () => MatPodMat)

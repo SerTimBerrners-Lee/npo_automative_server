@@ -3,24 +3,24 @@ import { ApiProperty } from "@nestjs/swagger";
 export class CreateMaterialDto {
     @ApiProperty({example: 'Лист', description: 'Запись значений'})
     readonly name: string;
-    @ApiProperty({example: '{"edizmId": 1, "znach": 123}', description: 'Запись значений'})
-    readonly length: [];    
+    @ApiProperty({example: '{"edizm": "мм", "znach": 123}', description: 'Запись значений'})
+    readonly length: any;    
 
-    @ApiProperty({example: '{"edizmId": 1, "znach": 123}', description: 'Запись значений'})
-    readonly width: [];    
+    @ApiProperty({example: '{"edizm": "мм", "znach": 123}', description: 'Запись значений'})
+    readonly width: any;    
 
-    @ApiProperty({example: '{"edizmId": 1, "znach": 123}', description: 'Запись значений'})
-    readonly height: [];   
+    @ApiProperty({example: '{"edizm": "мм", "znach": 123}', description: 'Запись значений'})
+    readonly height: any;   
 
-    @ApiProperty({example: '{"edizmId": 1, "znach": 123}', description: 'Запись значений'})
-    readonly wallThickness: [];   
+    @ApiProperty({example: '{"edizm": "мм", "znach": 123}', description: 'Запись значений'})
+    readonly wallThickness: any;   
 
-    @ApiProperty({example: '{"edizmId": 1, "znach": 123}', description: 'Запись значений'})
-    readonly outsideDiametr: []; 
+    @ApiProperty({example: '{"edizm": "мм", "znach": 123}', description: 'Запись значений'})
+    readonly outsideDiametr: any; 
     
-    @ApiProperty({example: '{"edizmId": 1, "znach": 123}', description: 'Запись значений'})
-    readonly thickness: [];   
+    @ApiProperty({example: '{"edizm": "мм", "znach": 123}', description: 'Запись значений'})
+    readonly thickness: any;   
 
-    @ApiProperty({example: '{"edizmId": 1, "znach": 123}', description: 'Запись значений'})
-    readonly areaCrossSectional: [];   
+    @ApiProperty({example: '{"edizm": "мм", "znach": 123}', description: 'Запись значений'})
+    readonly areaCrossSectional: any;   
 }
