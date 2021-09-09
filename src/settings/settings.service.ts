@@ -171,8 +171,13 @@ export class SettingsService {
         if(!pod_material)
             throw new HttpException('Произошла проблема при создании материала', HttpStatus.BAD_REQUEST)
         
-        if(dto.density && dto.density.edizm) {
-            pod_material.density = JSON.stringify({edizm: dto.density.edizm, znach: dto.density.znach})
+        let density = dto.density
+        console.log(density)
+        if(density && density.edizm) {
+            await this.edizmReprository.findByPk(density.edizm).then(res=>{
+                if(res)
+                    pod_material.density = JSON.stringify({edizm: res, znach: density.znach})
+            })
         }
         await pod_material.save()
     
@@ -189,8 +194,13 @@ export class SettingsService {
         if(!pod_material)
             throw new HttpException('Запись не найдена', HttpStatus.NOT_FOUND)
 
-        if(dto.density && dto.density.edizm) 
-                pod_material.density = JSON.stringify({edizm: dto.density.edizm, znach: dto.density.znach})
+        let density = dto.density
+
+        if(density && density.edizm) 
+            await this.edizmReprository.findByPk(density.edizm).then(res =>{
+                if(res)
+                    pod_material.density = JSON.stringify({edizm: res, znach: density.znach})
+            })
         else 
             pod_material.density = null
 
@@ -222,16 +232,24 @@ export class SettingsService {
         let [deliveryTime, kolvo, density]: any[] = []
 
         deliveryTime = JSON.parse(dto.deliveryTime)
-        kolvo = JSON.parse(dto.kolvo)
+        kolvo = JSON.parse(dto.kolvo).kolvo
         density = JSON.parse(dto.density)
 
-        if(kolvo && kolvo.edizm && kolvo.znach)
-            await this.edizmReprository.findByPk(kolvo.edizm).then((res) => {
-                if(res) 
-                    podPodMaterial.kolvo = JSON.stringify({edizm: res, znach: kolvo.znach}) 
+        podPodMaterial.kolvo = []
+
+        if(kolvo) {
+            Object.values(kolvo).forEach((ez, inx) => {
+                if(ez) 
+                    this.edizmReprository.findByPk(inx + 1).then((res) => {
+                        if(res) {
+                            if(!podPodMaterial.kolvo)
+                                podPodMaterial.kolvo = []
+                            podPodMaterial.kolvo.push(JSON.stringify(res))
+                        }
+                    })
+                    inx--
             })
-        else 
-            podPodMaterial.kolvo = null
+        }
             
         if(deliveryTime && deliveryTime.edizm && deliveryTime.znach) 
             await this.edizmReprository.findByPk(deliveryTime.edizm).then(res => {
@@ -248,8 +266,6 @@ export class SettingsService {
             })
         else 
             podPodMaterial.density = null
-            
-        console.log(dto)
         
         let [length, width, height, wallThickness, outsideDiametr, thickness, areaCrossSectional]: any[] = []
         length = JSON.parse(dto.length)

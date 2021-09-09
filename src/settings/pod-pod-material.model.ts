@@ -40,8 +40,8 @@ export class PodPodMaterial extends Model<PodPodMaterial, PodPodMaterialCreation
     density: any
  
     @ApiProperty({example: '{edizmId: 10, znach: 2}', description: 'Срок поставки'})
-    @Column({type: DataType.STRING, allowNull: true})
-    kolvo: any; 
+    @Column({type: DataType.ARRAY(DataType.STRING), allowNull: true})
+    kolvo: []; 
 
     @ApiProperty({example: 'материал железо', description: 'Описание материала'})
     @Column({type: DataType.STRING, allowNull: true})
