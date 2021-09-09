@@ -16,11 +16,11 @@ export class Edizm extends Model<Edizm, EdizmCreationAttrs> {
     id: number;
 
     @ApiProperty({example: 'квадратный миллиметр', description: 'Полная запись единиц измерений'})
-    @Column({type: DataType.STRING, unique: true, allowNull: false})
+    @Column({type: DataType.STRING, allowNull: false})
     name: string;    
 
     @ApiProperty({example: 'мм2', description: 'Кратка запись единиц измерений'})
-    @Column({type: DataType.STRING, unique: true, allowNull: false})
+    @Column({type: DataType.STRING, allowNull: false})
     short_name: string;    
 
 

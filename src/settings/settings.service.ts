@@ -1,6 +1,5 @@
 import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
 import { InjectModel } from '@nestjs/sequelize';
-import { where } from 'sequelize';
 import { Documents } from 'src/documents/documents.model';
 import { DocumentsService } from 'src/documents/documents.service';
 import { CreateEdizmDto } from './dto/create-edizm.dto';
@@ -60,9 +59,12 @@ export class SettingsService {
         types = await this.typeEdizmReprositoy.findOne({where: {name: 'Единицы площади'}})
         if(!types)
         await this.typeEdizmReprositoy.create({name: 'Единицы площади'})
-        types = await this.typeEdizmReprositoy.findOne({where: {name: 'Единицы длины'}})
+        types = await this.typeEdizmReprositoy.findOne({where: {name: 'Единицы длины (Длина L Ширина A Высота B)'}})
         if(!types)
-            await this.typeEdizmReprositoy.create({name: 'Единицы длины'})
+            await this.typeEdizmReprositoy.create({name: 'Единицы длины (Длина L Ширина A Высота B)'})
+        types = await this.typeEdizmReprositoy.findOne({where: {name: 'Количественные единицы'}})
+        if(!types)
+            await this.typeEdizmReprositoy.create({name: 'Количественные единицы'})
 
         const eType = await this.typeEdizmReprositoy.findAll()
         return eType
@@ -169,7 +171,6 @@ export class SettingsService {
         if(!pod_material)
             throw new HttpException('Произошла проблема при создании материала', HttpStatus.BAD_REQUEST)
         
-        console.log(dto)
         if(dto.density && dto.density.edizm) {
             pod_material.density = JSON.stringify({edizm: dto.density.edizm, znach: dto.density.znach})
         }
@@ -214,27 +215,32 @@ export class SettingsService {
         if(!podPodMaterial || !podMaterials) 
             throw new HttpException('Не удалось создать запись ', HttpStatus.BAD_REQUEST)   
 
-        if(dto.description)
-                podPodMaterial.description = dto.description
-
-        let [deliveryTime, metrMass, kolvo]: any[] = []
+        if(dto.description) {
+            podPodMaterial.description = dto.description
+        }
+        
+        let [deliveryTime, kolvo]: any[] = []
 
         deliveryTime = JSON.parse(dto.deliveryTime)
-        metrMass = JSON.parse(dto.metrMass)
         kolvo = JSON.parse(dto.kolvo)
 
         if(kolvo && kolvo.edizm && kolvo.znach)
-            podPodMaterial.kolvo = JSON.stringify({edizm: kolvo.edzim, znach: kolvo.znach})
-
-        if(deliveryTime && deliveryTime.edizmId && deliveryTime.znach) {
-            podPodMaterial.deliveryTime = JSON.stringify({edizm: deliveryTime.edzim, znach: deliveryTime.znach})
-        } else 
+            await this.edizmReprository.findByPk(kolvo.edizm).then((res) => {
+                if(res) 
+                    podPodMaterial.kolvo = JSON.stringify({edizm: res, znach: kolvo.znach}) 
+            })
+        else 
+            podPodMaterial.kolvo = null
+            
+        if(deliveryTime && deliveryTime.edizm && deliveryTime.znach) 
+            await this.edizmReprository.findByPk(deliveryTime.edizm).then(res => {
+                if(res) 
+                    podPodMaterial.deliveryTime = JSON.stringify({edizm: res, znach: deliveryTime.znach})
+            })
+        else 
             podPodMaterial.deliveryTime = null
-        if(metrMass && metrMass.edizm && metrMass.znach) {
-                podPodMaterial.metrMass = JSON.stringify({edizm: metrMass.edzim, znach: metrMass.znach})
-        } else 
-            podPodMaterial.metrMass = null
 
+        
         let [length, width, height, wallThickness, outsideDiametr, thickness, areaCrossSectional]: any[] = []
         length = JSON.parse(dto.length)
         width = JSON.parse(dto.width)
@@ -243,45 +249,68 @@ export class SettingsService {
         outsideDiametr = JSON.parse(dto.outsideDiametr)
         thickness = JSON.parse(dto.thickness)
         areaCrossSectional = JSON.parse(dto.areaCrossSectional)
+        
 
-        if(length && length.edizm && length.znach) {
-                podPodMaterial.length = JSON.stringify({edizm: length.edizm, znach: length.znach})
-        } else 
+        if(length && length.edizm && length.znach) 
+            await this.edizmReprository.findByPk(length.edizm).then(res => {
+                if(res) 
+                    podPodMaterial.length = JSON.stringify({edizm: res, znach: length.znach})
+            })
+        else 
             podPodMaterial.length = null
 
-        if(width && width.edizm && width.znach) {
-                podPodMaterial.width = JSON.stringify({edizm: width.edizm, znach: width.znach})
-        } else 
+        if(width && width.edizm && width.znach) 
+            await this.edizmReprository.findByPk(width.edizm).then(res => {
+                if(res) 
+                    podPodMaterial.width = JSON.stringify({edizm: res, znach: width.znach})
+            })
+        else 
             podPodMaterial.width = null
 
-        if(height && height.edizm && height.znach) {
-                podPodMaterial.height = JSON.stringify({edizm: height.edizm, znach: height.znach})
-        } else 
+        if(height && height.edizm && height.znach) 
+            await this.edizmReprository.findByPk(height.edizm).then(res => {
+                if(res) 
+                    podPodMaterial.height = JSON.stringify({edizm: res, znach: height.znach})
+            })
+        else 
             podPodMaterial.height = null
 
-        if(wallThickness && wallThickness.edizm && wallThickness.znach) {
-                podPodMaterial.wallThickness = JSON.stringify({edizm: wallThickness.edizm, znach: wallThickness.znach})
-        } else 
+        if(wallThickness && wallThickness.edizm && wallThickness.znach) 
+            await this.edizmReprository.findByPk(wallThickness.edizm).then(res => {
+                if(res) 
+                    podPodMaterial.wallThickness = JSON.stringify({edizm: res, znach: wallThickness.znach})
+            })
+        else 
             podPodMaterial.wallThickness = null
-        if(outsideDiametr && outsideDiametr.edizm && outsideDiametr.znach) {
-                podPodMaterial.outsideDiametr = JSON.stringify({edizm: outsideDiametr.edizm, znach: outsideDiametr.znach})
-        } else 
+
+        if(outsideDiametr && outsideDiametr.edizm && outsideDiametr.znach) 
+            await this.edizmReprository.findByPk(outsideDiametr.edizm).then(res => {
+                if(res) 
+                    podPodMaterial.outsideDiametr = JSON.stringify({edizm: res, znach: outsideDiametr.znach})
+            })
+        else 
             podPodMaterial.outsideDiametr = null
-        if(thickness && thickness.edizm && thickness.znach) {
-                podPodMaterial.thickness = JSON.stringify({edizm: thickness.edizm, znach: thickness.znach})
-        } else 
+
+        if(thickness && thickness.edizm && thickness.znach) 
+            await this.edizmReprository.findByPk(thickness.edizm).then(res => {
+                if(res) 
+                    podPodMaterial.thickness = JSON.stringify({edizm: res, znach: thickness.znach})
+            })
+        else 
             podPodMaterial.thickness = null
-        if(areaCrossSectional && areaCrossSectional.edizm && areaCrossSectional.znach) {
-                podPodMaterial.areaCrossSectional = JSON.stringify({edizm: areaCrossSectional.edizm, znach: areaCrossSectional.znach})
-        } else 
+
+        if(areaCrossSectional && areaCrossSectional.edizm && areaCrossSectional.znach) 
+            await this.edizmReprository.findByPk(areaCrossSectional.edizm).then(res => {
+                if(res) 
+                    podPodMaterial.areaCrossSectional = JSON.stringify({edizm: res, znach: areaCrossSectional.znach})
+            })
+        else 
             podPodMaterial.areaCrossSectional = null
 
         if(!Number(dto.id)) {
             await podMaterials.$add('podPodMaterials', podPodMaterial.id)
             await podMaterials.save() 
         }
-
-        console.log(dto)
 
         if(dto.docs) {
             let docs: any = Object.values(JSON.parse(dto.docs))

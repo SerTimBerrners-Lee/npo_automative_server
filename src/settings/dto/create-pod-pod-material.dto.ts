@@ -6,32 +6,30 @@ export class CreatePodPodMaterial {
     @ApiProperty({example: 'Лист', description: 'Запись значений'})
     readonly name: string;
 
-    readonly docs: string;
+    readonly docs: any;
     @ApiProperty({example: 1, description: 'Id подтипа материала к которой принадлежит'})
     readonly podTypeId: number;  
-    @ApiProperty({example: '{"edizmId": 1, "znach": 123}', description: 'Id ЕИ к которой принадлежит'})
+    @ApiProperty({example: '{"edizm": 1, "znach": 123}', description: 'Id ЕИ к которой принадлежит'})
     readonly kolvo: string;  
 
-    @ApiProperty({example: '{"edizmId": 1, "znach": 123}', description: 'Срок поставки'})
+    @ApiProperty({example: '{"edizm": 1, "znach": 123}', description: 'Срок поставки'})
     readonly deliveryTime: string; 
     @ApiProperty({example: 'материал железо', description: 'Описание материала'})
-    readonly description: string; 
-    @ApiProperty({example: '{"edizmId": 1, "znach": 123}', description: 'Срок поставки'})
-    readonly metrMass: string; 
+    readonly description: string;
 
-    @ApiProperty({example: '{"edizmId": 1, "znach": 123}', description: 'Запись значений'})
+    @ApiProperty({example: '{"edizm": 1, "znach": 123}', description: 'Запись значений'})
     readonly length: string;    
-    @ApiProperty({example: '{"edizmId": 1, "znach": 123}', description: 'Запись значений'})
+    @ApiProperty({example: '{"edizm": 1, "znach": 123}', description: 'Запись значений'})
     readonly width: string;    
-    @ApiProperty({example: '{"edizmId": 1, "znach": 123}', description: 'Запись значений'})
+    @ApiProperty({example: '{"edizm": 1, "znach": 123}', description: 'Запись значений'})
     readonly height: string;   
-    @ApiProperty({example: '{"edizmId": 1, "znach": 123}', description: 'Запись значений'})
+    @ApiProperty({example: '{"edizm": 1, "znach": 123}', description: 'Запись значений'})
     readonly wallThickness: string;   
-    @ApiProperty({example: '{"edizmId": 1, "znach": 123}', description: 'Запись значений'})
+    @ApiProperty({example: '{"edizm": 1, "znach": 123}', description: 'Запись значений'})
     readonly outsideDiametr: string; 
-    @ApiProperty({example: '{"edizmId": 1, "znach": 123}', description: 'Запись значений'})
+    @ApiProperty({example: '{"edizm": 1, "znach": 123}', description: 'Запись значений'})
     readonly thickness: string;   
-    @ApiProperty({example: '{"edizmId": 1, "znach": 123}', description: 'Запись значений'})
+    @ApiProperty({example: '{"edizm": 1, "znach": 123}', description: 'Запись значений'})
     readonly areaCrossSectional: string;   
 
 

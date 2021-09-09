@@ -24,6 +24,9 @@ import { Edizm } from "./settings/edizm.model";
 import { MatPodMat } from "./settings/mat-pod-mat.model";
 import { Material } from "./settings/material.model";
 import { TypeEdizm } from "./settings/type-edizm.model";
+import { ProviderModule } from './provider/provider.module';
+import { DocumentsProviders } from "./documents/documents-providers.model";
+import { Providers } from "./provider/provider.model";
 
 @Module({
     controllers: [],
@@ -56,7 +59,9 @@ import { TypeEdizm } from "./settings/type-edizm.model";
                 Edizm,
                 MatPodMat,
                 Material,
-                TypeEdizm
+                TypeEdizm,
+                DocumentsProviders,
+                Providers
             ],
             autoLoadModels: true,
           }),
@@ -68,6 +73,7 @@ import { TypeEdizm } from "./settings/type-edizm.model";
         FilesModule,
         DocumentsModule,
         SettingsModule,
+        ProviderModule,
     ]
 })
 

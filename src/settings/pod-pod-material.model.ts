@@ -26,7 +26,7 @@ export class PodPodMaterial extends Model<PodPodMaterial, PodPodMaterialCreation
     ban: boolean; 
 
     @ApiProperty({example: '{edizmId: 10, znach: 2}', description: 'Срок поставки'})
-    @Column({type: DataType.ARRAY(DataType.STRING), allowNull: true})
+    @Column({type: DataType.STRING, allowNull: true})
     deliveryTime: any; 
 
     @BelongsToMany(() => PodMaterial, () => NodePodPodMaterial)
@@ -42,10 +42,6 @@ export class PodPodMaterial extends Model<PodPodMaterial, PodPodMaterialCreation
     @ApiProperty({example: 'материал железо', description: 'Описание материала'})
     @Column({type: DataType.STRING, allowNull: true})
     description: string; 
-
-    @ApiProperty({example: '{edizmId: 10, znach: 2}', description: 'Срок поставки'})
-    @Column({type: DataType.STRING, allowNull: true})
-    metrMass: any; 
 
     @ApiProperty({example: '{edizmId: 10, znach: 2}', description: 'Запись значений'})
     @Column({type: DataType.STRING, allowNull: true})

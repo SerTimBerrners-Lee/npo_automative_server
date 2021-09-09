@@ -1,0 +1,40 @@
+import { ApiProperty } from "@nestjs/swagger";
+import { Model, Column, DataType, Table, BelongsToMany } from "sequelize-typescript";
+import { DocumentsProviders } from "src/documents/documents-providers.model";
+import { Documents } from "src/documents/documents.model";
+interface ProvidersCreationAttrs {
+    name: string;
+}
+
+@Table({tableName: 'providers', createdAt: false, updatedAt: false})
+export class Providers extends Model<Providers, ProvidersCreationAttrs> {
+
+    @ApiProperty({example: '1', description: 'Уникальный идентификатор'})
+    @Column({type: DataType.INTEGER, unique: true, autoIncrement: true, primaryKey: true})
+    id: number;
+
+    @Column({type: DataType.STRING, allowNull: false})
+    name: string;    
+
+    @Column({type: DataType.STRING, allowNull: true})
+    inn: string;
+
+    @Column({type: DataType.STRING, allowNull: true})
+    cpp: string;    
+
+    @Column({type: DataType.TEXT, allowNull: true})
+    rekvisit: string;
+
+    @Column({type: DataType.TEXT, allowNull: true})
+    contacts: string;
+
+    @Column({type: DataType.STRING, allowNull: true})
+    description: string;
+
+    @Column({type: DataType.BOOLEAN, defaultValue: false})
+    ban: boolean;
+
+    @BelongsToMany(() => Documents, () => DocumentsProviders)
+    documents: Documents[];
+
+}    
