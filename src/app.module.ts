@@ -27,6 +27,12 @@ import { TypeEdizm } from "./settings/type-edizm.model";
 import { ProviderModule } from './provider/provider.module';
 import { DocumentsProviders } from "./documents/documents-providers.model";
 import { Providers } from "./provider/provider.model";
+import { InstrumentController } from './instrument/instrument.controller';
+import { InstrumentService } from './instrument/instrument.service';
+import { InstrumentModule } from './instrument/instrument.module';
+import { Instrument } from "./instrument/instrument.model";
+import { PInstrument } from "./instrument/pt-instrument.model";
+import { NodePtTInstrument } from "./instrument/node-pt-t-instrument.model";
 
 @Module({
     controllers: [],
@@ -61,7 +67,10 @@ import { Providers } from "./provider/provider.model";
                 Material,
                 TypeEdizm,
                 DocumentsProviders,
-                Providers
+                Providers,
+                Instrument,
+                PInstrument,
+                NodePtTInstrument
             ],
             autoLoadModels: true,
           }),
@@ -74,6 +83,7 @@ import { Providers } from "./provider/provider.model";
         DocumentsModule,
         SettingsModule,
         ProviderModule,
+        InstrumentModule,
     ]
 })
 

@@ -13,7 +13,7 @@ import { PodPodMaterial } from './pod-pod-material.model';
 import { SettingsController } from './settings.controller';
 import { SettingsService } from './settings.service';
 import { TypeEdizm } from './type-edizm.model';
-
+ 
 @Module({
   controllers: [SettingsController],
   providers: [SettingsService],
