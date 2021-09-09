@@ -34,6 +34,10 @@ export class PodPodMaterial extends Model<PodPodMaterial, PodPodMaterialCreation
 
     @BelongsToMany(() => Documents, () => DocumentsMaterial)
     documents: Documents[];
+
+    @ApiProperty({example: '{edizmId: 10, znach: 2}', description: 'Срок поставки'})
+    @Column({type: DataType.STRING, allowNull: true})
+    density: any
  
     @ApiProperty({example: '{edizmId: 10, znach: 2}', description: 'Срок поставки'})
     @Column({type: DataType.STRING, allowNull: true})

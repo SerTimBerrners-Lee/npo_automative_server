@@ -219,10 +219,11 @@ export class SettingsService {
             podPodMaterial.description = dto.description
         }
         
-        let [deliveryTime, kolvo]: any[] = []
+        let [deliveryTime, kolvo, density]: any[] = []
 
         deliveryTime = JSON.parse(dto.deliveryTime)
         kolvo = JSON.parse(dto.kolvo)
+        density = JSON.parse(dto.density)
 
         if(kolvo && kolvo.edizm && kolvo.znach)
             await this.edizmReprository.findByPk(kolvo.edizm).then((res) => {
@@ -240,6 +241,15 @@ export class SettingsService {
         else 
             podPodMaterial.deliveryTime = null
 
+        if(density && density.edizm && density.znach) 
+            await this.edizmReprository.findByPk(density.edizm).then(res => {
+                if(res) 
+                    podPodMaterial.density = JSON.stringify({edizm: res, znach: density.znach})
+            })
+        else 
+            podPodMaterial.density = null
+            
+        console.log(dto)
         
         let [length, width, height, wallThickness, outsideDiametr, thickness, areaCrossSectional]: any[] = []
         length = JSON.parse(dto.length)
@@ -306,6 +316,8 @@ export class SettingsService {
             })
         else 
             podPodMaterial.areaCrossSectional = null
+
+        
 
         if(!Number(dto.id)) {
             await podMaterials.$add('podPodMaterials', podPodMaterial.id)
