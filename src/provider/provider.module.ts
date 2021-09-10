@@ -3,6 +3,8 @@ import { SequelizeModule } from '@nestjs/sequelize';
 import { DocumentsProviders } from 'src/documents/documents-providers.model';
 import { Documents } from 'src/documents/documents.model';
 import { DocumentsModule } from 'src/documents/documents.module';
+import { ProvidersInstrument } from './provider-instrument.dto';
+import { ProvidersMaterial } from './provider-material.model';
 import { ProviderController } from './provider.controller';
 import { Providers } from './provider.model';
 import { ProviderService } from './provider.service';
@@ -13,7 +15,10 @@ import { ProviderService } from './provider.service';
     imports: [
         SequelizeModule.forFeature([Providers, 
             Documents, 
-            DocumentsProviders]),
+            DocumentsProviders,
+            ProvidersInstrument,
+            ProvidersMaterial
+        ]),
         DocumentsModule
     ],
     exports: [

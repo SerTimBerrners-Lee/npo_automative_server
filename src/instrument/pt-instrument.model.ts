@@ -1,6 +1,8 @@
 import { ApiProperty } from "@nestjs/swagger";
 import { Model, Column, DataType, Table,  BelongsToMany } from "sequelize-typescript";
 import { Instrument } from "./instrument.model";
+import { NameInstrument } from "./name-instrument.model";
+import { NodeNamePtInstrument } from "./node-name-pt-instrument.mode";
 import { NodePtTInstrument } from "./node-pt-t-instrument.model";
 
 interface PInstrumentCreationAttrs {
@@ -20,4 +22,6 @@ export class PInstrument extends Model<PInstrument, PInstrumentCreationAttrs> {
     @BelongsToMany(() => Instrument, () => NodePtTInstrument)
     instruments: Instrument[];
 
+    @BelongsToMany(() => NameInstrument, () => NodeNamePtInstrument)
+    nameInstrument: NameInstrument[];
 }    

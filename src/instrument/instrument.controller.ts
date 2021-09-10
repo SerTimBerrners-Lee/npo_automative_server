@@ -1,11 +1,14 @@
-import { Body, Controller, Delete, Get, Param, Post } from '@nestjs/common';
+import { Body, Controller, Delete, Get, Param, Post, UploadedFiles, UseInterceptors } from '@nestjs/common';
+import { FileFieldsInterceptor } from '@nestjs/platform-express';
 import { ApiOperation, ApiTags } from '@nestjs/swagger';
 import { CreateInstrumentDto } from './dto/create-instrument.dto';
+import { CreateNameInstrumentDto } from './dto/create-name-instrument.dto';
 import { CreatePTInstrumentDto } from './dto/create-pt-instrument.dto';
 import { UpdateTInstrumentDto } from './dto/update-instrument.dto';
+import { UpdateNameInstrumentDto } from './dto/update-name-instrument.dto';
 import { UpdatePTInstrumentDto } from './dto/update-pt.dto';
 import { InstrumentService } from './instrument.service';
-
+ 
 @ApiTags('База Инструмента')
 @Controller('instrument')
 export class InstrumentController {
@@ -45,7 +48,6 @@ export class InstrumentController {
     @ApiOperation({summary: 'Удаление подтипа '})
     @Delete('/pt/:id')
     removePTInstrument(@Param('id') id: number) {
-        console.log("IDIDIIDIDIDIIDI", id)
         return this.instrumentService.removePTInstrument(id)
     } 
 
@@ -53,5 +55,46 @@ export class InstrumentController {
     @Post('/pt/update')
     updatePTInstrument(@Body() dto: UpdatePTInstrumentDto) {
         return this.instrumentService.updatePTInstrument(dto)
+    } 
+
+    @ApiOperation({summary: 'Получить все подтипы '})
+    @Get('/pt/:id')
+    getAllPTInstrument(@Param('id') id: number) {
+        return this.instrumentService.getAllPTInstrument(id)
+    }
+
+    @ApiOperation({summary: 'Создаем наименование инструмента или оснастки'})
+    @UseInterceptors(FileFieldsInterceptor([
+        {name: 'document', maxCount: 40}
+    ]))
+    @Post('/nameinstrument')
+    crteateNameInstrument(@Body() dto: CreateNameInstrumentDto, @UploadedFiles() files: { document?: Express.Multer.File[]} ) {
+        return this.instrumentService.createNameInstrument(dto, files)
+    }
+
+    @ApiOperation({summary: 'Получить  наименование '})
+    @Get('/name/:id')
+    getNameInstrument(@Param('id') id: number) {
+        return this.instrumentService.getNameInstrument(id)
+    }
+    @ApiOperation({summary: 'Удаление подтипа '})
+    @Delete('/file/:id')
+    removeFileInstrument(@Param('id') id: number) {
+        return this.instrumentService.removeFileInstrument(id)
+    } 
+
+    @ApiOperation({summary: 'Обновляем наименование инструмента или оснастки'})
+    @UseInterceptors(FileFieldsInterceptor([
+        {name: 'document', maxCount: 40}
+    ]))
+    @Post('/nameinstrument/update')
+    updateNameInstrument(@Body() dto: UpdateNameInstrumentDto, @UploadedFiles() files: { document?: Express.Multer.File[]} ) {
+        return this.instrumentService.updateNameInstrument(dto, files)
+    }
+
+    @ApiOperation({summary: 'Удаление подтипа '})
+    @Delete('/ban/:id')
+    banNameInstrument(@Param('id') id: number) {
+        return this.instrumentService.banNameInstrument(id)
     } 
 }

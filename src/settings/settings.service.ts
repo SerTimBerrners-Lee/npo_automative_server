@@ -2,6 +2,7 @@ import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
 import { InjectModel } from '@nestjs/sequelize';
 import { Documents } from 'src/documents/documents.model';
 import { DocumentsService } from 'src/documents/documents.service';
+import { Providers } from 'src/provider/provider.model';
 import { CreateEdizmDto } from './dto/create-edizm.dto';
 import { CreateMaterialDto } from './dto/create-material.dto';
 import { CreatePodMaterialDto } from './dto/create-pod-material.dto';
@@ -23,7 +24,8 @@ export class SettingsService {
         @InjectModel(PodMaterial) private podMaterialReprository: typeof PodMaterial,
         @InjectModel(PodPodMaterial) private podPodMaterialReprository: typeof PodPodMaterial,
         @InjectModel(Documents) private documentsReprository: typeof Documents,
-        private documentsService: DocumentsService
+        private documentsService: DocumentsService,
+        @InjectModel(Providers) private providersReprository: typeof Providers,
     ) {}
 
     async createTypeEdizm(dto: CreateTypeEdizmDto) {
@@ -338,6 +340,17 @@ export class SettingsService {
         if(!Number(dto.id)) {
             await podMaterials.$add('podPodMaterials', podPodMaterial.id)
             await podMaterials.save() 
+        }
+        await podPodMaterial.save()
+
+        if(dto.providers) {
+            podPodMaterial.providers = []
+            let providers = JSON.parse(dto.providers)
+            for(let prx of providers) {
+                let res = await this.providersReprository.findByPk(prx.id)
+                if(res) 
+                    podPodMaterial.$add('providers', res.id)
+            }
         }
 
         if(dto.docs) {

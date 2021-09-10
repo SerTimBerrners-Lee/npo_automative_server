@@ -33,5 +33,7 @@ export class CreatePodPodMaterial {
     @ApiProperty({example: '{"edizm": 1, "znach": 123}', description: 'Запись значений'})
     readonly areaCrossSectional: string;   
 
+    readonly providers: any;
+
 
 }

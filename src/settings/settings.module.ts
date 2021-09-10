@@ -4,6 +4,8 @@ import { DocumentsMaterial } from 'src/documents/documents-material.model';
 import { Documents } from 'src/documents/documents.model';
 import { DocumentsModule } from 'src/documents/documents.module';
 import { DocumentsService } from 'src/documents/documents.service';
+import { ProvidersMaterial } from 'src/provider/provider-material.model';
+import { Providers } from 'src/provider/provider.model';
 import { Edizm } from './edizm.model';
 import { MatPodMat } from './mat-pod-mat.model';
 import { Material } from './material.model';
@@ -22,7 +24,8 @@ import { TypeEdizm } from './type-edizm.model';
       TypeEdizm, Edizm, 
       Material, PodMaterial, 
       MatPodMat, PodPodMaterial,
-      NodePodPodMaterial, DocumentsMaterial, Documents
+      NodePodPodMaterial, DocumentsMaterial, Documents,
+      ProvidersMaterial, Providers
     ]),
     DocumentsModule
   ],

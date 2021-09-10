@@ -4,6 +4,7 @@ import { Providers } from 'src/provider/provider.model';
 import { PodPodMaterial } from 'src/settings/pod-pod-material.model';
 import { User } from 'src/users/users.model';
 import { UsersModule } from 'src/users/users.module';
+import { DocumentsInstrument } from './documents-instrument.model';
 import { DocumentsMaterial } from './documents-material.model';
 import { DocumentsProviders } from './documents-providers.model';
 import { DocumentsUser } from './documents-user.model';
@@ -21,7 +22,8 @@ import { DocumentsService } from './documents.service';
             DocumentsMaterial, 
             PodPodMaterial, 
             Providers, 
-            DocumentsProviders
+            DocumentsProviders,
+            DocumentsInstrument
         ]),
         forwardRef(() => UsersModule),
         

@@ -33,6 +33,11 @@ import { InstrumentModule } from './instrument/instrument.module';
 import { Instrument } from "./instrument/instrument.model";
 import { PInstrument } from "./instrument/pt-instrument.model";
 import { NodePtTInstrument } from "./instrument/node-pt-t-instrument.model";
+import { NameInstrument } from "./instrument/name-instrument.model";
+import { NodeNamePtInstrument } from "./instrument/node-name-pt-instrument.mode";
+import { DocumentsInstrument } from "./documents/documents-instrument.model";
+import { ProvidersInstrument } from "./provider/provider-instrument.dto";
+import { ProvidersMaterial } from "./provider/provider-material.model";
 
 @Module({
     controllers: [],
@@ -70,7 +75,12 @@ import { NodePtTInstrument } from "./instrument/node-pt-t-instrument.model";
                 Providers,
                 Instrument,
                 PInstrument,
-                NodePtTInstrument
+                NodePtTInstrument,
+                NameInstrument,
+                NodeNamePtInstrument,
+                DocumentsInstrument,
+                ProvidersInstrument,
+                ProvidersMaterial
             ],
             autoLoadModels: true,
           }),

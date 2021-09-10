@@ -2,6 +2,8 @@ import { ApiProperty } from "@nestjs/swagger";
 import { Model, Column, DataType, Table, BelongsTo, ForeignKey, BelongsToMany, HasMany } from "sequelize-typescript";
 import { DocumentsMaterial } from "src/documents/documents-material.model";
 import { Documents } from "src/documents/documents.model";
+import { ProvidersMaterial } from "src/provider/provider-material.model";
+import { Providers } from "src/provider/provider.model";
 import { Edizm } from "./edizm.model";
 import { NodePodPodMaterial } from "./node-pod-pod-material.model";
 import { PodMaterial } from "./pod-material.model";
@@ -54,7 +56,7 @@ export class PodPodMaterial extends Model<PodPodMaterial, PodPodMaterialCreation
     @ApiProperty({example: '{edizmId: 10, znach: 2}', description: 'Запись значений'})
     @Column({type: DataType.STRING, allowNull: true})
     width: any;    
-
+ 
     @ApiProperty({example: '{edizmId: 10, znach: 2}', description: 'Запись значений'})
     @Column({type: DataType.STRING, allowNull: true})
     height: any;   
@@ -74,7 +76,9 @@ export class PodPodMaterial extends Model<PodPodMaterial, PodPodMaterialCreation
     @ApiProperty({example: '{edizmId: 10, znach: 2}', description: 'Запись значений'})
     @Column({type: DataType.STRING, allowNull: true})
     areaCrossSectional: any;   
-    // После привязывать Поставщиков 
+    
+    @BelongsToMany(() => Providers, () => ProvidersMaterial)
+    providers: Providers[];
     // История изменений также прикрепляется сюда при изменении фала 
 
 }    
