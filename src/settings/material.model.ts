@@ -6,7 +6,7 @@ import { PodMaterial } from "./pod-material.model";
 interface MaterialCreationAttrs {
     name: string; 
 }
-
+ 
 @Table({tableName: 'material'})
 export class Material extends Model<Material, MaterialCreationAttrs> {
 
@@ -44,7 +44,11 @@ export class Material extends Model<Material, MaterialCreationAttrs> {
 
     @ApiProperty({example: '{edizmId: 10, znach: 2}', description: 'Запись значений'})
     @Column({type: DataType.STRING, allowNull: true})
-    areaCrossSectional: any;   
+    areaCrossSectional: any;    
+
+    @ApiProperty({example: 1, description: 'К какой инстанции относится под тип'})
+    @Column({type: DataType.STRING, allowNull: false, defaultValue: 1})
+    instansMaterial: number;
 
     @BelongsToMany(() => PodMaterial, () => MatPodMat)
     podMaterials: PodMaterial[];

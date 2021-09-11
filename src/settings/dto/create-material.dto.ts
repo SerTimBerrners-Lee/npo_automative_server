@@ -23,4 +23,7 @@ export class CreateMaterialDto {
 
     @ApiProperty({example: '{"edizm": "мм", "znach": 123}', description: 'Запись значений'})
     readonly areaCrossSectional: any;   
+
+    @ApiProperty({example: 1, description: 'К какой инстанции относится под тип'})
+    readonly instansMaterial: number;
 }

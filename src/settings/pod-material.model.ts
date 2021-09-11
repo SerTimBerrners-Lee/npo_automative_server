@@ -23,7 +23,11 @@ export class PodMaterial extends Model<PodMaterial, PodMaterialCreationAttrs> {
     @ApiProperty({example: '{edizmId: 10, znach: 2}', description: 'Запись значений'})
     @Column({type: DataType.STRING, allowNull: true})
     density: any; 
-
+ 
+    @ApiProperty({example: 1, description: 'К какой инстанции относится под тип'})
+    @Column({type: DataType.STRING, allowNull: false, defaultValue: 1})
+    instansMaterial: number;
+    
     @BelongsToMany(() => PodPodMaterial, () => NodePodPodMaterial)
     podPodMaterials: PodPodMaterial[];
 

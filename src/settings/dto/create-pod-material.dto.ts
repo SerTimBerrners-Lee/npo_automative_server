@@ -7,5 +7,7 @@ export class CreatePodMaterialDto {
     @ApiProperty({example: '{"edizm": "мм", "znach": "permanent"}', description: 'Запись значений'})
     readonly density: any;
     @ApiProperty({example: 1, description: 'К какому материалу будет принадлежать'})
-    readonly materialId: number;
+    readonly id: number;
+    @ApiProperty({example: 1, description: 'К какой инстанции относится под тип'})
+    readonly instansMaterial: number;
 }

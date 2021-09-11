@@ -56,7 +56,6 @@ export class InstrumentService {
     }
 
     async createPTInstrument(dto: CreatePTInstrumentDto) {
-        console.log(dto)
         const pInstrument = await this.pIReorository.create({name: dto.name})
         if(!pInstrument)
             throw new HttpException('Ошибка при создании подтипа', HttpStatus.BAD_REQUEST)

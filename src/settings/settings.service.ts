@@ -104,6 +104,11 @@ export class SettingsService {
         const material = await this.materialReprository.create({name: dto.name})
         if(!material)
             throw new HttpException('Произошла проблема при запросе к базе данных', HttpStatus.BAD_REQUEST)
+        
+        if(dto.instansMaterial) {
+            material.instansMaterial = dto.instansMaterial
+            await material.save()
+        }
 
         const updateMat = await this.createOrUpdateMaterial(dto, material.id)
         return updateMat
@@ -174,7 +179,9 @@ export class SettingsService {
             throw new HttpException('Произошла проблема при создании материала', HttpStatus.BAD_REQUEST)
         
         let density = dto.density
-        console.log(density)
+        if(dto.instansMaterial) {
+            pod_material.instansMaterial = dto.instansMaterial
+        }
         if(density && density.edizm) {
             await this.edizmReprository.findByPk(density.edizm).then(res=>{
                 if(res)
@@ -192,7 +199,8 @@ export class SettingsService {
     }
 
     async updatePodTypeMaterial(dto: CreatePodMaterialDto) {
-        const pod_material = await this.podMaterialReprository.findByPk(dto.materialId)
+        const pod_material = await this.podMaterialReprository.findByPk(dto.id)
+
         if(!pod_material)
             throw new HttpException('Запись не найдена', HttpStatus.NOT_FOUND)
 

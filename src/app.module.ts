@@ -27,8 +27,6 @@ import { TypeEdizm } from "./settings/type-edizm.model";
 import { ProviderModule } from './provider/provider.module';
 import { DocumentsProviders } from "./documents/documents-providers.model";
 import { Providers } from "./provider/provider.model";
-import { InstrumentController } from './instrument/instrument.controller';
-import { InstrumentService } from './instrument/instrument.service';
 import { InstrumentModule } from './instrument/instrument.module';
 import { Instrument } from "./instrument/instrument.model";
 import { PInstrument } from "./instrument/pt-instrument.model";
@@ -38,6 +36,10 @@ import { NodeNamePtInstrument } from "./instrument/node-name-pt-instrument.mode"
 import { DocumentsInstrument } from "./documents/documents-instrument.model";
 import { ProvidersInstrument } from "./provider/provider-instrument.dto";
 import { ProvidersMaterial } from "./provider/provider-material.model";
+import { EquipmentModule } from './equipment/equipment.module';
+import { EquipmentType } from "./equipment/euipment-type.model";
+import { EquipmentPType } from "./equipment/equipment-pt.model";
+import { NodePTPEquipment } from "./equipment/node_tpt_equipment.model";
 
 @Module({
     controllers: [],
@@ -80,7 +82,10 @@ import { ProvidersMaterial } from "./provider/provider-material.model";
                 NodeNamePtInstrument,
                 DocumentsInstrument,
                 ProvidersInstrument,
-                ProvidersMaterial
+                ProvidersMaterial,
+                EquipmentType,
+                EquipmentPType,
+                NodePTPEquipment
             ],
             autoLoadModels: true,
           }),
@@ -94,6 +99,7 @@ import { ProvidersMaterial } from "./provider/provider-material.model";
         SettingsModule,
         ProviderModule,
         InstrumentModule,
+        EquipmentModule,
     ]
 })
 

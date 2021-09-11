@@ -26,4 +26,7 @@ export class UpdateMaterialDto {
 
     @ApiProperty({example: 1, description: 'Идентификатор записи'})
     readonly id: number;   
+
+    @ApiProperty({example: 1, description: 'К какой инстанции относится под тип'})
+    readonly instansMaterial: number;
 }
