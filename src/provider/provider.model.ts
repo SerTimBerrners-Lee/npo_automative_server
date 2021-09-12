@@ -2,10 +2,12 @@ import { ApiProperty } from "@nestjs/swagger";
 import { Model, Column, DataType, Table, BelongsToMany } from "sequelize-typescript";
 import { DocumentsProviders } from "src/documents/documents-providers.model";
 import { Documents } from "src/documents/documents.model";
+import { Equipment } from "src/equipment/equipment.model";
 import { NameInstrument } from "src/instrument/name-instrument.model";
 import { PodPodMaterial } from "src/settings/pod-pod-material.model";
 import { ProvidersInstrument } from "./provider-instrument.dto";
 import { ProvidersMaterial } from "./provider-material.model";
+import { ProvidersEquipment } from "./providers-equipment.model";
 interface ProvidersCreationAttrs {
     name: string;
 }
@@ -46,5 +48,8 @@ export class Providers extends Model<Providers, ProvidersCreationAttrs> {
 
     @BelongsToMany(() => PodPodMaterial, () => ProvidersMaterial)
     materials: PodPodMaterial[];
+
+    @BelongsToMany(() => Equipment, () => ProvidersEquipment)
+    equipments: Equipment[];
 
 }    

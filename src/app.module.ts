@@ -40,6 +40,10 @@ import { EquipmentModule } from './equipment/equipment.module';
 import { EquipmentType } from "./equipment/euipment-type.model";
 import { EquipmentPType } from "./equipment/equipment-pt.model";
 import { NodePTPEquipment } from "./equipment/node_tpt_equipment.model";
+import { Equipment } from "./equipment/equipment.model";
+import { NodeEqPTEq } from "./equipment/node-eqpt-eq.model";
+import { ProvidersEquipment } from "./provider/providers-equipment.model";
+import { DocumentsEquipment } from "./documents/documents-equipment";
 
 @Module({
     controllers: [],
@@ -85,7 +89,11 @@ import { NodePTPEquipment } from "./equipment/node_tpt_equipment.model";
                 ProvidersMaterial,
                 EquipmentType,
                 EquipmentPType,
-                NodePTPEquipment
+                NodePTPEquipment,
+                NodeEqPTEq,
+                Equipment,
+                ProvidersEquipment,
+                DocumentsEquipment
             ],
             autoLoadModels: true,
           }),

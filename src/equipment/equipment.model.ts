@@ -1,0 +1,57 @@
+import { ApiProperty } from "@nestjs/swagger";
+import { Model, Column, DataType, Table, BelongsToMany } from "sequelize-typescript";
+import { DocumentsEquipment } from "src/documents/documents-equipment";
+import { DocumentsInstrument } from "src/documents/documents-instrument.model";
+import { Documents } from "src/documents/documents.model";
+import { ProvidersInstrument } from "src/provider/provider-instrument.dto";
+import { Providers } from "src/provider/provider.model";
+import { ProvidersEquipment } from "src/provider/providers-equipment.model";
+import { EquipmentPType } from "./equipment-pt.model";
+import { NodeEqPTEq } from "./node-eqpt-eq.model";
+
+interface EquipmentCreationAttrs {
+    name: string;
+}
+
+@Table({tableName: 'equipment'})
+export class Equipment extends Model<Equipment, EquipmentCreationAttrs> {
+
+    @ApiProperty({example: '1', description: 'Уникальный идентификатор'})
+    @Column({type: DataType.INTEGER, unique: true, autoIncrement: true, primaryKey: true})
+    id: number;
+
+    @ApiProperty({example: 'Круг 20 D', description: 'Полная запись под материала измерений'})
+    @Column({type: DataType.STRING, allowNull: false})
+    name: string;   
+
+    @ApiProperty({example: true, description: 'Добавляем в архив'})
+    @Column({type: DataType.BOOLEAN, defaultValue: false})
+    ban: boolean; 
+
+    @ApiProperty({example: 12, description: 'Срок поставки'})
+    @Column({type: DataType.STRING, allowNull: true})
+    deliveryTime: string; 
+
+    @ApiProperty({example: 12, description: 'Срок поставки'})
+    @Column({type: DataType.STRING, allowNull: true})
+    invNymber: string; 
+
+    @ApiProperty({example: 12, description: 'Срок поставки'})
+    @Column({type: DataType.STRING, allowNull: true})
+    responsible: string; 
+
+    @ApiProperty({example: 12, description: 'Срок поставки'})
+    @Column({type: DataType.STRING, allowNull: true})
+    description: string; 
+ 
+    @BelongsToMany(() => Providers, () => ProvidersEquipment)
+    providers: Providers[];
+
+    @BelongsToMany(() => EquipmentPType, () => NodeEqPTEq)
+    parents: EquipmentPType[];
+
+    @BelongsToMany(() => Documents, () => DocumentsEquipment)
+    documents: Documents[];
+    // История изменений также прикрепляется сюда при изменении фала 
+
+}     

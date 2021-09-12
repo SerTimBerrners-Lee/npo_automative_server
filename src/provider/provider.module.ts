@@ -8,6 +8,7 @@ import { ProvidersMaterial } from './provider-material.model';
 import { ProviderController } from './provider.controller';
 import { Providers } from './provider.model';
 import { ProviderService } from './provider.service';
+import { ProvidersEquipment } from './providers-equipment.model';
 
 @Module({
     providers: [ProviderService],
@@ -17,7 +18,8 @@ import { ProviderService } from './provider.service';
             Documents, 
             DocumentsProviders,
             ProvidersInstrument,
-            ProvidersMaterial
+            ProvidersMaterial,
+            ProvidersEquipment
         ]),
         DocumentsModule
     ],

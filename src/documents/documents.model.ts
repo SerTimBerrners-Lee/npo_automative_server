@@ -6,6 +6,8 @@ import { PodPodMaterial } from "src/settings/pod-pod-material.model";
 import { DocumentsMaterial } from "./documents-material.model";
 import { DocumentsProviders } from "./documents-providers.model";
 import { Providers } from "src/provider/provider.model";
+import { Equipment } from "src/equipment/equipment.model";
+import { DocumentsEquipment } from "./documents-equipment";
 
 interface DocumentsCreationAttrs {
     name: string; 
@@ -55,4 +57,6 @@ export class Documents extends Model<Documents, DocumentsCreationAttrs> {
     @BelongsToMany(() => Providers, () => DocumentsProviders)
     providers: Providers[];
 
+    @BelongsToMany(() => Equipment, () => DocumentsEquipment)
+    equipments: Equipment[];
 }
