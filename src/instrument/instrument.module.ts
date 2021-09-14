@@ -5,6 +5,7 @@ import { Documents } from 'src/documents/documents.model';
 import { DocumentsModule } from 'src/documents/documents.module';
 import { ProvidersInstrument } from 'src/provider/provider-instrument.dto';
 import { Providers } from 'src/provider/provider.model';
+import { InstrumentEquipment } from './instrument-equipment.model';
 import { InstrumentController } from './instrument.controller';
 import { Instrument } from './instrument.model';
 import { InstrumentService } from './instrument.service';
@@ -26,7 +27,8 @@ import { PInstrument } from './pt-instrument.model';
             Documents,
             DocumentsInstrument,
             ProvidersInstrument,
-            Providers
+            Providers,
+            InstrumentEquipment
         ]),
         DocumentsModule
     ],

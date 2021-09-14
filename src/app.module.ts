@@ -44,6 +44,7 @@ import { Equipment } from "./equipment/equipment.model";
 import { NodeEqPTEq } from "./equipment/node-eqpt-eq.model";
 import { ProvidersEquipment } from "./provider/providers-equipment.model";
 import { DocumentsEquipment } from "./documents/documents-equipment";
+import { InstrumentEquipment } from "./instrument/instrument-equipment.model";
 
 @Module({
     controllers: [],
@@ -93,7 +94,8 @@ import { DocumentsEquipment } from "./documents/documents-equipment";
                 NodeEqPTEq,
                 Equipment,
                 ProvidersEquipment,
-                DocumentsEquipment
+                DocumentsEquipment,
+                InstrumentEquipment
             ],
             autoLoadModels: true,
           }),

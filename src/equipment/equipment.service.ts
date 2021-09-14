@@ -2,6 +2,7 @@ import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
 import { InjectModel } from '@nestjs/sequelize';
 import { Documents } from 'src/documents/documents.model';
 import { DocumentsService } from 'src/documents/documents.service';
+import { NameInstrument } from 'src/instrument/name-instrument.model';
 import { Providers } from 'src/provider/provider.model';
 import { CreateEquipmentDto } from './dto/create-equipment.dto';
 import { UpdateEquipmentDto } from './dto/update-equipment.dto';
@@ -17,7 +18,8 @@ export class EquipmentService {
     @InjectModel(Equipment) private equipmentReprository: typeof Equipment,
     @InjectModel(Documents) private documentsReprository: typeof Documents,
     @InjectModel(Providers) private providersReprository: typeof Providers,
-    private documentsService: DocumentsService
+    @InjectModel(NameInstrument) private nameInstrumentReprository: typeof NameInstrument,
+    private documentsService: DocumentsService,
     ) {}
 
     async createEquipmentType(dto: any) {
@@ -113,12 +115,31 @@ export class EquipmentService {
                     equipment.$add('providers', res.id)
             }
         }
+        await equipment.save()
 
         if(Number(dto.parentId)) {
             const equipmentPT = await this.equipemtnPTReprository.findByPk(dto.parentId)
             if(equipmentPT) {
                 await equipmentPT.$add('equipments', equipment.id)
                 await equipmentPT.save()
+            }
+        }
+        if(Number(dto.rootParentId)) {
+            const equipmentType = await this.equipmentTypeReprository.findByPk(dto.rootParentId)
+            if(equipmentType) {
+                equipment.rootParentId = equipmentType.id
+                await equipment.save()
+            }
+        }
+
+        let instrumentIdList = JSON.parse(dto.instrumentIdList).instrumentListId
+        if(instrumentIdList && instrumentIdList.length > 0) {
+            for(let inst of instrumentIdList) {
+                let nameInstrument = await this.nameInstrumentReprository.findByPk(inst)
+                if(nameInstrument) {
+                    equipment.$add('nameInstrument', nameInstrument.id)
+                    await equipment.save()
+                }
             }
         }
 
@@ -148,7 +169,7 @@ export class EquipmentService {
     } 
 
     async updateEquipmqnt(dto: UpdateEquipmentDto, files: any) {
-        const equipment = await this.equipmentReprository.findByPk(dto.id)
+        const equipment = await this.equipmentReprository.findByPk(dto.id, {include: {all: true}})
         console.info(dto)
         if(!equipment)
             throw new HttpException('Произошла ошибка при добавлении', HttpStatus.BAD_REQUEST)
@@ -173,6 +194,25 @@ export class EquipmentService {
                 let res = await this.providersReprository.findByPk(prx.id)
                 if(res) 
                     equipment.$add('providers', res.id)
+            }
+        }
+
+        let instrumentIdList: any
+        
+        for(let eq of equipment.nameInstrument){
+            await equipment.$remove('nameInstrument', eq.id) 
+            await equipment.save()
+        }
+
+        if(dto.instrumentIdList)
+            instrumentIdList = JSON.parse(dto.instrumentIdList).instrumentListId
+        if(instrumentIdList && instrumentIdList.length > 0) {
+            for(let inst of instrumentIdList) {
+                let nameInstrument = await this.nameInstrumentReprository.findByPk(inst)
+                if(nameInstrument) {
+                    equipment.$add('nameInstrument', nameInstrument.id)
+                    await equipment.save()
+                }
             }
         }
 

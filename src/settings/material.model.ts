@@ -1,7 +1,8 @@
 import { ApiProperty } from "@nestjs/swagger";
-import { Model, Column, DataType, Table, BelongsTo, ForeignKey, BelongsToMany } from "sequelize-typescript";
+import { Model, Column, DataType, Table, BelongsTo, ForeignKey, BelongsToMany, HasMany } from "sequelize-typescript";
 import { MatPodMat } from "./mat-pod-mat.model";
 import { PodMaterial } from "./pod-material.model";
+import { PodPodMaterial } from "./pod-pod-material.model";
 
 interface MaterialCreationAttrs {
     name: string; 
@@ -52,5 +53,9 @@ export class Material extends Model<Material, MaterialCreationAttrs> {
 
     @BelongsToMany(() => PodMaterial, () => MatPodMat)
     podMaterials: PodMaterial[];
+
+    @HasMany(() => PodPodMaterial)
+    podPodMaterials: PodPodMaterial[]
+
 
 }    

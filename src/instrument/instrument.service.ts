@@ -118,11 +118,20 @@ export class InstrumentService {
             }
         }
 
+        await nameInstrument.save()
+
         if(Number(dto.parentId)) {
             const pInstrument = await this.pIReorository.findByPk(dto.parentId)
             if(pInstrument) {
                 await pInstrument.$add('nameInstrument', nameInstrument.id)
                 await pInstrument.save()
+            }
+        }
+        if(Number(dto.rootParentId)) {
+            const instrument = await this.instrReprository.findByPk(dto.rootParentId)
+            if(instrument) {
+                nameInstrument.rootParentId = instrument.id
+                await nameInstrument.save()
             }
         }
 

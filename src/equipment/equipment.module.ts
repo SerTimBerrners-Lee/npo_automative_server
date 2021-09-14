@@ -4,6 +4,8 @@ import { DocumentsEquipment } from 'src/documents/documents-equipment';
 import { Documents } from 'src/documents/documents.model';
 import { DocumentsModule } from 'src/documents/documents.module';
 import { DocumentsService } from 'src/documents/documents.service';
+import { InstrumentModule } from 'src/instrument/instrument.module';
+import { NameInstrument } from 'src/instrument/name-instrument.model';
 import { Providers } from 'src/provider/provider.model';
 import { ProvidersEquipment } from 'src/provider/providers-equipment.model';
 import { EquipmentPType } from './equipment-pt.model';
@@ -27,9 +29,11 @@ import { NodePTPEquipment } from './node_tpt_equipment.model';
             ProvidersEquipment,
             DocumentsEquipment,
             Documents,
-            Providers
+            Providers,
+            NameInstrument
         ]),
-        DocumentsModule
+        DocumentsModule,
+        InstrumentModule
     ],
     exports: [
         EquipmentModule

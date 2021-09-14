@@ -6,6 +6,9 @@ export class CreatePodPodMaterial {
     @ApiProperty({example: 'Лист', description: 'Запись значений'})
     readonly name: string;
 
+    @ApiProperty({example: 1, description: 'Родительский тип'})
+    readonly rootParentId: number;
+
     readonly docs: any;
     readonly density: string;
     @ApiProperty({example: 1, description: 'Id подтипа материала к которой принадлежит'})

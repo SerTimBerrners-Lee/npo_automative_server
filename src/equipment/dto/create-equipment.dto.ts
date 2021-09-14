@@ -9,5 +9,6 @@ export class CreateEquipmentDto {
     readonly docs: any;
 
     readonly providers: string;
-
+    readonly instrumentIdList: any;
+    readonly rootParentId: number;
 }

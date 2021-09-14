@@ -248,17 +248,8 @@ export class SettingsService {
         podPodMaterial.kolvo = []
 
         if(kolvo) {
-            Object.values(kolvo).forEach((ez, inx) => {
-                if(ez) 
-                    this.edizmReprository.findByPk(inx + 1).then((res) => {
-                        if(res) {
-                            if(!podPodMaterial.kolvo)
-                                podPodMaterial.kolvo = []
-                            podPodMaterial.kolvo.push(JSON.stringify(res))
-                        }
-                    })
-                    inx--
-            })
+            podPodMaterial.kolvo = JSON.stringify(kolvo)
+            await podPodMaterial.save()
         }
             
         if(deliveryTime && deliveryTime.edizm && deliveryTime.znach) 
@@ -348,6 +339,11 @@ export class SettingsService {
         if(!Number(dto.id)) {
             await podMaterials.$add('podPodMaterials', podPodMaterial.id)
             await podMaterials.save() 
+            if(dto.rootParentId) {
+                let material = await this.materialReprository.findByPk(dto.rootParentId)
+                if(material)
+                    podPodMaterial.materialsId = material.id
+            }
         }
         await podPodMaterial.save()
 

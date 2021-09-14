@@ -1,9 +1,12 @@
 import { ApiProperty } from "@nestjs/swagger";
-import { Model, Column, DataType, Table, BelongsToMany } from "sequelize-typescript";
+import { Model, Column, DataType, Table, BelongsToMany, ForeignKey, BelongsTo } from "sequelize-typescript";
 import { DocumentsInstrument } from "src/documents/documents-instrument.model";
 import { Documents } from "src/documents/documents.model";
+import { Equipment } from "src/equipment/equipment.model";
 import { ProvidersInstrument } from "src/provider/provider-instrument.dto";
 import { Providers } from "src/provider/provider.model";
+import { InstrumentEquipment } from "./instrument-equipment.model";
+import { Instrument } from "./instrument.model";
 import { NodeNamePtInstrument } from "./node-name-pt-instrument.mode";
 import { PInstrument } from "./pt-instrument.model";
 
@@ -50,6 +53,16 @@ export class NameInstrument extends Model<NameInstrument, NameInstrumentCreation
 
     @BelongsToMany(() => Documents, () => DocumentsInstrument)
     documents: Documents[];
+
+    @BelongsToMany(() => Equipment, () => InstrumentEquipment)
+    equipments: Equipment[];
+
+    @ForeignKey(() => Instrument)
+    @Column({type: DataType.INTEGER})
+    rootParentId: number;
+
+    @BelongsTo(() => Instrument)
+    instrumentType: Instrument;
 
     // После привязывать Поставщиков 
     // История изменений также прикрепляется сюда при изменении фала 

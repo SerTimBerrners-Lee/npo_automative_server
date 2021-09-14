@@ -10,5 +10,6 @@ export class UpdateEquipmentDto {
     readonly docs: any;
 
     readonly providers: string;
+    readonly instrumentIdList: any;
 
 }

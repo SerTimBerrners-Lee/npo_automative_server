@@ -5,6 +5,7 @@ import { Documents } from "src/documents/documents.model";
 import { ProvidersMaterial } from "src/provider/provider-material.model";
 import { Providers } from "src/provider/provider.model";
 import { Edizm } from "./edizm.model";
+import { Material } from "./material.model";
 import { NodePodPodMaterial } from "./node-pod-pod-material.model";
 import { PodMaterial } from "./pod-material.model";
 
@@ -42,8 +43,8 @@ export class PodPodMaterial extends Model<PodPodMaterial, PodPodMaterialCreation
     density: any
  
     @ApiProperty({example: '{edizmId: 10, znach: 2}', description: 'Срок поставки'})
-    @Column({type: DataType.ARRAY(DataType.STRING), allowNull: true})
-    kolvo: []; 
+    @Column({type: DataType.STRING, allowNull: true})
+    kolvo: any; 
 
     @ApiProperty({example: 'материал железо', description: 'Описание материала'})
     @Column({type: DataType.STRING, allowNull: true})
@@ -79,6 +80,14 @@ export class PodPodMaterial extends Model<PodPodMaterial, PodPodMaterialCreation
     
     @BelongsToMany(() => Providers, () => ProvidersMaterial)
     providers: Providers[];
+
+    @ForeignKey(() => Material)
+    @Column({type: DataType.INTEGER})
+    materialsId: number;
+
+    @BelongsTo(() => Material)
+    material: Material;
+
     // История изменений также прикрепляется сюда при изменении фала 
 
 }    
