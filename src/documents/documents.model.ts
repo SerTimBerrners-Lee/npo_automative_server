@@ -8,6 +8,8 @@ import { DocumentsProviders } from "./documents-providers.model";
 import { Providers } from "src/provider/provider.model";
 import { Equipment } from "src/equipment/equipment.model";
 import { DocumentsEquipment } from "./documents-equipment";
+import { Detal } from "src/detal/detal.model";
+import { DocumentsDetal } from "./documents-detal.model";
 
 interface DocumentsCreationAttrs {
     name: string; 
@@ -59,4 +61,7 @@ export class Documents extends Model<Documents, DocumentsCreationAttrs> {
 
     @BelongsToMany(() => Equipment, () => DocumentsEquipment)
     equipments: Equipment[];
+
+    @BelongsToMany(() => Detal, () => DocumentsDetal)
+    detals: Detal[]
 }

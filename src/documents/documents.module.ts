@@ -1,5 +1,6 @@
 import { forwardRef, Module } from '@nestjs/common';
 import { SequelizeModule } from '@nestjs/sequelize';
+import { Detal } from 'src/detal/detal.model';
 import { Equipment } from 'src/equipment/equipment.model';
 import { Providers } from 'src/provider/provider.model';
 import { PodPodMaterial } from 'src/settings/pod-pod-material.model';
@@ -27,7 +28,8 @@ import { DocumentsService } from './documents.service';
             DocumentsProviders,
             DocumentsInstrument,
             DocumentsEquipment,
-            Equipment
+            Equipment,
+            Detal
         ]),
         forwardRef(() => UsersModule),
         

@@ -45,6 +45,10 @@ import { NodeEqPTEq } from "./equipment/node-eqpt-eq.model";
 import { ProvidersEquipment } from "./provider/providers-equipment.model";
 import { DocumentsEquipment } from "./documents/documents-equipment";
 import { InstrumentEquipment } from "./instrument/instrument-equipment.model";
+import { DetalModule } from './detal/detal.module';
+import { Detal } from "./detal/detal.model";
+import { DocumentsDetal } from "./documents/documents-detal.model";
+import { DetalMaterials } from "./detal/detal-materials.model";
 
 @Module({
     controllers: [],
@@ -95,7 +99,10 @@ import { InstrumentEquipment } from "./instrument/instrument-equipment.model";
                 Equipment,
                 ProvidersEquipment,
                 DocumentsEquipment,
-                InstrumentEquipment
+                InstrumentEquipment,
+                Detal,
+                DocumentsDetal,
+                DetalMaterials
             ],
             autoLoadModels: true,
           }),
@@ -110,6 +117,7 @@ import { InstrumentEquipment } from "./instrument/instrument-equipment.model";
         ProviderModule,
         InstrumentModule,
         EquipmentModule,
+        DetalModule,
     ]
 })
 
