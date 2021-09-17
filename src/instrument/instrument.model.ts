@@ -6,6 +6,7 @@ import { PInstrument } from "./pt-instrument.model";
 
 interface InstrumentCreationAttrs {
     name: string; 
+    instans: number;
 }
 
 @Table({tableName: 'instrument', createdAt: false, updatedAt: false})
@@ -17,6 +18,9 @@ export class Instrument extends Model<Instrument, InstrumentCreationAttrs> {
 
     @Column({type: DataType.STRING, allowNull: false})
     name: string;    
+
+    @Column({type: DataType.INTEGER, defaultValue: 1})
+    instans: number;
 
     @BelongsToMany(() => PInstrument, () => NodePtTInstrument)
     pInstruments: PInstrument[];

@@ -36,6 +36,14 @@ export class Detal extends Model<Detal, DetalCreationAttrs> {
     @Column({type: DataType.STRING, allowNull: true})
     description: string; 
 
+    @ApiProperty({example: 12, description: 'Срок поставки'})
+    @Column({type: DataType.TEXT, allowNull: true})
+    parametrs: any; 
+
+    @ApiProperty({example: 12, description: 'Срок поставки'})
+    @Column({type: DataType.TEXT, allowNull: true})
+    haracteriatic: any;
+
     @BelongsToMany(() => Documents, () => DocumentsDetal)
     documents: Documents[];
 

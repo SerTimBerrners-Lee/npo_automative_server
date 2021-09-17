@@ -25,7 +25,7 @@ export class InstrumentService {
     ) {}
 
     async createInstrument(dto: CreateInstrumentDto) {
-        const instr = await this.instrReprository.create({name: dto.name})
+        const instr = await this.instrReprository.create({name: dto.name, instans: dto.instans})
         if(!instr)
            throw new HttpException('Произошла ошибка придобавлении', HttpStatus.BAD_REQUEST)
 
@@ -51,6 +51,7 @@ export class InstrumentService {
         if(!instrument)
             throw new HttpException('Запись не найдена', HttpStatus.NOT_FOUND)
         instrument.name = dto.name
+        instrument.instans = dto.instans
         await instrument.save()
         return instrument
     }
