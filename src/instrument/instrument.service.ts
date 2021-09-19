@@ -90,10 +90,14 @@ export class InstrumentService {
         return pInstrument
     }
 
-    async getAllPTInstrument(id: number) {
+    async getPTInstrumentById(id: number) {
         const pInstrument = await this.pIReorository.findByPk(id, {include: {all: true}})
         if(pInstrument)
             return pInstrument
+    }
+
+    async getAllPInstrument() {
+        return await this.pIReorository.findAll({include: {all: true}})
     }
 
     async createNameInstrument(dto: CreateNameInstrumentDto, files: any) {
@@ -233,5 +237,9 @@ export class InstrumentService {
             nameInstrument.ban = !nameInstrument.ban
             await nameInstrument.save()
         }
+    }
+
+    async getAllNameInstrument() {
+        return await this.nameInastrumentReprository.findAll({include: {all: true}})
     }
 }

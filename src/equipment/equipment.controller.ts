@@ -46,6 +46,12 @@ export class EquipmentController {
         return this.equipmentService.getOneEquipmentPType(id)
     }
 
+    @ApiOperation({summary: 'Получение всех подтипов'})
+    @Get('/pt')
+    getAllEquipmentPType() {
+        return this.equipmentService.getAllEquipmentPType()
+    }
+
     @ApiOperation({summary: 'Обновление подтипа '})
     @Post('/pt/update')
     updateEquipmentPType(@Body() dto: any) {
@@ -93,5 +99,11 @@ export class EquipmentController {
     banEquipment(@Param('id') id: number) {
         return this.equipmentService.banEquipment(id) 
     } 
+
+    @ApiOperation({summary: 'Получение всех подтипов'})
+    @Get('/eq')
+    getAllEquipment() {
+        return this.equipmentService.getAllEquipment()
+    }
 
 }

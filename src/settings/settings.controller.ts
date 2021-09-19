@@ -138,4 +138,10 @@ export class SettingsController {
     getOnePPT(@Param('id') id: number) {
         return this.settingsService.getOnePPT(id)
     }
+
+    @ApiOperation({summary: 'Получаем все Полдтип материала со всеми полями'})
+    @Get('/material/podpodtype/')
+    getAllPPT() {
+        return this.settingsService.getAllPPT()
+    }
 } 

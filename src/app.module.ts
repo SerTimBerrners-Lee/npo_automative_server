@@ -49,6 +49,11 @@ import { DetalModule } from './detal/detal.module';
 import { Detal } from "./detal/detal.model";
 import { DocumentsDetal } from "./documents/documents-detal.model";
 import { DetalMaterials } from "./detal/detal-materials.model";
+import { Operation } from "./detal/operation.model";
+import { OperationEq } from "./detal/operation-equipment.model";
+import { OperationMaterial } from "./detal/operation-material.model";
+import { DocumentsOperation } from "./documents/dociments-operation.model";
+import { InstrumentOperation } from "./instrument/instrument-operation.model";
 
 @Module({
     controllers: [],
@@ -102,7 +107,12 @@ import { DetalMaterials } from "./detal/detal-materials.model";
                 InstrumentEquipment,
                 Detal,
                 DocumentsDetal,
-                DetalMaterials
+                DetalMaterials,
+                Operation,
+                OperationEq,
+                OperationMaterial,
+                DocumentsOperation,
+                InstrumentOperation
             ],
             autoLoadModels: true,
           }),

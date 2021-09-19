@@ -1,5 +1,6 @@
 import { Module } from '@nestjs/common';
 import { SequelizeModule } from '@nestjs/sequelize';
+import { Operation } from 'src/detal/operation.model';
 import { DocumentsEquipment } from 'src/documents/documents-equipment';
 import { Documents } from 'src/documents/documents.model';
 import { DocumentsModule } from 'src/documents/documents.module';
@@ -30,7 +31,8 @@ import { NodePTPEquipment } from './node_tpt_equipment.model';
             DocumentsEquipment,
             Documents,
             Providers,
-            NameInstrument
+            NameInstrument,
+            Operation
         ]),
         DocumentsModule,
         InstrumentModule

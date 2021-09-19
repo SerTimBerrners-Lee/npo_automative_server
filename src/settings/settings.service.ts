@@ -413,4 +413,8 @@ export class SettingsService {
         if(PPM)
             return PPM
     }
+
+    async getAllPPT() {
+        return await this.podPodMaterialReprository.findAll()
+    }
 }

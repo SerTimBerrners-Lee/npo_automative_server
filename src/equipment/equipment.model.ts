@@ -1,5 +1,7 @@
 import { ApiProperty } from "@nestjs/swagger";
 import { Model, Column, DataType, Table, BelongsToMany, ForeignKey, BelongsTo } from "sequelize-typescript";
+import { OperationEq } from "src/detal/operation-equipment.model";
+import { Operation } from "src/detal/operation.model";
 import { DocumentsEquipment } from "src/documents/documents-equipment";
 import { DocumentsInstrument } from "src/documents/documents-instrument.model";
 import { Documents } from "src/documents/documents.model";
@@ -66,5 +68,8 @@ export class Equipment extends Model<Equipment, EquipmentCreationAttrs> {
     @BelongsTo(() => EquipmentType)
     equipmentType: EquipmentType;
     // История изменений также прикрепляется сюда при изменении фала 
+
+    @BelongsToMany(() => Operation, () => OperationEq)
+    operation: Operation[]
 
 }     

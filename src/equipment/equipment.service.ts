@@ -13,13 +13,14 @@ import { EquipmentType } from './euipment-type.model';
 @Injectable()
 export class EquipmentService {
 
-    constructor(@InjectModel(EquipmentType) private equipmentTypeReprository: typeof EquipmentType,
-    @InjectModel(EquipmentPType) private equipemtnPTReprository: typeof EquipmentPType,
-    @InjectModel(Equipment) private equipmentReprository: typeof Equipment,
-    @InjectModel(Documents) private documentsReprository: typeof Documents,
-    @InjectModel(Providers) private providersReprository: typeof Providers,
-    @InjectModel(NameInstrument) private nameInstrumentReprository: typeof NameInstrument,
-    private documentsService: DocumentsService,
+    constructor(
+        @InjectModel(EquipmentType) private equipmentTypeReprository: typeof EquipmentType,
+        @InjectModel(EquipmentPType) private equipemtnPTReprository: typeof EquipmentPType,
+        @InjectModel(Equipment) private equipmentReprository: typeof Equipment,
+        @InjectModel(Documents) private documentsReprository: typeof Documents,
+        @InjectModel(Providers) private providersReprository: typeof Providers,
+        @InjectModel(NameInstrument) private nameInstrumentReprository: typeof NameInstrument,
+        private documentsService: DocumentsService, 
     ) {}
 
     async createEquipmentType(dto: any) {
@@ -92,6 +93,10 @@ export class EquipmentService {
             return equipmentPT
     }
 
+    async getAllEquipmentPType() {
+        return await this.equipemtnPTReprository.findAll({include: {all: true}})
+    }
+
     async createEquipment(dto: CreateEquipmentDto, files: any) {
         const equipment = await this.equipmentReprository.create({name: dto.name })
         if(!equipment)
@@ -107,6 +112,7 @@ export class EquipmentService {
             equipment.responsible = dto.responsible
         
         await equipment.save()
+
         if(dto.providers) {
             let providers = JSON.parse(dto.providers)
             for(let prx of providers) {
@@ -124,6 +130,7 @@ export class EquipmentService {
                 await equipmentPT.save()
             }
         }
+
         if(Number(dto.rootParentId)) {
             const equipmentType = await this.equipmentTypeReprository.findByPk(dto.rootParentId)
             if(equipmentType) {
@@ -132,7 +139,10 @@ export class EquipmentService {
             }
         }
 
-        let instrumentIdList = JSON.parse(dto.instrumentIdList).instrumentListId
+        let instrumentIdList: any
+        
+        if(dto.instrumentIdList)
+            instrumentIdList = JSON.parse(dto.instrumentIdList)
         if(instrumentIdList && instrumentIdList.length > 0) {
             for(let inst of instrumentIdList) {
                 let nameInstrument = await this.nameInstrumentReprository.findByPk(inst)
@@ -170,7 +180,6 @@ export class EquipmentService {
 
     async updateEquipmqnt(dto: UpdateEquipmentDto, files: any) {
         const equipment = await this.equipmentReprository.findByPk(dto.id, {include: {all: true}})
-        console.info(dto)
         if(!equipment)
             throw new HttpException('Произошла ошибка при добавлении', HttpStatus.BAD_REQUEST)
         
@@ -205,7 +214,7 @@ export class EquipmentService {
         }
 
         if(dto.instrumentIdList)
-            instrumentIdList = JSON.parse(dto.instrumentIdList).instrumentListId
+            instrumentIdList = JSON.parse(dto.instrumentIdList)
         if(instrumentIdList && instrumentIdList.length > 0) {
             for(let inst of instrumentIdList) {
                 let nameInstrument = await this.nameInstrumentReprository.findByPk(inst)
@@ -259,5 +268,9 @@ export class EquipmentService {
             equipment.ban = !equipment.ban
             await equipment.save()
         }
+    }
+
+    async getAllEquipment() {
+        return await this.equipmentReprository.findAll()
     }
 } 

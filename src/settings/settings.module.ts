@@ -1,5 +1,6 @@
 import { Module } from '@nestjs/common';
 import { SequelizeModule } from '@nestjs/sequelize';
+import { Operation } from 'src/detal/operation.model';
 import { DocumentsMaterial } from 'src/documents/documents-material.model';
 import { Documents } from 'src/documents/documents.model';
 import { DocumentsModule } from 'src/documents/documents.module';
@@ -25,7 +26,8 @@ import { TypeEdizm } from './type-edizm.model';
       Material, PodMaterial, 
       MatPodMat, PodPodMaterial,
       NodePodPodMaterial, DocumentsMaterial, Documents,
-      ProvidersMaterial, Providers
+      ProvidersMaterial, Providers,
+      Operation
     ]),
     DocumentsModule
   ],

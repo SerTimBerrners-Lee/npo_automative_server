@@ -59,8 +59,14 @@ export class InstrumentController {
 
     @ApiOperation({summary: 'Получить все подтипы '})
     @Get('/pt/:id')
-    getAllPTInstrument(@Param('id') id: number) {
-        return this.instrumentService.getAllPTInstrument(id)
+    getPTInstrumentById(@Param('id') id: number) {
+        return this.instrumentService.getPTInstrumentById(id)
+    }
+
+    @ApiOperation({summary: 'Получить все подтипы'})
+    @Get('/pt')
+    getAllPInstrument() {
+        return this.instrumentService.getAllPInstrument()
     }
 
     @ApiOperation({summary: 'Создаем наименование инструмента или оснастки'})
@@ -97,4 +103,10 @@ export class InstrumentController {
     banNameInstrument(@Param('id') id: number) {
         return this.instrumentService.banNameInstrument(id)
     } 
+
+    @ApiOperation({summary: 'Получить все наименования инструментов'})
+    @Get('/nameinstrument')
+    getAllNameInstrument() {
+        return this.instrumentService.getAllNameInstrument()
+    }
 }

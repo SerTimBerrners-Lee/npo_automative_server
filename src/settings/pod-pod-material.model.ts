@@ -2,6 +2,8 @@ import { ApiProperty } from "@nestjs/swagger";
 import { Model, Column, DataType, Table, BelongsTo, ForeignKey, BelongsToMany, HasMany } from "sequelize-typescript";
 import { DetalMaterials } from "src/detal/detal-materials.model";
 import { Detal } from "src/detal/detal.model";
+import { OperationMaterial } from "src/detal/operation-material.model";
+import { Operation } from "src/detal/operation.model";
 import { DocumentsMaterial } from "src/documents/documents-material.model";
 import { Documents } from "src/documents/documents.model";
 import { ProvidersMaterial } from "src/provider/provider-material.model";
@@ -92,6 +94,9 @@ export class PodPodMaterial extends Model<PodPodMaterial, PodPodMaterialCreation
 
     @BelongsToMany(() => Detal, () => DetalMaterials)
     detals: Detal[];
+
+    @BelongsToMany(() => Operation, () => OperationMaterial)
+    operation: Operation[]
 
     // История изменений также прикрепляется сюда при изменении фала 
 
