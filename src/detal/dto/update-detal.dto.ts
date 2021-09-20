@@ -1,5 +1,4 @@
-
-export class CreateDetalDto {
+export class UpdateDetalDto {
     readonly name:              string;
     readonly articl:            string;
     readonly responsible:       string;
@@ -14,4 +13,5 @@ export class CreateDetalDto {
     readonly materialList:      string;
     readonly docs:              any;
     readonly techProcessID:     number;
+    readonly id:                number;
 }

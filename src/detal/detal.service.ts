@@ -10,6 +10,7 @@ import { Detal } from './detal.model';
 import { CreateDetalDto } from './dto/create-detal.dto';
 import { UpCreateTechProcessDto } from './dto/up-create-tech-process.dto';
 import { UpCreateOperationDto } from './dto/update-create-operation.dto';
+import { UpdateDetalDto } from './dto/update-detal.dto';
 import { UpOperationTechDto } from './dto/update-operation-tech.dto';
 import { Operation } from './operation.model';
 import { TechProcess } from './tech-process.model';
@@ -35,8 +36,24 @@ export class DetalService {
         if(!detal)
             throw new HttpException('Не удалось создать деталь', HttpStatus.BAD_REQUEST)
 
-        if(dto.atricl)
-            detal.atricl = dto.atricl
+        return await this.upCreateDetal(dto, files, detal)
+    }
+
+    async updateDetal(dto: UpdateDetalDto, files: any) {
+        const detal = await this.detalReprository.findByPk(dto.id)
+        if(!detal)
+            throw new HttpException('Не удалось создать деталь', HttpStatus.BAD_REQUEST)
+        
+        detal.name = dto.name
+        await detal.save()
+        console.log(dto)
+        return await this.upCreateDetal(dto, files, detal)
+    }
+
+    private async upCreateDetal(dto: any, files: any, detal: any) {
+
+        if(dto.articl)
+            detal.articl = dto.articl
         if(dto.responsible)
             detal.responsible = dto.responsible
         if(dto.description)
@@ -75,6 +92,7 @@ export class DetalService {
 
         if(dto.materialList) {
             const mList = JSON.parse(dto.materialList)
+            detal.materialList = dto.materialList
             if(mList.length) {
                 for(let m = 0; m < mList.length; m++) {
                     let material = await this.podPodMaterialReprository.findByPk(mList[m].mat.id)
@@ -86,8 +104,6 @@ export class DetalService {
             }
         }
 
-
-        // Добавит Технологический процесс 
         if(Number(dto.techProcessID)) {
             const tp = await this.techProcessReprository.findByPk(dto.techProcessID)
             if(tp) {
@@ -111,13 +127,15 @@ export class DetalService {
                 if(res.id) {
                     let docId = await this.documentsReprository.findByPk(res.id)
                     await detal.$add('documents', docId.id)
+                    await detal.save()
                 }
                 i++
             }
         }
 
+        await detal.save()
         return detal
-    }
+    } 
 
     async createNewOperation(dto: UpCreateOperationDto, files: any) {
         const operation = await this.operationReprository.create({name: dto.name})
@@ -191,7 +209,7 @@ export class DetalService {
                     }
                 }
                 operation.instrumentMerList = dto.instrumentMerList
-            }
+            } 
         }
 
         operation.instrumentOsnList = null

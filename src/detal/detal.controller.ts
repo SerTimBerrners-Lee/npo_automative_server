@@ -5,6 +5,7 @@ import { DetalService } from './detal.service';
 import { CreateDetalDto } from './dto/create-detal.dto';
 import { UpCreateTechProcessDto } from './dto/up-create-tech-process.dto';
 import { UpCreateOperationDto } from './dto/update-create-operation.dto';
+import { UpdateDetalDto } from './dto/update-detal.dto';
 import { UpOperationTechDto } from './dto/update-operation-tech.dto';
 
 @Controller('detal')
@@ -21,6 +22,16 @@ export class DetalController {
         return this.detalService.createNewDetal(dto, files)
     }
 
+    @ApiOperation({summary: 'Обновляем деталь'})
+    @UseInterceptors(FileFieldsInterceptor([
+        {name: 'document', maxCount: 40}
+    ]))
+    @Post('/update')
+    updateDetal(@Body() dto: UpdateDetalDto, 
+        @UploadedFiles() files: { document?: Express.Multer.File[]} ) {
+        return this.detalService.updateDetal(dto, files)
+    }
+ 
     @ApiOperation({summary: 'Get All Detals '})
     @Get('/')
     getAllDetals() {

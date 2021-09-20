@@ -28,7 +28,7 @@ export class Detal extends Model<Detal, DetalCreationAttrs> {
 
     @ApiProperty({example: 12, description: 'Срок поставки'})
     @Column({type: DataType.STRING, allowNull: true})
-    atricl: string; 
+    articl: string; 
 
     @ApiProperty({example: 12, description: 'Срок поставки'})
     @Column({type: DataType.STRING, allowNull: true})
@@ -57,6 +57,10 @@ export class Detal extends Model<Detal, DetalCreationAttrs> {
     @ApiProperty({example: 12, description: 'Срок поставки'})
     @Column({type: DataType.STRING, allowNull: true})
     trash: any;
+
+    @ApiProperty({example: 12, description: 'Срок поставки'})
+    @Column({type: DataType.TEXT, allowNull: true})
+    materialList: any;
 
     @BelongsToMany(() => Documents, () => DocumentsDetal)
     documents: Documents[];
