@@ -63,19 +63,26 @@ export class Operation extends Model<Operation, OperationCreationAttrs> {
     @ApiProperty({example: '1', description: 'Описание операции'})
     @Column({type: DataType.TEXT, defaultValue: ''})
     instrumentList: string; 
+    
+    @Column({type: DataType.INTEGER, defaultValue: null})
+    instrumentID: number;
 
     @ApiProperty({example: '1', description: 'Описание операции'})
     @Column({type: DataType.TEXT, defaultValue: ''})
     instrumentMerList: string; 
+    @Column({type: DataType.INTEGER, defaultValue: null})
+    instrumentMerID: number;
+
 
     @ApiProperty({example: '1', description: 'Описание операции'})
     @Column({type: DataType.TEXT, defaultValue: ''})
     instrumentOsnList: string; 
+    @Column({type: DataType.INTEGER, defaultValue: null})
+    instrumentOsnID: number;
 
     @ApiProperty({example: '1', description: 'Описание операции'})
     @Column({type: DataType.TEXT, defaultValue: ''})
     eqList: string; 
-
-
-    
+    @Column({type: DataType.INTEGER, defaultValue: null})
+    eqID: number;
 }     

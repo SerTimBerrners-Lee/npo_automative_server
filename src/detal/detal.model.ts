@@ -1,10 +1,11 @@
 import { ApiProperty } from "@nestjs/swagger";
-import { Model, Column, DataType, Table, BelongsToMany } from "sequelize-typescript";
+import { Model, Column, DataType, Table, BelongsToMany, HasMany } from "sequelize-typescript";
 import { DocumentsOperation } from "src/documents/dociments-operation.model";
 import { DocumentsDetal } from "src/documents/documents-detal.model";
 import { Documents } from "src/documents/documents.model";
 import { PodPodMaterial } from "src/settings/pod-pod-material.model";
 import { DetalMaterials } from "./detal-materials.model";
+import { TechProcess } from "./tech-process.model";
 
 interface DetalCreationAttrs {
     name: string;
@@ -68,4 +69,7 @@ export class Detal extends Model<Detal, DetalCreationAttrs> {
     mat_zag: number;
     @Column({type: DataType.INTEGER, allowNull: true})
     mat_zag_zam: number;
+
+    @HasMany(() => TechProcess)
+    techProcesses: TechProcess[];
 }     

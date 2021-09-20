@@ -12,7 +12,9 @@ import { Detal } from './detal.model';
 import { DetalService } from './detal.service';
 import { OperationEq } from './operation-equipment.model';
 import { OperationMaterial } from './operation-material.model';
+import { OperationTechProcess } from './operation-tech-process.model';
 import { Operation } from './operation.model';
+import { TechProcess } from './tech-process.model';
 
 @Module({
     controllers: [DetalController],
@@ -26,7 +28,9 @@ import { Operation } from './operation.model';
             Equipment,
             Operation,
             OperationEq,
-            NameInstrument
+            NameInstrument,
+            TechProcess,
+            OperationTechProcess
         ]),
         DocumentsModule
     ],

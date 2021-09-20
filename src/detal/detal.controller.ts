@@ -1,9 +1,11 @@
-import { Body, Controller, Post, UploadedFiles, UseInterceptors } from '@nestjs/common';
+import { Body, Controller, Delete, Get, Param, Post, UploadedFiles, UseInterceptors } from '@nestjs/common';
 import { FileFieldsInterceptor } from '@nestjs/platform-express';
 import { ApiOperation } from '@nestjs/swagger';
 import { DetalService } from './detal.service';
 import { CreateDetalDto } from './dto/create-detal.dto';
-import { CreateOperationDto } from './dto/create-operation.dto';
+import { UpCreateTechProcessDto } from './dto/up-create-tech-process.dto';
+import { UpCreateOperationDto } from './dto/update-create-operation.dto';
+import { UpOperationTechDto } from './dto/update-operation-tech.dto';
 
 @Controller('detal')
 export class DetalController {
@@ -19,13 +21,64 @@ export class DetalController {
         return this.detalService.createNewDetal(dto, files)
     }
 
-    @ApiOperation({summary: 'Создаем деталь'})
+    @ApiOperation({summary: 'Get All Detals '})
+    @Get('/')
+    getAllDetals() {
+        return this.detalService.getAllDetals()
+    }
+
+    @ApiOperation({summary: 'Создаем операцию'})
     @UseInterceptors(FileFieldsInterceptor([
         {name: 'document', maxCount: 40}
     ]))
     @Post('/operation')
-    createNewOperation(@Body() dto: CreateOperationDto, 
+    createNewOperation(@Body() dto: UpCreateOperationDto, 
         @UploadedFiles() files: { document?: Express.Multer.File[]} ) {
         return this.detalService.createNewOperation(dto, files)
     }
+
+    @ApiOperation({summary: 'Обновляем операцию'})
+    @UseInterceptors(FileFieldsInterceptor([
+        {name: 'document', maxCount: 40}
+    ]))
+    @Post('/operation/update')
+    updateOperation(@Body() dto: UpCreateOperationDto, 
+        @UploadedFiles() files: { document?: Express.Multer.File[]} ) {
+        return this.detalService.updateOperation(dto, files)
+    }
+
+    @ApiOperation({summary: 'Получаем операцию по ID'})
+    @Get('/operation/get/:id')
+    getOneOperationById(@Param('id') id: number) {
+        return this.detalService.getOneOperationById(id)
+    }
+
+    @ApiOperation({summary: 'Обновляем основной инструмент и оборудование'})
+    @Post('/operation/up/tech')
+    updateOperationTech(@Body() dto: UpOperationTechDto) {
+        return this.detalService.updateOperationTech(dto)
+    }
+
+    @ApiOperation({summary: 'Добавляем в бан операцию'})
+    @Delete('/operation/:id')
+    banOperation(@Param('id') id: number) {
+        return this.detalService.banOperation(id)
+    }
+
+    @ApiOperation({summary: 'Создаем Технический процесс'})
+    @UseInterceptors(FileFieldsInterceptor([
+        {name: 'document', maxCount: 40}
+    ]))
+    @Post('/techprocess')
+    createNewTechProcess(@Body() dto: UpCreateTechProcessDto, 
+        @UploadedFiles() files: { document?: Express.Multer.File[]} ) {
+        return this.detalService.createNewTechProcess(dto, files)
+    }
+
+    @ApiOperation({summary: 'Получить технологический процесс по id'})
+    @Get('/techprocess/:id')
+    getTechProcessById(@Param('id') id: number){
+        return this.detalService.getTechProcessById(id)
+    }
+
 }

@@ -54,6 +54,9 @@ import { OperationEq } from "./detal/operation-equipment.model";
 import { OperationMaterial } from "./detal/operation-material.model";
 import { DocumentsOperation } from "./documents/dociments-operation.model";
 import { InstrumentOperation } from "./instrument/instrument-operation.model";
+import { TechProcess } from "./detal/tech-process.model";
+import { DocumentsTechProcess } from "./documents/documents-tech-process.model";
+import { OperationTechProcess } from "./detal/operation-tech-process.model";
 
 @Module({
     controllers: [],
@@ -112,7 +115,10 @@ import { InstrumentOperation } from "./instrument/instrument-operation.model";
                 OperationEq,
                 OperationMaterial,
                 DocumentsOperation,
-                InstrumentOperation
+                InstrumentOperation,
+                TechProcess,
+                DocumentsTechProcess,
+                OperationTechProcess
             ],
             autoLoadModels: true,
           }),

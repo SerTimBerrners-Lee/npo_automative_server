@@ -64,7 +64,4 @@ export class NameInstrument extends Model<NameInstrument, NameInstrumentCreation
     @BelongsTo(() => Instrument)
     instrumentType: Instrument;
 
-    // После привязывать Поставщиков 
-    // История изменений также прикрепляется сюда при изменении фала 
-
 }    

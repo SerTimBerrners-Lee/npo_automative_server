@@ -13,4 +13,5 @@ export class CreateDetalDto {
     readonly mat_zag_zam:       number;
     readonly materialList:      string;
     readonly docs:              any;
+    readonly techProcessID:     number;
 }
