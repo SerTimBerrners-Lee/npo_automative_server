@@ -31,6 +31,12 @@ export class DetalController {
         @UploadedFiles() files: { document?: Express.Multer.File[]} ) {
         return this.detalService.updateDetal(dto, files)
     }
+
+    @ApiOperation({summary: 'Remove detal by id '})
+    @Delete('/:id')
+    removeDeleteById(@Param('id') id: number) {
+        return this.detalService.removeDeleteById(id)
+    }
  
     @ApiOperation({summary: 'Get All Detals '})
     @Get('/')

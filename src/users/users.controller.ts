@@ -17,7 +17,7 @@ import { ValidationPipe } from 'src/pipes/validation.pipe';
 import { FileFieldsInterceptor } from '@nestjs/platform-express';
 import _ from 'lodash'; 
 
-@ApiTags('Пользователи')
+@ApiTags('Пользователи') 
 @Controller('users')
 export class UsersController { 
 
@@ -37,6 +37,19 @@ export class UsersController {
         @UploadedFiles() files: { image?: Express.Multer.File[], document?: Express.Multer.File[] }
     ) {
         return this.userService.createUser(userDto, files);
+    }
+
+    @ApiOperation({summary: 'Обновление пользователя'})
+    @Post('/update')
+    @UseInterceptors(FileFieldsInterceptor([
+        {name: 'image', maxCount: 1},
+        {name: 'document', maxCount: 20}
+    ]))
+    updateUser(
+        @Body() userDto: CreateUserDto, 
+        @UploadedFiles() files: { image?: Express.Multer.File[], document?: Express.Multer.File[] }
+    ) {
+        return this.userService.updateUser(userDto, files);
     }
 
     @ApiOperation({summary: 'Получение всех пользователей'})

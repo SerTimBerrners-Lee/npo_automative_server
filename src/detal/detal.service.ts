@@ -35,18 +35,31 @@ export class DetalService {
         const detal = await this.detalReprository.create({name: dto.name})
         if(!detal)
             throw new HttpException('Не удалось создать деталь', HttpStatus.BAD_REQUEST)
-
+        console.log(dto)
+        console.log(files)
         return await this.upCreateDetal(dto, files, detal)
+    }
+    
+    async removeDeleteById(id: number) {
+        const detal = await this.detalReprository.findByPk(id)
+        if(!detal) 
+            throw new HttpException('Не удалось обновить деталь', HttpStatus.BAD_REQUEST)
+            
+        detal.ban = !detal.ban
+        await detal.save()
+        return detal
     }
 
     async updateDetal(dto: UpdateDetalDto, files: any) {
         const detal = await this.detalReprository.findByPk(dto.id)
         if(!detal)
-            throw new HttpException('Не удалось создать деталь', HttpStatus.BAD_REQUEST)
+            throw new HttpException('Не удалосьм обновить деталь', HttpStatus.BAD_REQUEST)
+
+        console.log(dto)
+        console.log(files)
         
         detal.name = dto.name
         await detal.save()
-        console.log(dto)
         return await this.upCreateDetal(dto, files, detal)
     }
 

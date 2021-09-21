@@ -3,6 +3,9 @@ import { IsString, Length, IsEmail } from "class-validator";
 
 export class CreateUserDto {
 
+    @ApiProperty({example: 1, description: 'Обновление пользователя'})
+    readonly id: number; 
+
     @ApiProperty({example: 'user@mail.ru', description: 'Почта'})
     readonly email: string;
     @ApiProperty({example: '12345678', description: 'Пароль'})
