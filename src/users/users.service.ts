@@ -126,6 +126,11 @@ export class UsersService {
         return user;
     }
 
+    async getUserByLogin(login: string) {
+        const user = await this.userRepository.findOne({where: {login}, include: {all:true}})
+        return user
+    }
+
     async addRole(dto: AddRoleDto) {
         const user = await this.userRepository.findByPk(dto.userId);
         const role = await this.rolesService.getRoleByValue(dto.value);

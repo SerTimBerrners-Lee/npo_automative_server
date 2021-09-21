@@ -15,7 +15,7 @@ export class DetalController {
     @ApiOperation({summary: 'Создаем деталь'})
     @UseInterceptors(FileFieldsInterceptor([
         {name: 'document', maxCount: 40}
-    ]))
+    ])) 
     @Post('/')
     createNewDetal(@Body() dto: CreateDetalDto, 
         @UploadedFiles() files: { document?: Express.Multer.File[]} ) {
@@ -36,6 +36,12 @@ export class DetalController {
     @Delete('/:id')
     removeDeleteById(@Param('id') id: number) {
         return this.detalService.removeDeleteById(id)
+    }
+
+    @ApiOperation({summary: 'Get detal by id '})
+    @Get('/:id')
+    getDeleteById(@Param('id') id: number) {
+        return this.detalService.getDeleteById(id)
     }
  
     @ApiOperation({summary: 'Get All Detals '})

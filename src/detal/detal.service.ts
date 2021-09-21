@@ -25,7 +25,7 @@ export class DetalService {
         @InjectModel(Equipment) private equipmentReprository: typeof Equipment,
         @InjectModel(TechProcess) private techProcessReprository: typeof TechProcess,
         private documentsService: DocumentsService
-    ) {}
+    ) {} 
 
     async getAllDetals() {
         return await this.detalReprository.findAll({include: {all: true}})
@@ -47,6 +47,14 @@ export class DetalService {
             
         detal.ban = !detal.ban
         await detal.save()
+        return detal
+    }
+
+    async getDeleteById(id:number) {
+        const detal = await this.detalReprository.findByPk(id, {include: {all: true}})
+        if(!detal) 
+            throw new HttpException('Не удалось обновить деталь', HttpStatus.BAD_REQUEST)
+            
         return detal
     }
 
