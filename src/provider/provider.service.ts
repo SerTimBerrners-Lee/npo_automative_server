@@ -2,6 +2,7 @@ import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
 import { InjectModel } from '@nestjs/sequelize';
 import { Documents } from 'src/documents/documents.model';
 import { DocumentsService } from 'src/documents/documents.service';
+import { PodPodMaterial } from 'src/settings/pod-pod-material.model';
 import { CreateProviderDto } from './dto/create-provider.dto';
 import { Providers } from './provider.model';
 
@@ -9,6 +10,7 @@ import { Providers } from './provider.model';
 export class ProviderService {
     constructor(@InjectModel(Providers) private providersReprository: typeof Providers,
             @InjectModel(Documents) private documentsReprository: typeof Documents,
+            @InjectModel(PodPodMaterial) private podPodMaterialReprository: typeof PodPodMaterial,
             private documentService: DocumentsService
     ) {}
 
@@ -23,7 +25,6 @@ export class ProviderService {
             throw new HttpException('Произошла ошибка при добавлении пользователя', HttpStatus.NOT_FOUND)
 
         console.log(dto)
-        console.log(providers)
 
         if(dto.name)
             providers.name = dto.name
@@ -43,6 +44,8 @@ export class ProviderService {
         if(dto.description) 
             providers.description = dto.description 
         
+        await providers.save()
+        
         if(dto.docs) {
             let docs: any = Object.values(JSON.parse(dto.docs))
             let i = 0
@@ -60,6 +63,17 @@ export class ProviderService {
                     await providers.$add('documents', docId.id)
                 }
                 i++
+            }
+        }
+        
+        if(dto.materialList) {
+            let mat = JSON.parse(dto.materialList)
+            if(mat.length) {
+                for(let m of mat) {
+                    let check = await this.podPodMaterialReprository.findByPk(m)
+                    if(check) 
+                        await providers.$add('materials', check.id)
+                }
             }
         }
 

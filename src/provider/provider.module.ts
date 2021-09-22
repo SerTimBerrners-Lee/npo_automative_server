@@ -3,6 +3,7 @@ import { SequelizeModule } from '@nestjs/sequelize';
 import { DocumentsProviders } from 'src/documents/documents-providers.model';
 import { Documents } from 'src/documents/documents.model';
 import { DocumentsModule } from 'src/documents/documents.module';
+import { PodPodMaterial } from 'src/settings/pod-pod-material.model';
 import { ProvidersInstrument } from './provider-instrument.dto';
 import { ProvidersMaterial } from './provider-material.model';
 import { ProviderController } from './provider.controller';
@@ -19,7 +20,8 @@ import { ProvidersEquipment } from './providers-equipment.model';
             DocumentsProviders,
             ProvidersInstrument,
             ProvidersMaterial,
-            ProvidersEquipment
+            ProvidersEquipment,
+            PodPodMaterial
         ]),
         DocumentsModule
     ],
