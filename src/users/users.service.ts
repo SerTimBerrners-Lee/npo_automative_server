@@ -16,8 +16,7 @@ export class UsersService {
         private documentService: DocumentsService) {}
 
     async createUser(dto: CreateUserDto, files?: any) {
-        
-        const ava  =   await this.saveImage(files)
+
         const tabel     =   await this.userRepository.findOne({where: { tabel: dto.tabel }})
         if(tabel) 
             throw new HttpException("Табельный номер не может повторяться", HttpStatus.BAD_REQUEST)
@@ -25,11 +24,14 @@ export class UsersService {
         const roles         =   await this.rolesService.getRoleByPk(dto.roles)
         const hashPassword  =   await bcrypt.hash(dto.password, 5);
         const user          =   await this.userRepository
-            .create({...dto, password: hashPassword, 
-                image: typeof ava == 'object' ? ava.dataValues.path : ava});
-        if(typeof ava == 'object') {
-            await user.$add('document', ava.id)
-            await user.save()
+            .create({...dto, password: hashPassword});
+
+        if(files.image)  {
+            const ava = await this.saveImage(files)
+            if(typeof ava == 'object') {
+                user.image = ava.dataValues.path
+                await user.$add('document', ava.id)
+            }
         }
                 
        
@@ -56,12 +58,12 @@ export class UsersService {
             throw new HttpException("Табельный номер не может повторяться", HttpStatus.EXPECTATION_FAILED)
         
         if(files.image) {
-                const ava = await this.saveImage(files)
-                if(typeof ava == 'object') {
-                    user.image = ava.dataValues.path
-                    await user.$add('document', ava.id)
-                } else 
-                    user.image = ava
+            const ava = await this.saveImage(files)
+            if(typeof ava == 'object') {
+                user.image = ava.dataValues.path
+                await user.$add('document', ava.id)
+            } else 
+                user.image = ava
         }
 
         await user.save()

@@ -10,9 +10,8 @@ import { UserRoles } from "src/roles/user-roles.model";
 
 interface UserCreationAttrs {
     password: string;
-    initial: string;
+    login: string;
     tabel: string;
-    image: string;
 }
 
 @Table({tableName: 'users'})
@@ -83,7 +82,7 @@ export class User extends Model<User, UserCreationAttrs> {
     banReason: string;
 
     @ApiProperty({example: 'http://photo.png', description: 'Аватар пользователя'})
-    @Column({type: DataType.STRING, allowNull: true})
+    @Column({type: DataType.STRING, defaultValue: 'ava_defolt.png'})
     image: string;
 
     @BelongsToMany(() => Role, () => UserRoles)
