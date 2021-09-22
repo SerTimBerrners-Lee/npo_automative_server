@@ -1,4 +1,4 @@
-import { Body, Controller, Get, Param, Post, UploadedFiles, UseInterceptors } from '@nestjs/common';
+import { Body, Controller, Delete, Get, Param, Post, UploadedFiles, UseInterceptors } from '@nestjs/common';
 import { FileFieldsInterceptor } from '@nestjs/platform-express';
 import { ApiOperation, ApiTags } from '@nestjs/swagger';
 import { DocumentsService } from './documents.service';
@@ -32,9 +32,15 @@ export class DocumentsController {
     }
 
     @ApiOperation({summary: 'Перенос файла в архив'})
-    @Get('/:id')
+    @Delete('/:id')
     banFile(@Param('id') id: number) {
         return this.documentService.banFile(id)
+    }
+
+    @ApiOperation({summary: 'Перенос файла в архив'})
+    @Get('/:id')
+    getFileById(@Param('id') id: number) {
+        return this.documentService.getFileById(id)
     }
 
     @ApiOperation({summary: 'Изменение Типа документа'})

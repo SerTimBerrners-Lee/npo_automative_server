@@ -9,6 +9,7 @@ import { InstrumentModule } from 'src/instrument/instrument.module';
 import { NameInstrument } from 'src/instrument/name-instrument.model';
 import { Providers } from 'src/provider/provider.model';
 import { ProvidersEquipment } from 'src/provider/providers-equipment.model';
+import { User } from 'src/users/users.model';
 import { EquipmentPType } from './equipment-pt.model';
 import { EquipmentController } from './equipment.controller';
 import { Equipment } from './equipment.model';
@@ -32,7 +33,8 @@ import { NodePTPEquipment } from './node_tpt_equipment.model';
             Documents,
             Providers,
             NameInstrument,
-            Operation
+            Operation,
+            User
         ]),
         DocumentsModule,
         InstrumentModule

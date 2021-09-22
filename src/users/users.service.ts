@@ -17,7 +17,7 @@ export class UsersService {
 
     async createUser(dto: CreateUserDto, files?: any) {
         
-        const fileName  =   await this.saveImage(files)
+        const ava  =   await this.saveImage(files)
         const tabel     =   await this.userRepository.findOne({where: { tabel: dto.tabel }})
         if(tabel) 
             throw new HttpException("Табельный номер не может повторяться", HttpStatus.BAD_REQUEST)
@@ -25,19 +25,25 @@ export class UsersService {
         const roles         =   await this.rolesService.getRoleByPk(dto.roles)
         const hashPassword  =   await bcrypt.hash(dto.password, 5);
         const user          =   await this.userRepository
-            .create({...dto, password: hashPassword, image: fileName});
+            .create({...dto, password: hashPassword, 
+                image: typeof ava == 'object' ? ava.dataValues.path : ava});
+        if(typeof ava == 'object') {
+            await user.$add('document', ava.id)
+            await user.save()
+        }
+                
        
         await user.$set('roles', roles.id)
         user.roles = [roles]
         
         if(files.document) {
             for(let file of files.document) {
-                let docks = await this.documentService.saveDocument(file, 'p') 
+                let docks = await this.documentService.saveDocument(file) 
                 await user.$add('document', docks.id)
             }
         }
         
-        return user 
+        return user  
     }
 
     async updateUser(dto: CreateUserDto, files: any) {
@@ -47,12 +53,18 @@ export class UsersService {
 
         const tabel = await this.userRepository.findOne({where: { tabel: dto.tabel }})
         if(tabel && tabel.id != user.id) 
-            throw new HttpException("Табельный номер не может повторяться", HttpStatus.BAD_REQUEST)
+            throw new HttpException("Табельный номер не может повторяться", HttpStatus.EXPECTATION_FAILED)
         
         if(files.image) {
-                let image = await this.saveImage(files)
-                user.image = image
+                const ava = await this.saveImage(files)
+                if(typeof ava == 'object') {
+                    user.image = ava.dataValues.path
+                    await user.$add('document', ava.id)
+                } else 
+                    user.image = ava
         }
+
+        await user.save()
 
         if(dto.password && dto.password.length < 15) {
             const hashPassword  = await bcrypt.hash(dto.password, 5);
@@ -84,7 +96,7 @@ export class UsersService {
 
         if(files.document) {
             for(let file of files.document) {
-                let docks = await this.documentService.saveDocument(file, 'p') 
+                let docks = await this.documentService.saveDocument(file) 
                 await user.$add('document', docks.id)
             }
         }
@@ -96,14 +108,13 @@ export class UsersService {
     private async saveImage(files: any) {
         let fileName: any;
         if(files.image) {
-            if(fileName     =   await this.documentService.saveDocument(files.image[0], 'p'))
-                fileName    =   fileName.dataValues.path
+            if(fileName = await this.documentService.saveDocument(files.image[0]))
+                return fileName
             else 
-                fileName    =   'ava_defolt.png' 
-        } else 
-            fileName        =   'ava_defolt.png'
+                return 'ava_defolt.png' 
+        } 
 
-        return fileName
+        return 'ava_defolt.png'
     }
 
     async getUser() {

@@ -51,7 +51,7 @@ export class DocumentsService {
             fs.writeFileSync(path.join(filePath, pathName), file.buffer)
 
             const document = await this.createDocument({
-                    name: origName, 
+                    name: origName,  
                     path: (folderToSave + '/' + pathName), 
                     nameInstans: nameInstans,
                     description: description,
@@ -68,6 +68,10 @@ export class DocumentsService {
         const docsD = this.documentReprository.findAll()
         return docsD
     } 
+
+    async getFileById(id:number) {
+        return await this.documentReprository.findByPk(id, {include: {all: true}})
+    }
 
     async banFile(id: number) {
         const documents = await this.documentReprository.findByPk(id)

@@ -7,6 +7,7 @@ import { DocumentsModule } from 'src/documents/documents.module';
 import { Equipment } from 'src/equipment/equipment.model';
 import { NameInstrument } from 'src/instrument/name-instrument.model';
 import { PodPodMaterial } from 'src/settings/pod-pod-material.model';
+import { User } from 'src/users/users.model';
 import { DetalController } from './detal.controller';
 import { Detal } from './detal.model';
 import { DetalService } from './detal.service';
@@ -30,7 +31,8 @@ import { TechProcess } from './tech-process.model';
             OperationEq,
             NameInstrument,
             TechProcess,
-            OperationTechProcess
+            OperationTechProcess,
+            User
         ]),
         DocumentsModule
     ],

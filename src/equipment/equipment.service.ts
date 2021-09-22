@@ -4,6 +4,7 @@ import { Documents } from 'src/documents/documents.model';
 import { DocumentsService } from 'src/documents/documents.service';
 import { NameInstrument } from 'src/instrument/name-instrument.model';
 import { Providers } from 'src/provider/provider.model';
+import { User } from 'src/users/users.model';
 import { CreateEquipmentDto } from './dto/create-equipment.dto';
 import { UpdateEquipmentDto } from './dto/update-equipment.dto';
 import { EquipmentPType } from './equipment-pt.model';
@@ -20,6 +21,7 @@ export class EquipmentService {
         @InjectModel(Documents) private documentsReprository: typeof Documents,
         @InjectModel(Providers) private providersReprository: typeof Providers,
         @InjectModel(NameInstrument) private nameInstrumentReprository: typeof NameInstrument,
+        @InjectModel(User) private userRepository: typeof User,
         private documentsService: DocumentsService, 
     ) {}
 
@@ -108,8 +110,11 @@ export class EquipmentService {
             equipment.deliveryTime = dto.deliveryTime
         if(dto.invNymber)
             equipment.invNymber = dto.invNymber
-        if(dto.responsible)
-            equipment.responsible = dto.responsible
+         if(dto.responsible) {
+            const user = await this.userRepository.findByPk(dto.responsible)
+            if(user) 
+                equipment.responsibleId = user.id
+        }  
         
         await equipment.save()
 
@@ -189,10 +194,14 @@ export class EquipmentService {
             equipment.deliveryTime = dto.deliveryTime
         if(dto.invNymber)
             equipment.invNymber = dto.invNymber
-        if(dto.responsible)
-            equipment.responsible = dto.responsible
         if(dto.name)
             equipment.name = dto.name
+
+        if(dto.responsible) {
+            const user = await this.userRepository.findByPk(dto.responsible)
+            if(user) 
+                equipment.responsibleId = user.id
+        }
 
         await equipment.save()
 

@@ -1,9 +1,10 @@
 import { ApiProperty } from "@nestjs/swagger";
-import { Model, Column, DataType, Table, BelongsToMany, HasMany } from "sequelize-typescript";
+import { Model, Column, DataType, Table, BelongsToMany, HasMany, ForeignKey, BelongsTo } from "sequelize-typescript";
 import { DocumentsOperation } from "src/documents/dociments-operation.model";
 import { DocumentsDetal } from "src/documents/documents-detal.model";
 import { Documents } from "src/documents/documents.model";
 import { PodPodMaterial } from "src/settings/pod-pod-material.model";
+import { User } from "src/users/users.model";
 import { DetalMaterials } from "./detal-materials.model";
 import { TechProcess } from "./tech-process.model";
 
@@ -29,10 +30,6 @@ export class Detal extends Model<Detal, DetalCreationAttrs> {
     @ApiProperty({example: 12, description: 'Срок поставки'})
     @Column({type: DataType.STRING, allowNull: true})
     articl: string; 
-
-    @ApiProperty({example: 12, description: 'Срок поставки'})
-    @Column({type: DataType.STRING, allowNull: true})
-    responsible: string; 
 
     @ApiProperty({example: 12, description: 'Срок поставки'})
     @Column({type: DataType.STRING, allowNull: true})
@@ -76,4 +73,11 @@ export class Detal extends Model<Detal, DetalCreationAttrs> {
 
     @HasMany(() => TechProcess)
     techProcesses: TechProcess[];
+
+    @ForeignKey(() => User)
+    @Column({type: DataType.INTEGER})
+    responsibleId: number;
+
+    @BelongsTo(() => User)
+    user: User;
 }     

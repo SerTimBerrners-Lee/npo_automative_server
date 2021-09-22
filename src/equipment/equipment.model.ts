@@ -10,6 +10,7 @@ import { NameInstrument } from "src/instrument/name-instrument.model";
 import { ProvidersInstrument } from "src/provider/provider-instrument.dto";
 import { Providers } from "src/provider/provider.model";
 import { ProvidersEquipment } from "src/provider/providers-equipment.model";
+import { User } from "src/users/users.model";
 import { EquipmentPType } from "./equipment-pt.model";
 import { EquipmentType } from "./euipment-type.model";
 import { NodeEqPTEq } from "./node-eqpt-eq.model";
@@ -39,11 +40,7 @@ export class Equipment extends Model<Equipment, EquipmentCreationAttrs> {
 
     @ApiProperty({example: 12, description: 'Срок поставки'})
     @Column({type: DataType.STRING, allowNull: true})
-    invNymber: string; 
-
-    @ApiProperty({example: 12, description: 'Срок поставки'})
-    @Column({type: DataType.STRING, allowNull: true})
-    responsible: string; 
+    invNymber: string;
 
     @ApiProperty({example: 12, description: 'Срок поставки'})
     @Column({type: DataType.STRING, allowNull: true})
@@ -67,9 +64,15 @@ export class Equipment extends Model<Equipment, EquipmentCreationAttrs> {
 
     @BelongsTo(() => EquipmentType)
     equipmentType: EquipmentType;
-    // История изменений также прикрепляется сюда при изменении фала 
 
     @BelongsToMany(() => Operation, () => OperationEq)
     operation: Operation[]
+
+    @ForeignKey(() => User)
+    @Column({type: DataType.INTEGER})
+    responsibleId: number;
+
+    @BelongsTo(() => User)
+    user: User;
 
 }     

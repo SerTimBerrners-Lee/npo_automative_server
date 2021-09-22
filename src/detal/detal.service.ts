@@ -6,6 +6,7 @@ import { DocumentsService } from 'src/documents/documents.service';
 import { Equipment } from 'src/equipment/equipment.model';
 import { NameInstrument } from 'src/instrument/name-instrument.model';
 import { PodPodMaterial } from 'src/settings/pod-pod-material.model';
+import { User } from 'src/users/users.model';
 import { Detal } from './detal.model';
 import { CreateDetalDto } from './dto/create-detal.dto';
 import { UpCreateTechProcessDto } from './dto/up-create-tech-process.dto';
@@ -24,6 +25,7 @@ export class DetalService {
         @InjectModel(NameInstrument) private nInstrumentReprository: typeof NameInstrument,
         @InjectModel(Equipment) private equipmentReprository: typeof Equipment,
         @InjectModel(TechProcess) private techProcessReprository: typeof TechProcess,
+        @InjectModel(User) private userRepository: typeof User,
         private documentsService: DocumentsService
     ) {} 
 
@@ -39,7 +41,7 @@ export class DetalService {
         console.log(files)
         return await this.upCreateDetal(dto, files, detal)
     }
-    
+
     async removeDeleteById(id: number) {
         const detal = await this.detalReprository.findByPk(id)
         if(!detal) 
@@ -75,8 +77,6 @@ export class DetalService {
 
         if(dto.articl)
             detal.articl = dto.articl
-        if(dto.responsible)
-            detal.responsible = dto.responsible
         if(dto.description)
             detal.description = dto.description
         if(dto.parametrs)
@@ -91,6 +91,13 @@ export class DetalService {
             detal.trash = dto.trash
 
         await detal.save()
+
+        // Ответственный 
+        if(dto.responsible) {
+            const user = await this.userRepository.findByPk(dto.responsible)
+            if(user)
+                detal.responsibleId = user.id
+        }
 
         if(Number(dto.mat_zag)) {
             detal.mat_zag = dto.mat_zag
