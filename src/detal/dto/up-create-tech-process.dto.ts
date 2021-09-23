@@ -5,4 +5,6 @@ export class UpCreateTechProcessDto {
     readonly description   :       string;
     readonly docs          :       any;
     readonly id            :       number;
+
+    readonly responsibleActionId: string;
 }

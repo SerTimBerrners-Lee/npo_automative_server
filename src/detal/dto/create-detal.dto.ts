@@ -14,4 +14,6 @@ export class CreateDetalDto {
     readonly materialList:      string;
     readonly docs:              any;
     readonly techProcessID:     number;
+
+    readonly responsibleActionId:       string;
 }

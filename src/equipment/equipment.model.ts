@@ -1,5 +1,6 @@
 import { ApiProperty } from "@nestjs/swagger";
-import { Model, Column, DataType, Table, BelongsToMany, ForeignKey, BelongsTo } from "sequelize-typescript";
+import { Model, Column, DataType, Table, BelongsToMany, ForeignKey, BelongsTo, HasMany } from "sequelize-typescript";
+import { Actions } from "src/actions/actions.model";
 import { OperationEq } from "src/detal/operation-equipment.model";
 import { Operation } from "src/detal/operation.model";
 import { DocumentsEquipment } from "src/documents/documents-equipment";
@@ -74,5 +75,8 @@ export class Equipment extends Model<Equipment, EquipmentCreationAttrs> {
 
     @BelongsTo(() => User)
     user: User;
+
+    @HasMany(() => Actions)
+    actions: Actions[];
 
 }     

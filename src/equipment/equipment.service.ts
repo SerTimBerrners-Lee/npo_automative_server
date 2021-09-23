@@ -59,11 +59,11 @@ export class EquipmentService {
     async createEquipmentPType(dto: any) {
         const equipment = await this.equipmentTypeReprository.findByPk(dto.parentId)
         if(!equipment)
-            throw new HttpException('Запись не найдена', HttpStatus.NOT_FOUND)
+            throw new HttpException('Запись не найдена', HttpStatus.BAD_REQUEST)
 
         const equipmentPT = await this.equipemtnPTReprository.create({name: dto.name})
         if(!equipmentPT)
-            throw new HttpException('Запись не найдена', HttpStatus.NOT_FOUND)
+            throw new HttpException('Запись не найдена', HttpStatus.BAD_REQUEST)
         
         await equipment.$add('equipmentsPT', equipmentPT.id)
         await equipment.save()

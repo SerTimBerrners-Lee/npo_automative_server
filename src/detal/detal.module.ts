@@ -1,6 +1,6 @@
 import { Module } from '@nestjs/common';
 import { SequelizeModule } from '@nestjs/sequelize';
-import { DocumentsOperation } from 'src/documents/dociments-operation.model';
+import { Actions } from 'src/actions/actions.model';
 import { DocumentsDetal } from 'src/documents/documents-detal.model';
 import { Documents } from 'src/documents/documents.model';
 import { DocumentsModule } from 'src/documents/documents.module';
@@ -16,6 +16,7 @@ import { OperationMaterial } from './operation-material.model';
 import { OperationTechProcess } from './operation-tech-process.model';
 import { Operation } from './operation.model';
 import { TechProcess } from './tech-process.model';
+import { ActionsModule } from 'src/actions/actions.module';
 
 @Module({
     controllers: [DetalController],
@@ -32,9 +33,11 @@ import { TechProcess } from './tech-process.model';
             NameInstrument,
             TechProcess,
             OperationTechProcess,
-            User
+            User,
+            Actions
         ]),
-        DocumentsModule
+        DocumentsModule,
+        ActionsModule
     ],
     exports: [
         DetalModule

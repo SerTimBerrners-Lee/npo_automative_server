@@ -1,6 +1,6 @@
 import { ApiProperty } from "@nestjs/swagger";
 import { Model, Column, DataType, Table, BelongsToMany, HasMany, ForeignKey, BelongsTo } from "sequelize-typescript";
-import { DocumentsOperation } from "src/documents/dociments-operation.model";
+import { Actions } from "src/actions/actions.model";
 import { DocumentsDetal } from "src/documents/documents-detal.model";
 import { Documents } from "src/documents/documents.model";
 import { PodPodMaterial } from "src/settings/pod-pod-material.model";
@@ -80,4 +80,7 @@ export class Detal extends Model<Detal, DetalCreationAttrs> {
 
     @BelongsTo(() => User)
     user: User;
+
+    @HasMany(() => Actions)
+    actions: Actions[];
 }     

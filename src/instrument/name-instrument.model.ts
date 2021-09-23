@@ -1,5 +1,6 @@
 import { ApiProperty } from "@nestjs/swagger";
-import { Model, Column, DataType, Table, BelongsToMany, ForeignKey, BelongsTo } from "sequelize-typescript";
+import { Model, Column, DataType, Table, BelongsToMany, ForeignKey, BelongsTo, HasMany } from "sequelize-typescript";
+import { Actions } from "src/actions/actions.model";
 import { DocumentsInstrument } from "src/documents/documents-instrument.model";
 import { Documents } from "src/documents/documents.model";
 import { Equipment } from "src/equipment/equipment.model";
@@ -63,5 +64,8 @@ export class NameInstrument extends Model<NameInstrument, NameInstrumentCreation
 
     @BelongsTo(() => Instrument)
     instrumentType: Instrument;
+
+    @HasMany(() => Actions)
+    actions: Actions[];
 
 }    

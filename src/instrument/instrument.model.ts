@@ -1,5 +1,6 @@
 import { ApiProperty } from "@nestjs/swagger";
 import { Model, Column, DataType, Table,  BelongsToMany, HasMany } from "sequelize-typescript";
+import { Actions } from "src/actions/actions.model";
 import { NameInstrument } from "./name-instrument.model";
 import { NodePtTInstrument } from "./node-pt-t-instrument.model";
 import { PInstrument } from "./pt-instrument.model";

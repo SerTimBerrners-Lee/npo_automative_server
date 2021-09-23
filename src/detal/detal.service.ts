@@ -1,6 +1,7 @@
 import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
 import { InjectModel } from '@nestjs/sequelize';
 import { isArray } from 'lodash';
+import { Actions } from 'src/actions/actions.model';
 import { Documents } from 'src/documents/documents.model';
 import { DocumentsService } from 'src/documents/documents.service';
 import { Equipment } from 'src/equipment/equipment.model';
@@ -26,6 +27,7 @@ export class DetalService {
         @InjectModel(Equipment) private equipmentReprository: typeof Equipment,
         @InjectModel(TechProcess) private techProcessReprository: typeof TechProcess,
         @InjectModel(User) private userRepository: typeof User,
+        @InjectModel(Actions) private actionsReprository: typeof Actions,
         private documentsService: DocumentsService
     ) {} 
 
@@ -33,19 +35,42 @@ export class DetalService {
         return await this.detalReprository.findAll({include: {all: true}})
     }
 
-    async createNewDetal(dto: CreateDetalDto, files: any) {
+    async createNewDetal(dto: CreateDetalDto, files: any, authID: any) {
         const detal = await this.detalReprository.create({name: dto.name})
         if(!detal)
             throw new HttpException('Не удалось создать деталь', HttpStatus.BAD_REQUEST)
-        console.log(dto)
-        console.log(files)
+        
+        const action = await this.actionsReprository.create({action: "Добавил детать"})
+        let user: any
+        if(authID)
+            user = await this.userRepository.findByPk(authID)
+        if(action) {
+            action.detalId = detal.id
+            if(user)
+                action.responsibleId = user.id
+            await action.save()
+        }
+
         return await this.upCreateDetal(dto, files, detal)
     }
 
-    async removeDeleteById(id: number) {
+    async removeDeleteById(id: number, authId: any) {
         const detal = await this.detalReprository.findByPk(id)
         if(!detal) 
             throw new HttpException('Не удалось обновить деталь', HttpStatus.BAD_REQUEST)
+
+        const action = await this.actionsReprository
+            .create({action: detal.ban ? "Вернул деталь из арзива" : "Занес деталь в архив"})
+
+        let user: any
+        if(authId)
+            user = await this.userRepository.findByPk(authId)
+        if(action) {
+            action.detalId = detal.id
+            if(user)
+                action.responsibleId = user.id
+            await action.save()
+        }
             
         detal.ban = !detal.ban
         await detal.save()
@@ -60,13 +85,21 @@ export class DetalService {
         return detal
     }
 
-    async updateDetal(dto: UpdateDetalDto, files: any) {
+    async updateDetal(dto: UpdateDetalDto, files: any, authID: any) {
         const detal = await this.detalReprository.findByPk(dto.id)
         if(!detal)
             throw new HttpException('Не удалосьм обновить деталь', HttpStatus.BAD_REQUEST)
 
-        console.log(dto)
-        console.log(files)
+        const action = await this.actionsReprository.create({action: "Внес изменения в детать"})
+        let user: any
+        if(authID)
+            user = await this.userRepository.findByPk(authID)
+        if(action) {
+            action.detalId = detal.id
+            if(user)
+                action.responsibleId = user.id
+            await action.save()
+        }
         
         detal.name = dto.name
         await detal.save()
@@ -92,8 +125,7 @@ export class DetalService {
 
         await detal.save()
 
-        // Ответственный 
-        if(dto.responsible) {
+        if(Number(dto.responsible)) {
             const user = await this.userRepository.findByPk(dto.responsible)
             if(user)
                 detal.responsibleId = user.id
@@ -328,12 +360,26 @@ export class DetalService {
 
     async createNewTechProcess(dto: UpCreateTechProcessDto, files: any) {
 
-        let tp: any;
+        let [tp, description]: any[] = [];
 
-        if(Number(dto.id)) 
-           tp = await this.techProcessReprository.findByPk(dto.id)
-        else 
+        if(Number(dto.id)) {
+            tp = await this.techProcessReprository.findByPk(dto.id)
+            description = 'Изменил технический процесс'
+        }   else {
             tp = await this.techProcessReprository.create()
+            description = 'Добавил технический процесс'
+        } 
+
+        const action = await this.actionsReprository.create({action: description})
+        let user: any
+        if(dto.responsibleActionId)
+            user = await this.userRepository.findByPk(dto.responsibleActionId)
+        if(action) {
+            action.techProcessId = tp.id
+            if(user)
+                action.user = user.id
+            await action.save()
+        }
 
         if(!tp)
             throw new HttpException('Не удалось создать операцию', HttpStatus.BAD_REQUEST)

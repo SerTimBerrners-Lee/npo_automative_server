@@ -1,5 +1,6 @@
 import { ApiProperty } from "@nestjs/swagger";
-import { Model, Column, DataType, Table, BelongsToMany } from "sequelize-typescript";
+import { Model, Column, DataType, Table, BelongsToMany, HasMany } from "sequelize-typescript";
+import { Actions } from "src/actions/actions.model";
 import { DocumentsProviders } from "src/documents/documents-providers.model";
 import { Documents } from "src/documents/documents.model";
 import { Equipment } from "src/equipment/equipment.model";
@@ -51,5 +52,8 @@ export class Providers extends Model<Providers, ProvidersCreationAttrs> {
 
     @BelongsToMany(() => Equipment, () => ProvidersEquipment)
     equipments: Equipment[];
+
+    @HasMany(() => Actions)
+    actions: Actions[];
 
 }    

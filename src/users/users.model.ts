@@ -1,5 +1,6 @@
 import { ApiProperty } from "@nestjs/swagger";
 import { Model, Column, DataType, Table, BelongsToMany, HasMany } from "sequelize-typescript";
+import { Actions } from "src/actions/actions.model";
 import { Avatars } from "src/avatars/avatars.model";
 import { Detal } from "src/detal/detal.model";
 import { DocumentsUser } from "src/documents/documents-user.model";
@@ -99,4 +100,7 @@ export class User extends Model<User, UserCreationAttrs> {
 
     @HasMany(() => Equipment)
     equipments: Equipment[];
+
+    @HasMany(() => Actions)
+    actions: Actions[];
 }  

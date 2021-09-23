@@ -1,5 +1,6 @@
 import { ApiProperty } from "@nestjs/swagger";
-import { Model, Column, DataType, Table, BelongsToMany, ForeignKey, BelongsTo } from "sequelize-typescript";
+import { Model, Column, DataType, Table, BelongsToMany, ForeignKey, BelongsTo, HasMany } from "sequelize-typescript";
+import { Actions } from "src/actions/actions.model";
 import { DocumentsTechProcess } from "src/documents/documents-tech-process.model";
 import { Documents } from "src/documents/documents.model";
 import { Detal } from "./detal.model";
@@ -37,4 +38,7 @@ export class TechProcess extends Model<TechProcess> {
 
     @BelongsTo(() => Detal)
     detal: Detal;
+
+    @HasMany(() => Actions)
+    actions: Actions[];
 }     

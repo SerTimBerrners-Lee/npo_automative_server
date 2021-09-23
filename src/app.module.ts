@@ -57,6 +57,8 @@ import { InstrumentOperation } from "./instrument/instrument-operation.model";
 import { TechProcess } from "./detal/tech-process.model";
 import { DocumentsTechProcess } from "./documents/documents-tech-process.model";
 import { OperationTechProcess } from "./detal/operation-tech-process.model";
+import { ActionsModule } from './actions/actions.module';
+import { Actions } from "./actions/actions.model";
 
 @Module({
     controllers: [],
@@ -118,7 +120,8 @@ import { OperationTechProcess } from "./detal/operation-tech-process.model";
                 InstrumentOperation,
                 TechProcess,
                 DocumentsTechProcess,
-                OperationTechProcess
+                OperationTechProcess,
+                Actions
             ],
             autoLoadModels: true,
           }),
@@ -134,6 +137,7 @@ import { OperationTechProcess } from "./detal/operation-tech-process.model";
         InstrumentModule,
         EquipmentModule,
         DetalModule,
+        ActionsModule,
     ]
 })
 

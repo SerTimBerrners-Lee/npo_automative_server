@@ -1,4 +1,4 @@
-import { Model, Column, DataType, Table, BelongsToMany } from "sequelize-typescript";
+import { Model, Column, DataType, Table, BelongsToMany, HasMany } from "sequelize-typescript";
 import { ApiProperty } from "@nestjs/swagger";
 import { User } from "src/users/users.model";
 import { DocumentsUser } from "./documents-user.model";
@@ -10,6 +10,7 @@ import { Equipment } from "src/equipment/equipment.model";
 import { DocumentsEquipment } from "./documents-equipment";
 import { Detal } from "src/detal/detal.model";
 import { DocumentsDetal } from "./documents-detal.model";
+import { Actions } from "src/actions/actions.model";
 
 interface DocumentsCreationAttrs {
     name: string; 
@@ -64,4 +65,7 @@ export class Documents extends Model<Documents, DocumentsCreationAttrs> {
 
     @BelongsToMany(() => Detal, () => DocumentsDetal)
     detals: Detal[]
+
+    @HasMany(() => Actions)
+    actions: Actions[];
 }
