@@ -10,12 +10,15 @@ import { PodPodMaterial } from 'src/settings/pod-pod-material.model';
 import { User } from 'src/users/users.model';
 import { Detal } from './detal.model';
 import { CreateDetalDto } from './dto/create-detal.dto';
+import { CreateTypeOperation } from './dto/create-type-operation.dto';
 import { UpCreateTechProcessDto } from './dto/up-create-tech-process.dto';
 import { UpCreateOperationDto } from './dto/update-create-operation.dto';
 import { UpdateDetalDto } from './dto/update-detal.dto';
 import { UpOperationTechDto } from './dto/update-operation-tech.dto';
+import { UpdateTypeOperation } from './dto/update-type-operation.dto';
 import { Operation } from './operation.model';
 import { TechProcess } from './tech-process.model';
+import { TypeOperation } from './type-operation.model';
 
 @Injectable()
 export class DetalService {
@@ -28,6 +31,7 @@ export class DetalService {
         @InjectModel(TechProcess) private techProcessReprository: typeof TechProcess,
         @InjectModel(User) private userRepository: typeof User,
         @InjectModel(Actions) private actionsReprository: typeof Actions,
+        @InjectModel(TypeOperation) private typeOperationReprository: typeof TypeOperation,
         private documentsService: DocumentsService
     ) {} 
 
@@ -199,7 +203,7 @@ export class DetalService {
 
     async createNewOperation(dto: UpCreateOperationDto, files: any) {
         const operation = await this.operationReprository.create({name: dto.name})
-        if(!operation)
+        if(!operation) 
             throw new HttpException('Не удалось создать операцию', HttpStatus.BAD_REQUEST)
         
         return await this.upAndCreateOperation(dto, files, operation)
@@ -234,6 +238,8 @@ export class DetalService {
             operation.mainTime = dto.mainTime
         if(dto.generalCountTime)
             operation.generalCountTime = dto.generalCountTime
+            
+        operation.tOperationId = operation.name
         
         // add instrument 
         operation.instruments = []
@@ -432,5 +438,38 @@ export class DetalService {
         if(!tp)
             throw new HttpException('Не удалось создать операцию', HttpStatus.BAD_REQUEST)
         return tp
+    }
+
+    async createNewTypeOperation(dto: CreateTypeOperation) {
+        if(!dto && !dto.name) 
+            throw new HttpException('Не удалось сохранить тип операции', HttpStatus.BAD_REQUEST)
+        const TO = await this.typeOperationReprository.create(dto)
+        if(!TO)
+            throw new HttpException('Не удалось сохранить тип операции', HttpStatus.BAD_REQUEST)
+        return TO
+        
+    }
+
+    async updateTypeOperation(dto: UpdateTypeOperation) {
+        if(!dto && !dto.name) 
+            throw new HttpException('Не удалось сохранить тип операции', HttpStatus.BAD_REQUEST)
+        const TO = await this.typeOperationReprository.findByPk(dto.id)
+        if(!TO)
+            throw new HttpException('Не удалось сохранить тип операции', HttpStatus.BAD_REQUEST)
+        await TO.update(dto)
+        
+        return TO
+        
+    }
+
+    async getAllTypeOperation() {
+        return await this.typeOperationReprository.findAll({include: {all: true}})
+    }
+
+    async deleteTypeOperationById(id: any) {
+        const TO = await this.typeOperationReprository.findByPk(id.id)
+        if(!TO)
+            throw new HttpException('Не удалось удалить тип операции', HttpStatus.BAD_REQUEST)
+        return await this.typeOperationReprository.destroy({where: {id: TO.id}})
     }
 }

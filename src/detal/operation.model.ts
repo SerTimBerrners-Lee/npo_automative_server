@@ -1,5 +1,5 @@
 import { ApiProperty } from "@nestjs/swagger";
-import { Model, Column, DataType, Table, BelongsToMany } from "sequelize-typescript";
+import { Model, Column, DataType, Table, BelongsToMany, ForeignKey, BelongsTo } from "sequelize-typescript";
 import { DocumentsOperation } from "src/documents/dociments-operation.model";
 import { DocumentsDetal } from "src/documents/documents-detal.model";
 import { Documents } from "src/documents/documents.model";
@@ -10,6 +10,7 @@ import { PodPodMaterial } from "src/settings/pod-pod-material.model";
 import { DetalMaterials } from "./detal-materials.model";
 import { OperationEq } from "./operation-equipment.model";
 import { OperationMaterial } from "./operation-material.model";
+import { TypeOperation } from "./type-operation.model";
 
 interface OperationCreationAttrs {
     name: number;
@@ -73,7 +74,6 @@ export class Operation extends Model<Operation, OperationCreationAttrs> {
     @Column({type: DataType.INTEGER, defaultValue: null})
     instrumentMerID: number;
 
-
     @ApiProperty({example: '1', description: 'Описание операции'})
     @Column({type: DataType.TEXT, defaultValue: ''})
     instrumentOsnList: string; 
@@ -85,4 +85,11 @@ export class Operation extends Model<Operation, OperationCreationAttrs> {
     eqList: string; 
     @Column({type: DataType.INTEGER, defaultValue: null})
     eqID: number;
+
+    @ForeignKey(() => TypeOperation)
+    @Column({type: DataType.INTEGER, allowNull: true})
+    tOperationId: number;
+    
+    @BelongsTo(() => TypeOperation)
+    typeOperation: TypeOperation;
 }     

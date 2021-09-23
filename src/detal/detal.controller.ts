@@ -1,13 +1,16 @@
 import { Body, Controller, Delete, ExecutionContext, Get, HttpException, HttpStatus, Param, Post, Request, UploadedFiles, UseInterceptors } from '@nestjs/common';
 import { FileFieldsInterceptor } from '@nestjs/platform-express';
-import { ApiOperation } from '@nestjs/swagger';
+import { ApiOperation, ApiTags } from '@nestjs/swagger';
 import { DetalService } from './detal.service';
 import { CreateDetalDto } from './dto/create-detal.dto';
+import { CreateTypeOperation } from './dto/create-type-operation.dto';
 import { UpCreateTechProcessDto } from './dto/up-create-tech-process.dto';
 import { UpCreateOperationDto } from './dto/update-create-operation.dto';
 import { UpdateDetalDto } from './dto/update-detal.dto';
 import { UpOperationTechDto } from './dto/update-operation-tech.dto';
+import { UpdateTypeOperation } from './dto/update-type-operation.dto';
 
+@ApiTags('Детали')
 @Controller('detal')
 export class DetalController {
     constructor(private detalService: DetalService) {}
@@ -52,6 +55,12 @@ export class DetalController {
         if(!authHeader)
             throw new  HttpException('Пользователь не зарегестрирован', HttpStatus.BAD_REQUEST)
         return this.detalService.removeDeleteById(id, authHeader)
+    }
+
+    @ApiOperation({summary: 'Получить все типы операций'})
+    @Get('/typeoperation')
+    getAllTypeOperation() {
+        return this.detalService.getAllTypeOperation()
     }
 
     @ApiOperation({summary: 'Get detal by id '})
@@ -120,4 +129,21 @@ export class DetalController {
         return this.detalService.getTechProcessById(id)
     }
 
+    @ApiOperation({summary: 'Создать новый тип операции'})
+    @Post('/typeoperation')
+    createNewTypeOperation(@Body() dto: CreateTypeOperation) {
+        return this.detalService.createNewTypeOperation(dto)
+    }
+
+    @ApiOperation({summary: 'Создать новый тип операции'})
+    @Post('/typeoperation/update')
+    updateTypeOperation(@Body() dto: UpdateTypeOperation) {
+        return this.detalService.updateTypeOperation(dto)
+    }
+
+    @ApiOperation({summary: 'Удалить тип операции'})
+    @Delete('/typeoperation/:id')
+    deleteTypeOperationById(@Param() id: any) {
+        return this.detalService.deleteTypeOperationById(id)
+    }
 }

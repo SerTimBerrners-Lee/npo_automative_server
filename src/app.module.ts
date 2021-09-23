@@ -59,6 +59,7 @@ import { DocumentsTechProcess } from "./documents/documents-tech-process.model";
 import { OperationTechProcess } from "./detal/operation-tech-process.model";
 import { ActionsModule } from './actions/actions.module';
 import { Actions } from "./actions/actions.model";
+import { TypeOperation } from "./detal/type-operation.model";
 
 @Module({
     controllers: [],
@@ -121,7 +122,8 @@ import { Actions } from "./actions/actions.model";
                 TechProcess,
                 DocumentsTechProcess,
                 OperationTechProcess,
-                Actions
+                Actions,
+                TypeOperation
             ],
             autoLoadModels: true,
           }),
