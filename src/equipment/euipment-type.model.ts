@@ -16,7 +16,7 @@ export class EquipmentType extends Model<EquipmentType, EquipmentTypeCreationAtt
     id: number;
 
     @Column({type: DataType.STRING, allowNull: false})
-    name: string;    
+    name: string;
 
     @BelongsToMany(() => EquipmentPType, () => NodePTPEquipment)
     equipmentsPT: EquipmentPType[]

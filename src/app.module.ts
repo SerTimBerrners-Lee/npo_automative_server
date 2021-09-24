@@ -31,7 +31,6 @@ import { Instrument } from "./instrument/instrument.model";
 import { PInstrument } from "./instrument/pt-instrument.model";
 import { NodePtTInstrument } from "./instrument/node-pt-t-instrument.model";
 import { NameInstrument } from "./instrument/name-instrument.model";
-import { NodeNamePtInstrument } from "./instrument/node-name-pt-instrument.mode";
 import { DocumentsInstrument } from "./documents/documents-instrument.model";
 import { ProvidersInstrument } from "./provider/provider-instrument.dto";
 import { ProvidersMaterial } from "./provider/provider-material.model";
@@ -40,7 +39,6 @@ import { EquipmentType } from "./equipment/euipment-type.model";
 import { EquipmentPType } from "./equipment/equipment-pt.model";
 import { NodePTPEquipment } from "./equipment/node_tpt_equipment.model";
 import { Equipment } from "./equipment/equipment.model";
-import { NodeEqPTEq } from "./equipment/node-eqpt-eq.model";
 import { ProvidersEquipment } from "./provider/providers-equipment.model";
 import { DocumentsEquipment } from "./documents/documents-equipment";
 import { InstrumentEquipment } from "./instrument/instrument-equipment.model";
@@ -59,6 +57,8 @@ import { OperationTechProcess } from "./detal/operation-tech-process.model";
 import { ActionsModule } from './actions/actions.module';
 import { Actions } from "./actions/actions.model";
 import { TypeOperation } from "./detal/type-operation.model";
+import { SebestoimModule } from './sebestoim/sebestoim.module';
+import { Sebestoim } from "./sebestoim/sebestoim.model";
 
 @Module({
     controllers: [],
@@ -97,14 +97,12 @@ import { TypeOperation } from "./detal/type-operation.model";
                 PInstrument,
                 NodePtTInstrument,
                 NameInstrument,
-                NodeNamePtInstrument,
                 DocumentsInstrument,
                 ProvidersInstrument,
                 ProvidersMaterial,
                 EquipmentType,
                 EquipmentPType,
                 NodePTPEquipment,
-                NodeEqPTEq,
                 Equipment,
                 ProvidersEquipment,
                 DocumentsEquipment,
@@ -121,7 +119,8 @@ import { TypeOperation } from "./detal/type-operation.model";
                 DocumentsTechProcess,
                 OperationTechProcess,
                 Actions,
-                TypeOperation
+                TypeOperation,
+                Sebestoim
             ],
             autoLoadModels: true,
           }),
@@ -138,6 +137,7 @@ import { TypeOperation } from "./detal/type-operation.model";
         EquipmentModule,
         DetalModule,
         ActionsModule,
+        SebestoimModule,
     ]
 })
 

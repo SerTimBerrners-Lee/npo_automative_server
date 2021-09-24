@@ -4,18 +4,14 @@ import { Actions } from "src/actions/actions.model";
 import { OperationEq } from "src/detal/operation-equipment.model";
 import { Operation } from "src/detal/operation.model";
 import { DocumentsEquipment } from "src/documents/documents-equipment";
-import { DocumentsInstrument } from "src/documents/documents-instrument.model";
 import { Documents } from "src/documents/documents.model";
 import { InstrumentEquipment } from "src/instrument/instrument-equipment.model";
 import { NameInstrument } from "src/instrument/name-instrument.model";
-import { ProvidersInstrument } from "src/provider/provider-instrument.dto";
 import { Providers } from "src/provider/provider.model";
 import { ProvidersEquipment } from "src/provider/providers-equipment.model";
 import { User } from "src/users/users.model";
 import { EquipmentPType } from "./equipment-pt.model";
 import { EquipmentType } from "./euipment-type.model";
-import { NodeEqPTEq } from "./node-eqpt-eq.model";
-
 interface EquipmentCreationAttrs {
     name: string;
 }
@@ -50,8 +46,13 @@ export class Equipment extends Model<Equipment, EquipmentCreationAttrs> {
     @BelongsToMany(() => Providers, () => ProvidersEquipment)
     providers: Providers[];
 
-    @BelongsToMany(() => EquipmentPType, () => NodeEqPTEq)
-    parents: EquipmentPType[];
+    //Привязываем к подтипу 
+    @ForeignKey(() => EquipmentPType)
+    @Column({type: DataType.INTEGER})
+    equipmentPTypeId: number;
+
+    @BelongsTo(() => EquipmentPType)
+    equipmentPType: EquipmentPType;
 
     @BelongsToMany(() => Documents, () => DocumentsEquipment)
     documents: Documents[];
@@ -63,8 +64,9 @@ export class Equipment extends Model<Equipment, EquipmentCreationAttrs> {
     @Column({type: DataType.INTEGER})
     rootParentId: number;
 
+    //  Привязка к типу
     @BelongsTo(() => EquipmentType)
-    equipmentType: EquipmentType;
+    equipmentType: EquipmentType;    
 
     @BelongsToMany(() => Operation, () => OperationEq)
     operation: Operation[]

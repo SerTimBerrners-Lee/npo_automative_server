@@ -4,7 +4,6 @@ import { Operation } from 'src/detal/operation.model';
 import { DocumentsEquipment } from 'src/documents/documents-equipment';
 import { Documents } from 'src/documents/documents.model';
 import { DocumentsModule } from 'src/documents/documents.module';
-import { DocumentsService } from 'src/documents/documents.service';
 import { InstrumentModule } from 'src/instrument/instrument.module';
 import { NameInstrument } from 'src/instrument/name-instrument.model';
 import { Providers } from 'src/provider/provider.model';
@@ -15,7 +14,6 @@ import { EquipmentController } from './equipment.controller';
 import { Equipment } from './equipment.model';
 import { EquipmentService } from './equipment.service';
 import { EquipmentType } from './euipment-type.model';
-import { NodeEqPTEq } from './node-eqpt-eq.model';
 import { NodePTPEquipment } from './node_tpt_equipment.model';
 
 @Module({
@@ -26,7 +24,6 @@ import { NodePTPEquipment } from './node_tpt_equipment.model';
             EquipmentType,
             EquipmentPType,
             NodePTPEquipment,
-            NodeEqPTEq,
             Equipment,
             ProvidersEquipment,
             DocumentsEquipment,

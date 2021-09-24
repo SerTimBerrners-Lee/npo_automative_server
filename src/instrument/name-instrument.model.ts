@@ -8,7 +8,6 @@ import { ProvidersInstrument } from "src/provider/provider-instrument.dto";
 import { Providers } from "src/provider/provider.model";
 import { InstrumentEquipment } from "./instrument-equipment.model";
 import { Instrument } from "./instrument.model";
-import { NodeNamePtInstrument } from "./node-name-pt-instrument.mode";
 import { PInstrument } from "./pt-instrument.model";
 
 interface NameInstrumentCreationAttrs {
@@ -49,8 +48,12 @@ export class NameInstrument extends Model<NameInstrument, NameInstrumentCreation
     @BelongsToMany(() => Providers, () => ProvidersInstrument)
     providers: Providers[];
 
-    @BelongsToMany(() => PInstrument, () => NodeNamePtInstrument)
-    parents: PInstrument[];
+    @ForeignKey(() => PInstrument)
+    @Column({type: DataType.INTEGER})
+    pInstrumentId: number;
+
+    @BelongsTo(() => PInstrument)
+    parent: PInstrument;
 
     @BelongsToMany(() => Documents, () => DocumentsInstrument)
     documents: Documents[];
@@ -66,6 +69,6 @@ export class NameInstrument extends Model<NameInstrument, NameInstrumentCreation
     instrumentType: Instrument;
 
     @HasMany(() => Actions)
-    actions: Actions[];
+    actions: Actions[]; 
 
 }    

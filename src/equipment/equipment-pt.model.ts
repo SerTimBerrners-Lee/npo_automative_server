@@ -1,8 +1,7 @@
 import { ApiProperty } from "@nestjs/swagger";
-import { Model, Column, DataType, Table, BelongsToMany } from "sequelize-typescript";
+import { Model, Column, DataType, Table, BelongsToMany, HasMany } from "sequelize-typescript";
 import { Equipment } from "./equipment.model";
 import { EquipmentType } from "./euipment-type.model";
-import { NodeEqPTEq } from "./node-eqpt-eq.model";
 import { NodePTPEquipment } from "./node_tpt_equipment.model";
 
 interface EquipmentPTypeCreationAttrs {
@@ -22,7 +21,7 @@ export class EquipmentPType extends Model<EquipmentPType, EquipmentPTypeCreation
     @BelongsToMany(() => EquipmentType, () =>  NodePTPEquipment)
     equipmentTypes: EquipmentType[]
 
-    @BelongsToMany(() => Equipment, () => NodeEqPTEq)
+    @HasMany(() => Equipment)
     equipments: Equipment[];
 
 }    

@@ -10,7 +10,6 @@ import { InstrumentController } from './instrument.controller';
 import { Instrument } from './instrument.model';
 import { InstrumentService } from './instrument.service';
 import { NameInstrument } from './name-instrument.model';
-import { NodeNamePtInstrument } from './node-name-pt-instrument.mode';
 import { NodePtTInstrument } from './node-pt-t-instrument.model';
 import { PInstrument } from './pt-instrument.model';
 
@@ -23,7 +22,6 @@ import { PInstrument } from './pt-instrument.model';
             PInstrument,
             NodePtTInstrument,
             NameInstrument,
-            NodeNamePtInstrument,
             Documents,
             DocumentsInstrument,
             ProvidersInstrument,

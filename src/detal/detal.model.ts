@@ -1,8 +1,9 @@
 import { ApiProperty } from "@nestjs/swagger";
-import { Model, Column, DataType, Table, BelongsToMany, HasMany, ForeignKey, BelongsTo } from "sequelize-typescript";
+import { Model, Column, DataType, Table, BelongsToMany, HasMany, ForeignKey, BelongsTo, HasOne } from "sequelize-typescript";
 import { Actions } from "src/actions/actions.model";
 import { DocumentsDetal } from "src/documents/documents-detal.model";
 import { Documents } from "src/documents/documents.model";
+import { Sebestoim } from "src/sebestoim/sebestoim.model";
 import { PodPodMaterial } from "src/settings/pod-pod-material.model";
 import { User } from "src/users/users.model";
 import { DetalMaterials } from "./detal-materials.model";
@@ -83,4 +84,7 @@ export class Detal extends Model<Detal, DetalCreationAttrs> {
 
     @HasMany(() => Actions)
     actions: Actions[];
+
+    @HasOne(() => Sebestoim)
+    sebestoim: Sebestoim;
 }     
