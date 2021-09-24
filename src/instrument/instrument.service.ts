@@ -105,14 +105,22 @@ export class InstrumentService {
         if(!nameInstrument)
             throw new HttpException('Произошла ошибка при добавлении', HttpStatus.BAD_REQUEST)
         
-        if(dto.description)
+        if(dto.description != 'null') 
             nameInstrument.description = dto.description
-        if(dto.deliveryTime)
+        else 
+            nameInstrument.description = ''
+        if(dto.deliveryTime != 'null') 
             nameInstrument.deliveryTime = dto.deliveryTime
-        if(dto.minOstatok)
+        else 
+            nameInstrument.deliveryTime = ''
+        if(dto.minOstatok != 'null')
             nameInstrument.minOstatok = dto.minOstatok
-        if(dto.mountUsed)
+        else 
+            nameInstrument.minOstatok = ''
+        if(dto.mountUsed != 'null') 
             nameInstrument.mountUsed = dto.mountUsed
+        else 
+            nameInstrument.mountUsed = ''
 
         if(dto.providers) {
             let providers = JSON.parse(dto.providers)
@@ -170,17 +178,23 @@ export class InstrumentService {
         console.info(dto)
         if(!nameInstrument)
             throw new HttpException('Произошла ошибка при добавлении', HttpStatus.BAD_REQUEST)
-        
-        if(dto.name) 
-            nameInstrument.name = dto.name
-        if(dto.description)
+    
+        if(dto.description != 'null') 
             nameInstrument.description = dto.description
-        if(dto.deliveryTime)
+        else 
+            nameInstrument.description = ''
+        if(dto.deliveryTime != 'null') 
             nameInstrument.deliveryTime = dto.deliveryTime
-        if(dto.minOstatok)
+        else 
+            nameInstrument.deliveryTime = ''
+        if(dto.minOstatok != 'null')
             nameInstrument.minOstatok = dto.minOstatok
-        if(dto.mountUsed)
+        else 
+            nameInstrument.minOstatok = ''
+        if(dto.mountUsed != 'null') 
             nameInstrument.mountUsed = dto.mountUsed
+        else 
+            nameInstrument.mountUsed = ''
 
         await nameInstrument.save()
 

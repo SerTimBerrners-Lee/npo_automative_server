@@ -10,7 +10,6 @@ import { Providers } from 'src/provider/provider.model';
 import { Edizm } from './edizm.model';
 import { MatPodMat } from './mat-pod-mat.model';
 import { Material } from './material.model';
-import { NodePodPodMaterial } from './node-pod-pod-material.model';
 import { PodMaterial } from './pod-material.model';
 import { PodPodMaterial } from './pod-pod-material.model';
 import { SettingsController } from './settings.controller';
@@ -25,7 +24,7 @@ import { TypeEdizm } from './type-edizm.model';
       TypeEdizm, Edizm, 
       Material, PodMaterial, 
       MatPodMat, PodPodMaterial,
-      NodePodPodMaterial, DocumentsMaterial, Documents,
+      DocumentsMaterial, Documents,
       ProvidersMaterial, Providers,
       Operation
     ]),

@@ -226,18 +226,21 @@ export class SettingsService {
         if(Number(dto.id)) {
             podPodMaterial = await this.podPodMaterialReprository.findByPk(dto.id)
             podPodMaterial.name = dto.name
-        } else {
+        } else 
             podPodMaterial = await this.podPodMaterialReprository.create({ name: dto.name})
-        }
-       
+        
+        await podPodMaterial.save()
+
         const podMaterials = await this.podMaterialReprository.findByPk(dto.podTypeId)
 
         if(!podPodMaterial || !podMaterials) 
             throw new HttpException('Не удалось создать запись ', HttpStatus.BAD_REQUEST)   
 
         if(dto.description) {
-            podPodMaterial.description = dto.description
-        }
+            let discr = JSON.parse(dto.description)
+            podPodMaterial.description = discr
+        } else 
+            podPodMaterial.description = '' 
         
         let [deliveryTime, kolvo, density]: any[] = []
 
@@ -277,7 +280,6 @@ export class SettingsService {
         thickness = JSON.parse(dto.thickness)
         areaCrossSectional = JSON.parse(dto.areaCrossSectional)
         
-
         if(length && length.edizm && length.znach) 
             await this.edizmReprository.findByPk(length.edizm).then(res => {
                 if(res) 
@@ -334,12 +336,12 @@ export class SettingsService {
         else 
             podPodMaterial.areaCrossSectional = null
 
-        
+        await podPodMaterial.save()
 
         if(!Number(dto.id)) {
-            await podMaterials.$add('podPodMaterials', podPodMaterial.id)
-            await podMaterials.save() 
-            if(dto.rootParentId) {
+            //podTypeId
+            podPodMaterial.podMaterialId = podMaterials.id
+            if(dto.rootParentId) { 
                 let material = await this.materialReprository.findByPk(dto.rootParentId)
                 if(material)
                     podPodMaterial.materialsId = material.id
@@ -376,9 +378,7 @@ export class SettingsService {
                 i++
             }
         }
-
         await podPodMaterial.save()
-
         return podPodMaterial
     }
 

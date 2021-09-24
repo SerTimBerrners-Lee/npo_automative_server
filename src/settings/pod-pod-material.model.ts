@@ -9,9 +9,7 @@ import { DocumentsMaterial } from "src/documents/documents-material.model";
 import { Documents } from "src/documents/documents.model";
 import { ProvidersMaterial } from "src/provider/provider-material.model";
 import { Providers } from "src/provider/provider.model";
-import { Edizm } from "./edizm.model";
 import { Material } from "./material.model";
-import { NodePodPodMaterial } from "./node-pod-pod-material.model";
 import { PodMaterial } from "./pod-material.model";
 
 interface PodPodMaterialCreationAttrs {
@@ -26,7 +24,7 @@ export class PodPodMaterial extends Model<PodPodMaterial, PodPodMaterialCreation
     id: number;
 
     @ApiProperty({example: 'Круг 20 D', description: 'Полная запись под материала измерений'})
-    @Column({type: DataType.STRING, allowNull: false})
+    @Column({type: DataType.STRING, allowNull: true})
     name: string;   
 
     @ApiProperty({example: true, description: 'Добавляем в архив'})
@@ -36,10 +34,7 @@ export class PodPodMaterial extends Model<PodPodMaterial, PodPodMaterialCreation
     @ApiProperty({example: '{edizmId: 10, znach: 2}', description: 'Срок поставки'})
     @Column({type: DataType.STRING, allowNull: true})
     deliveryTime: any; 
-
-    @BelongsToMany(() => PodMaterial, () => NodePodPodMaterial)
-    materials: PodMaterial[];
-
+    
     @BelongsToMany(() => Documents, () => DocumentsMaterial)
     documents: Documents[];
 
@@ -92,6 +87,13 @@ export class PodPodMaterial extends Model<PodPodMaterial, PodPodMaterialCreation
 
     @BelongsTo(() => Material)
     material: Material;
+
+    @ForeignKey(() => PodMaterial)
+    @Column({type: DataType.INTEGER})
+    podMaterialId: number;
+
+    @BelongsTo(() => PodMaterial)
+    podMaterial: PodMaterial;
 
     @BelongsToMany(() => Detal, () => DetalMaterials)
     detals: Detal[];

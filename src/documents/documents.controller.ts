@@ -1,4 +1,4 @@
-import { Body, Controller, Delete, Get, Param, Post, UploadedFiles, UseInterceptors } from '@nestjs/common';
+import { Body, Controller, Delete, Get, Param, Post, Put, UploadedFiles, UseInterceptors } from '@nestjs/common';
 import { FileFieldsInterceptor } from '@nestjs/platform-express';
 import { ApiOperation, ApiTags } from '@nestjs/swagger';
 import { DocumentsService } from './documents.service';
@@ -48,6 +48,12 @@ export class DocumentsController {
     changeType(@Body() dto: ChangeTypeDto) {
         console.log(dto)
         return this.documentService.changeType(dto)
+    }
+
+    @ApiOperation({summary: 'Привязываем деталь к документу'})
+    @Put('/setdetal')
+    setDetalForDocument(@Body() dto: any) {
+        return this.documentService.setDetalForDocument(dto)
     }
 }
  

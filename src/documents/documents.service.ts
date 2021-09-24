@@ -6,11 +6,13 @@ import * as fs from 'fs';
 import * as path from 'path';
 import * as uuid from 'uuid';
 import { ChangeTypeDto } from './dto/change-type.dto';
+import { Detal } from 'src/detal/detal.model';
 
 @Injectable()
 export class DocumentsService {
     constructor(@InjectModel(Documents)
-        private documentReprository: typeof Documents
+        private documentReprository: typeof Documents,
+        @InjectModel(Detal) private detalReprository: typeof Detal,
     ) {}
 
     async createDocument(dto: CreateDocumentsDto) {
@@ -93,6 +95,16 @@ export class DocumentsService {
         await documents.save()
 
         return documents
+    }
+    
+    async setDetalForDocument(dto: any) {
+        const detal = await this.detalReprository.findByPk(dto.id_detal)
+        const document = await this.documentReprository.findByPk(dto.id_document)
+        if(!detal || !document) 
+            throw new HttpException('Не удалось найти деталь или документ', HttpStatus.BAD_REQUEST)
+        await document.$add('detals', detal.id)
+        await document.save()
+        return document
     }
 
 

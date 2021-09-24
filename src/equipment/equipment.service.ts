@@ -104,12 +104,18 @@ export class EquipmentService {
         if(!equipment)
             throw new HttpException('Произошла ошибка при добавлении', HttpStatus.BAD_REQUEST)
         
-        if(dto.description)
+        if(dto.description != 'null')
             equipment.description = dto.description
-        if(dto.deliveryTime)
+            else
+                equipment.description = ''
+        if(dto.deliveryTime != 'null')
             equipment.deliveryTime = dto.deliveryTime
-        if(dto.invNymber)
+            else
+                equipment.deliveryTime = ''
+        if(dto.invNymber != 'null')
             equipment.invNymber = dto.invNymber
+            else
+                equipment.invNymber = ''
          if(dto.responsible) {
             const user = await this.userRepository.findByPk(dto.responsible)
             if(user) 
@@ -188,12 +194,18 @@ export class EquipmentService {
         if(!equipment)
             throw new HttpException('Произошла ошибка при добавлении', HttpStatus.BAD_REQUEST)
         
-        if(dto.description)
+        if(dto.description != 'null')
             equipment.description = dto.description
-        if(dto.deliveryTime)
+            else
+                equipment.description = ''
+        if(dto.deliveryTime != 'null')
             equipment.deliveryTime = dto.deliveryTime
-        if(dto.invNymber)
+            else
+                equipment.deliveryTime = ''
+        if(dto.invNymber != 'null')
             equipment.invNymber = dto.invNymber
+            else
+                equipment.invNymber = ''
         if(dto.name)
             equipment.name = dto.name
 

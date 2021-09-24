@@ -18,7 +18,6 @@ import { DocumentsUser } from "./documents/documents-user.model";
 import { SettingsModule } from './settings/settings.module';
 import { DocumentsMaterial } from "./documents/documents-material.model";
 import { PodPodMaterial } from "./settings/pod-pod-material.model";
-import { NodePodPodMaterial } from "./settings/node-pod-pod-material.model";
 import { PodMaterial } from "./settings/pod-material.model";
 import { Edizm } from "./settings/edizm.model";
 import { MatPodMat } from "./settings/mat-pod-mat.model";
@@ -87,7 +86,6 @@ import { TypeOperation } from "./detal/type-operation.model";
                 DocumentsUser,
                 DocumentsMaterial,
                 PodPodMaterial,
-                NodePodPodMaterial,
                 PodMaterial,
                 Edizm,
                 MatPodMat,
