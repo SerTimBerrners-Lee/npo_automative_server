@@ -175,10 +175,10 @@ export class InstrumentService {
 
     async updateNameInstrument(dto: UpdateNameInstrumentDto, files: any) {
         const nameInstrument = await this.nameInastrumentReprository.findByPk(dto.id)
-        console.info(dto)
+
         if(!nameInstrument)
             throw new HttpException('Произошла ошибка при добавлении', HttpStatus.BAD_REQUEST)
-    
+        nameInstrument.name = dto.name
         if(dto.description != 'null') 
             nameInstrument.description = dto.description
         else 

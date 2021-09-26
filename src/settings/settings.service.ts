@@ -188,6 +188,14 @@ export class SettingsService {
                     pod_material.density = JSON.stringify({edizm: res, znach: density.znach})
             })
         }
+
+        if(Number(dto.parentMaterialId)) {
+            const type_material = await this.materialReprository.findByPk(dto.parentMaterialId)
+            if(type_material)   {
+                await type_material.$add('podMaterials', pod_material.id)
+                await type_material.save()
+            }
+        }
         await pod_material.save()
     
         return pod_material

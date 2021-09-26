@@ -10,4 +10,6 @@ export class CreatePodMaterialDto {
     readonly id: number;
     @ApiProperty({example: 1, description: 'К какой инстанции относится под тип'})
     readonly instansMaterial: number;
+    @ApiProperty({example: 1, description: 'К какому типу принадлежит'})
+    readonly parentMaterialId: any;
 }
