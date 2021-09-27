@@ -10,6 +10,7 @@ import { IssueUser } from "src/issue/issue-user.model";
 import { Issue } from "src/issue/issue.model";
 import { Role } from "src/roles/roles.model";
 import * as bcrypt from 'bcryptjs';
+import { Cbed } from "src/cbed/cbed.model";
 
 interface UserCreationAttrs {
     password: string;
@@ -103,6 +104,9 @@ export class User extends Model<User, UserCreationAttrs> {
 
     @HasMany(() => Detal)
     detals: Detal[];
+
+    @HasMany(() => Cbed)
+    cbeds: Cbed[];
 
     @HasMany(() => Equipment)
     equipments: Equipment[];

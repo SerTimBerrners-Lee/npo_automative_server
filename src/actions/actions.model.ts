@@ -8,6 +8,7 @@ import { PodPodMaterial } from "src/settings/pod-pod-material.model";
 import { NameInstrument } from "src/instrument/name-instrument.model";
 import { Detal } from "src/detal/detal.model";
 import { TechProcess } from "src/detal/tech-process.model";
+import { Cbed } from "src/cbed/cbed.model";
 interface ActionsCreationAttrs { 
     action: string
 }
@@ -74,6 +75,13 @@ export class Actions extends Model<Actions, ActionsCreationAttrs> {
 
     @BelongsTo(() => Detal)
     detal: Detal;
+
+    @ForeignKey(() => Cbed)
+    @Column({type: DataType.INTEGER})
+    cbedId: number;
+
+    @BelongsTo(() => Cbed)
+    cbed: Cbed;
 
     @ForeignKey(() => TechProcess)
     @Column({type: DataType.INTEGER})

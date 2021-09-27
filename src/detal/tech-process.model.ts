@@ -1,6 +1,7 @@
 import { ApiProperty } from "@nestjs/swagger";
 import { Model, Column, DataType, Table, BelongsToMany, ForeignKey, BelongsTo, HasMany } from "sequelize-typescript";
 import { Actions } from "src/actions/actions.model";
+import { Cbed } from "src/cbed/cbed.model";
 import { DocumentsTechProcess } from "src/documents/documents-tech-process.model";
 import { Documents } from "src/documents/documents.model";
 import { Detal } from "./detal.model";
@@ -38,6 +39,13 @@ export class TechProcess extends Model<TechProcess> {
 
     @BelongsTo(() => Detal)
     detal: Detal;
+
+    @ForeignKey(() => Cbed)
+    @Column({type: DataType.INTEGER})
+    cbedId: number;
+
+    @BelongsTo(() => Cbed)
+    cbed: Cbed;
 
     @HasMany(() => Actions)
     actions: Actions[];

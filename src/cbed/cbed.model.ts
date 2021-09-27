@@ -1,21 +1,21 @@
 import { ApiProperty } from "@nestjs/swagger";
 import { Model, Column, DataType, Table, BelongsToMany, HasMany, ForeignKey, BelongsTo, HasOne } from "sequelize-typescript";
 import { Actions } from "src/actions/actions.model";
-import { Cbed } from "src/cbed/cbed.model";
+import { Detal } from "src/detal/detal.model";
+import { TechProcess } from "src/detal/tech-process.model";
+import { DocumentsCbed } from "src/documents/documents-cbed.model";
 import { DocumentsDetal } from "src/documents/documents-detal.model";
 import { Documents } from "src/documents/documents.model";
 import { Sebestoim } from "src/sebestoim/sebestoim.model";
 import { PodPodMaterial } from "src/settings/pod-pod-material.model";
 import { User } from "src/users/users.model";
-import { DetalMaterials } from "./detal-materials.model";
-import { TechProcess } from "./tech-process.model";
 
-interface DetalCreationAttrs {
+interface CbedCreationAttrs {
     name: string;
 }
 
-@Table({tableName: 'detal'})
-export class Detal extends Model<Detal, DetalCreationAttrs> {
+@Table({tableName: 'cbed'})
+export class Cbed extends Model<Cbed, CbedCreationAttrs> {
 
     @ApiProperty({example: '1', description: 'Уникальный идентификатор'})
     @Column({type: DataType.INTEGER, unique: true, autoIncrement: true, primaryKey: true})
@@ -46,32 +46,26 @@ export class Detal extends Model<Detal, DetalCreationAttrs> {
     haracteriatic: any;
 
     @ApiProperty({example: 12, description: 'Срок поставки'})
-    @Column({type: DataType.STRING, allowNull: true})
-    DxL: any;
-
-    @ApiProperty({example: 12, description: 'Срок поставки'})
-    @Column({type: DataType.STRING, allowNull: true})
-    massZag: any;
-    
-    @ApiProperty({example: 12, description: 'Срок поставки'})
-    @Column({type: DataType.STRING, allowNull: true})
-    trash: any;
-
-    @ApiProperty({example: 12, description: 'Срок поставки'})
     @Column({type: DataType.TEXT, allowNull: true})
     materialList: any;
 
-    @BelongsToMany(() => Documents, () => DocumentsDetal)
+    @ApiProperty({example: 12, description: 'Срок поставки'})
+    @Column({type: DataType.TEXT, allowNull: true})
+    listPokDet: any;
+
+    @ApiProperty({example: 12, description: 'Срок поставки'})
+    @Column({type: DataType.TEXT, allowNull: true})
+    listDetal: any;
+
+    @BelongsToMany(() => Documents, () => DocumentsCbed)
     documents: Documents[];
 
     // Регистрируем модель для материалов
-    @BelongsToMany(() => PodPodMaterial, () => DetalMaterials)
+    @HasMany(() => PodPodMaterial)
     materials: PodPodMaterial[];
 
-    @Column({type: DataType.INTEGER, allowNull: true})
-    mat_zag: number;
-    @Column({type: DataType.INTEGER, allowNull: true})
-    mat_zag_zam: number;
+    @HasMany(() => Detal)
+    detals: Detal[];
 
     @HasMany(() => TechProcess)
     techProcesses: TechProcess[];
@@ -82,13 +76,6 @@ export class Detal extends Model<Detal, DetalCreationAttrs> {
 
     @BelongsTo(() => User)
     user: User;
-
-    @ForeignKey(() => Cbed)
-    @Column({type: DataType.INTEGER})
-    cbedId: number;
-
-    @BelongsTo(() => Cbed)
-    cbed: Cbed;
 
     @HasMany(() => Actions)
     actions: Actions[];

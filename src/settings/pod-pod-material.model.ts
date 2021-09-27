@@ -1,6 +1,7 @@
 import { ApiProperty } from "@nestjs/swagger";
 import { Model, Column, DataType, Table, BelongsTo, ForeignKey, BelongsToMany, HasMany } from "sequelize-typescript";
 import { Actions } from "src/actions/actions.model";
+import { Cbed } from "src/cbed/cbed.model";
 import { DetalMaterials } from "src/detal/detal-materials.model";
 import { Detal } from "src/detal/detal.model";
 import { OperationMaterial } from "src/detal/operation-material.model";
@@ -104,5 +105,12 @@ export class PodPodMaterial extends Model<PodPodMaterial, PodPodMaterialCreation
     // История изменений также прикрепляется сюда при изменении фала 
     @HasMany(() => Actions)
     actions: Actions[];
+
+    @ForeignKey(() => Cbed)
+    @Column({type: DataType.INTEGER})
+    cbedId: number;
+
+    @BelongsTo(() => Cbed)
+    cbed: Cbed;
 
 }    
