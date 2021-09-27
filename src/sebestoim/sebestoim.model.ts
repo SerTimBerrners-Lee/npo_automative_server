@@ -2,6 +2,7 @@ import { ApiProperty } from "@nestjs/swagger";
 import { Model, Column, DataType, Table, BelongsToMany, ForeignKey, BelongsTo } from "sequelize-typescript";
 import { Cbed } from "src/cbed/cbed.model";
 import { Detal } from "src/detal/detal.model";
+import { Product } from "src/product/product.model";
 import { User } from "src/users/users.model";
 
 interface SebestoimCreationAttrs {
@@ -32,4 +33,11 @@ export class Sebestoim extends Model<Sebestoim, SebestoimCreationAttrs> {
 
     @BelongsTo(() => Cbed)
     cbed: Cbed;
+
+    @ForeignKey(() => Product)
+    @Column({type: DataType.INTEGER})
+    productId: number;
+
+    @BelongsTo(() => Product)
+    product: Product;
 }     

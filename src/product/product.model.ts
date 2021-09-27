@@ -1,21 +1,21 @@
 import { ApiProperty } from "@nestjs/swagger";
 import { Model, Column, DataType, Table, BelongsToMany, HasMany, ForeignKey, BelongsTo, HasOne } from "sequelize-typescript";
 import { Actions } from "src/actions/actions.model";
+import { Cbed } from "src/cbed/cbed.model";
 import { Detal } from "src/detal/detal.model";
 import { TechProcess } from "src/detal/tech-process.model";
-import { DocumentsCbed } from "src/documents/documents-cbed.model";
+import { DocumentsProduct } from "src/documents/documents-product.model";
 import { Documents } from "src/documents/documents.model";
-import { Product } from "src/product/product.model";
 import { Sebestoim } from "src/sebestoim/sebestoim.model";
 import { PodPodMaterial } from "src/settings/pod-pod-material.model";
 import { User } from "src/users/users.model";
 
-interface CbedCreationAttrs {
+interface ProductCreationAttrs {
     name: string;
 }
 
-@Table({tableName: 'cbed'})
-export class Cbed extends Model<Cbed, CbedCreationAttrs> {
+@Table({tableName: 'product'})
+export class Product extends Model<Product, ProductCreationAttrs> {
 
     @ApiProperty({example: '1', description: 'Уникальный идентификатор'})
     @Column({type: DataType.INTEGER, unique: true, autoIncrement: true, primaryKey: true})
@@ -28,6 +28,10 @@ export class Cbed extends Model<Cbed, CbedCreationAttrs> {
     @ApiProperty({example: true, description: 'Добавляем в архив'})
     @Column({type: DataType.BOOLEAN, defaultValue: false})
     ban: boolean; 
+
+    @ApiProperty({example: 12, description: 'Срок поставки'})
+    @Column({type: DataType.STRING, allowNull: true})
+    fabricNumber: string; 
 
     @ApiProperty({example: 12, description: 'Срок поставки'})
     @Column({type: DataType.STRING, allowNull: true})
@@ -57,15 +61,22 @@ export class Cbed extends Model<Cbed, CbedCreationAttrs> {
     @Column({type: DataType.TEXT, allowNull: true})
     listDetal: any;
 
-    @BelongsToMany(() => Documents, () => DocumentsCbed)
+    @ApiProperty({example: 12, description: 'Срок поставки'})
+    @Column({type: DataType.TEXT, allowNull: true})
+    listCbed: any;
+
+    // Регестрируем привязки
+    @BelongsToMany(() => Documents, () => DocumentsProduct)
     documents: Documents[];
 
-    // Регистрируем модель для материалов
     @HasMany(() => PodPodMaterial)
     materials: PodPodMaterial[];
 
     @HasMany(() => Detal)
     detals: Detal[];
+
+    @HasMany(() => Cbed)
+    cbeds: Cbed[];
 
     @HasMany(() => TechProcess)
     techProcesses: TechProcess[];
@@ -76,13 +87,6 @@ export class Cbed extends Model<Cbed, CbedCreationAttrs> {
 
     @BelongsTo(() => User)
     user: User;
-
-    @ForeignKey(() => Product)
-    @Column({type: DataType.INTEGER})
-    productId: number;
-
-    @BelongsTo(() => Product)
-    product: Product;
 
     @HasMany(() => Actions)
     actions: Actions[];

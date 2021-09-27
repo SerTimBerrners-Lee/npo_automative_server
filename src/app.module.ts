@@ -62,11 +62,12 @@ import { IssueModule } from './issue/issue.module';
 import { IssueUser } from "./issue/issue-user.model";
 import { Issue } from "./issue/issue.model";
 import { Deliveries } from "./provider/deliveries.model";
-import { CbedController } from './cbed/cbed.controller';
-import { CbedService } from './cbed/cbed.service';
 import { CbedModule } from './cbed/cbed.module';
 import { Cbed } from "./cbed/cbed.model";
 import { DocumentsCbed } from "./documents/documents-cbed.model";
+import { ProductModule } from './product/product.module';
+import { Product } from "./product/product.model";
+import { DocumentsProduct } from "./documents/documents-product.model";
 
 @Module({
     controllers: [],
@@ -132,7 +133,9 @@ import { DocumentsCbed } from "./documents/documents-cbed.model";
                 IssueUser,
                 Deliveries,
                 Cbed,
-                DocumentsCbed
+                DocumentsCbed,
+                DocumentsProduct,
+                Product
             ],
             autoLoadModels: true,
           }),
@@ -152,6 +155,7 @@ import { DocumentsCbed } from "./documents/documents-cbed.model";
         SebestoimModule,
         IssueModule,
         CbedModule,
+        ProductModule,
     ]
 })
 

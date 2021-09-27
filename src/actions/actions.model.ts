@@ -9,6 +9,7 @@ import { NameInstrument } from "src/instrument/name-instrument.model";
 import { Detal } from "src/detal/detal.model";
 import { TechProcess } from "src/detal/tech-process.model";
 import { Cbed } from "src/cbed/cbed.model";
+import { Product } from "src/product/product.model";
 interface ActionsCreationAttrs { 
     action: string
 }
@@ -89,6 +90,13 @@ export class Actions extends Model<Actions, ActionsCreationAttrs> {
 
     @BelongsTo(() => TechProcess)
     techProcess: TechProcess;
+
+    @ForeignKey(() => Product)
+    @Column({type: DataType.INTEGER})
+    productId: number;
+
+    @BelongsTo(() => Product)
+    product: Product;
 
 
 

@@ -8,6 +8,7 @@ import { OperationMaterial } from "src/detal/operation-material.model";
 import { Operation } from "src/detal/operation.model";
 import { DocumentsMaterial } from "src/documents/documents-material.model";
 import { Documents } from "src/documents/documents.model";
+import { Product } from "src/product/product.model";
 import { ProvidersMaterial } from "src/provider/provider-material.model";
 import { Providers } from "src/provider/provider.model";
 import { Material } from "./material.model";
@@ -112,5 +113,13 @@ export class PodPodMaterial extends Model<PodPodMaterial, PodPodMaterialCreation
 
     @BelongsTo(() => Cbed)
     cbed: Cbed;
+
+    @ForeignKey(() => Product)
+    @Column({type: DataType.INTEGER})
+    productId: number;
+
+    @BelongsTo(() => Product)
+    product: Product;
+
 
 }    

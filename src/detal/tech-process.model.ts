@@ -4,6 +4,7 @@ import { Actions } from "src/actions/actions.model";
 import { Cbed } from "src/cbed/cbed.model";
 import { DocumentsTechProcess } from "src/documents/documents-tech-process.model";
 import { Documents } from "src/documents/documents.model";
+import { Product } from "src/product/product.model";
 import { Detal } from "./detal.model";
 import { OperationTechProcess } from "./operation-tech-process.model";
 import { Operation } from "./operation.model";
@@ -49,4 +50,11 @@ export class TechProcess extends Model<TechProcess> {
 
     @HasMany(() => Actions)
     actions: Actions[];
+
+    @ForeignKey(() => Product)
+    @Column({type: DataType.INTEGER})
+    productId: number;
+
+    @BelongsTo(() => Product)
+    product: Product;
 }     

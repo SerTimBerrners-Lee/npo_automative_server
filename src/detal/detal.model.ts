@@ -4,6 +4,7 @@ import { Actions } from "src/actions/actions.model";
 import { Cbed } from "src/cbed/cbed.model";
 import { DocumentsDetal } from "src/documents/documents-detal.model";
 import { Documents } from "src/documents/documents.model";
+import { Product } from "src/product/product.model";
 import { Sebestoim } from "src/sebestoim/sebestoim.model";
 import { PodPodMaterial } from "src/settings/pod-pod-material.model";
 import { User } from "src/users/users.model";
@@ -89,6 +90,13 @@ export class Detal extends Model<Detal, DetalCreationAttrs> {
 
     @BelongsTo(() => Cbed)
     cbed: Cbed;
+
+    @ForeignKey(() => Product)
+    @Column({type: DataType.INTEGER})
+    productId: number;
+
+    @BelongsTo(() => Product)
+    product: Product;
 
     @HasMany(() => Actions)
     actions: Actions[];
