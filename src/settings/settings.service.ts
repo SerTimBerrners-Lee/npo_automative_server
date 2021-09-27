@@ -42,32 +42,6 @@ export class SettingsService {
     } 
 
     async getAllTypeEdizm() {
-        // Проверяем типы если их нет - создаем
-        let types = await this.typeEdizmReprositoy.findOne({where: {name: 'Экономические единицы'}})
-        if(!types)
-            await this.typeEdizmReprositoy.create({name: 'Экономические единицы'})
-        types = await this.typeEdizmReprositoy.findOne({where: {name: 'Единицы времени'}})
-        if(!types)
-            await this.typeEdizmReprositoy.create({name: 'Единицы времени'})
-        types = await this.typeEdizmReprositoy.findOne({where: {name: 'Технические единицы'}})
-        if(!types)
-            await this.typeEdizmReprositoy.create({name: 'Технические единицы'})
-        types = await this.typeEdizmReprositoy.findOne({where: {name: 'Единицы массы'}})
-        if(!types)
-            await this.typeEdizmReprositoy.create({name: 'Единицы массы'})
-        types = await this.typeEdizmReprositoy.findOne({where: {name: 'Единицы объема'}})
-        if(!types)
-            await this.typeEdizmReprositoy.create({name: 'Единицы объема'})
-        types = await this.typeEdizmReprositoy.findOne({where: {name: 'Единицы площади'}})
-        if(!types)
-        await this.typeEdizmReprositoy.create({name: 'Единицы площади'})
-        types = await this.typeEdizmReprositoy.findOne({where: {name: 'Единицы длины (Длина L Ширина A Высота B)'}})
-        if(!types)
-            await this.typeEdizmReprositoy.create({name: 'Единицы длины (Длина L Ширина A Высота B)'})
-        types = await this.typeEdizmReprositoy.findOne({where: {name: 'Количественные единицы'}})
-        if(!types)
-            await this.typeEdizmReprositoy.create({name: 'Количественные единицы'})
-
         const eType = await this.typeEdizmReprositoy.findAll()
         return eType
     }

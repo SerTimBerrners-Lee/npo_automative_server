@@ -1,5 +1,5 @@
 import { ApiProperty } from "@nestjs/swagger";
-import { Model, Column, DataType, Table, BelongsToMany, HasMany, ForeignKey, BelongsTo } from "sequelize-typescript";
+import { Model, Column, DataType, Table, BelongsToMany, HasMany, ForeignKey, BelongsTo, BeforeSync, BeforeInit, AfterSync, AfterDefine } from "sequelize-typescript";
 import { Actions } from "src/actions/actions.model";
 import { Avatars } from "src/avatars/avatars.model";
 import { Detal } from "src/detal/detal.model";
@@ -9,6 +9,7 @@ import { Equipment } from "src/equipment/equipment.model";
 import { IssueUser } from "src/issue/issue-user.model";
 import { Issue } from "src/issue/issue.model";
 import { Role } from "src/roles/roles.model";
+import * as bcrypt from 'bcryptjs';
 
 interface UserCreationAttrs {
     password: string;
@@ -112,5 +113,23 @@ export class User extends Model<User, UserCreationAttrs> {
     // Issue 
     @BelongsToMany(() => Issue, () => IssueUser)
     issues: Issue[];
+
+    @AfterSync
+    static async checkUser(sync: any) {
+        const user = await sync.sequelize.models.User
+        if(!user)
+            return 
+
+        const hashPassword = await bcrypt.hash('54321', 5);
+        const allUser = await user.findAll()
+        if(!allUser.length) {
+            user.create({
+                password: hashPassword,
+                login: 'Admin.A.A',
+                tabel: '001',
+                initial: 'Admin Admin Admin'
+            })
+        }
+    }
 
 }  
