@@ -5,7 +5,6 @@ import { User } from "./users/users.model";
 import { UsersModule } from './users/users.module';
 import { RolesModule } from './roles/roles.module';
 import { Role } from "./roles/roles.model";
-import { UserRoles } from "./roles/user-roles.model";
 import { AuthModule } from './auth/auth.module';
 import { AvatarsModule } from './avatars/avatars.module';
 import { Avatars } from "./avatars/avatars.model";
@@ -59,6 +58,10 @@ import { Actions } from "./actions/actions.model";
 import { TypeOperation } from "./detal/type-operation.model";
 import { SebestoimModule } from './sebestoim/sebestoim.module';
 import { Sebestoim } from "./sebestoim/sebestoim.model";
+import { IssueModule } from './issue/issue.module';
+import { IssueUser } from "./issue/issue-user.model";
+import { Issue } from "./issue/issue.model";
+import { Deliveries } from "./provider/deliveries.model";
 
 @Module({
     controllers: [],
@@ -79,8 +82,7 @@ import { Sebestoim } from "./sebestoim/sebestoim.model";
             database: process.env.POSTGRES_DB,
             models: [
                 User, 
-                Role, 
-                UserRoles, 
+                Role,
                 Avatars, 
                 Documents, 
                 DocumentsUser,
@@ -120,7 +122,10 @@ import { Sebestoim } from "./sebestoim/sebestoim.model";
                 OperationTechProcess,
                 Actions,
                 TypeOperation,
-                Sebestoim
+                Sebestoim,
+                Issue,
+                IssueUser,
+                Deliveries
             ],
             autoLoadModels: true,
           }),
@@ -138,6 +143,7 @@ import { Sebestoim } from "./sebestoim/sebestoim.model";
         DetalModule,
         ActionsModule,
         SebestoimModule,
+        IssueModule,
     ]
 })
 

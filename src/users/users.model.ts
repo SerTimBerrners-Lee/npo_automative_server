@@ -1,13 +1,14 @@
 import { ApiProperty } from "@nestjs/swagger";
-import { Model, Column, DataType, Table, BelongsToMany, HasMany } from "sequelize-typescript";
+import { Model, Column, DataType, Table, BelongsToMany, HasMany, ForeignKey, BelongsTo } from "sequelize-typescript";
 import { Actions } from "src/actions/actions.model";
 import { Avatars } from "src/avatars/avatars.model";
 import { Detal } from "src/detal/detal.model";
 import { DocumentsUser } from "src/documents/documents-user.model";
 import { Documents } from "src/documents/documents.model";
 import { Equipment } from "src/equipment/equipment.model";
+import { IssueUser } from "src/issue/issue-user.model";
+import { Issue } from "src/issue/issue.model";
 import { Role } from "src/roles/roles.model";
-import { UserRoles } from "src/roles/user-roles.model";
 
 interface UserCreationAttrs {
     password: string;
@@ -86,8 +87,12 @@ export class User extends Model<User, UserCreationAttrs> {
     @Column({type: DataType.STRING, defaultValue: 'ava_defolt.png'})
     image: string;
 
-    @BelongsToMany(() => Role, () => UserRoles)
-    roles: Role[];
+    @ForeignKey(() => Role)
+    @Column({type: DataType.INTEGER})
+    rolesId: number;
+
+    @BelongsTo(() => Role)
+    role: Role;
 
     @BelongsToMany(() => Documents, () => DocumentsUser)
     documents: Documents[];
@@ -103,4 +108,9 @@ export class User extends Model<User, UserCreationAttrs> {
 
     @HasMany(() => Actions)
     actions: Actions[];
+
+    // Issue 
+    @BelongsToMany(() => Issue, () => IssueUser)
+    issues: Issue[];
+
 }  

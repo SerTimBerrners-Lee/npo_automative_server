@@ -1,11 +1,12 @@
 import { ApiProperty } from "@nestjs/swagger";
-import { Model, Column, DataType, Table, BelongsToMany, HasMany } from "sequelize-typescript";
+import { Model, Column, DataType, Table, BelongsToMany, HasMany, ForeignKey, BelongsTo } from "sequelize-typescript";
 import { Actions } from "src/actions/actions.model";
 import { DocumentsProviders } from "src/documents/documents-providers.model";
 import { Documents } from "src/documents/documents.model";
 import { Equipment } from "src/equipment/equipment.model";
 import { NameInstrument } from "src/instrument/name-instrument.model";
 import { PodPodMaterial } from "src/settings/pod-pod-material.model";
+import { Deliveries } from "./deliveries.model";
 import { ProvidersInstrument } from "./provider-instrument.dto";
 import { ProvidersMaterial } from "./provider-material.model";
 import { ProvidersEquipment } from "./providers-equipment.model";
@@ -55,5 +56,12 @@ export class Providers extends Model<Providers, ProvidersCreationAttrs> {
 
     @HasMany(() => Actions)
     actions: Actions[];
+
+    @ForeignKey(() => Deliveries)
+    @Column({type: DataType.INTEGER})
+    deliveriesId: number;
+
+    @BelongsTo(() => Deliveries)
+    deliveries: Deliveries;
 
 }    

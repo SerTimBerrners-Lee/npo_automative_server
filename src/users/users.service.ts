@@ -25,6 +25,11 @@ export class UsersService {
         const hashPassword  =   await bcrypt.hash(dto.password, 5);
         const user          =   await this.userRepository
             .create({...dto, password: hashPassword});
+        
+        if(roles) {
+            user.rolesId = roles.id
+            await user.save()
+        }
 
         if(files.image)  {
             const ava = await this.saveImage(files)
@@ -33,10 +38,6 @@ export class UsersService {
                 await user.$add('document', ava.id)
             }
         }
-                
-       
-        await user.$set('roles', roles.id)
-        user.roles = [roles]
         
         if(files.document) {
             for(let file of files.document) {
@@ -75,8 +76,7 @@ export class UsersService {
 
         const roles =  await this.rolesService.getRoleByPk(dto.roles)
         if(roles) {
-            user.roles = [];
-            await user.$add('roles', roles.id)
+            user.rolesId = roles.id
             await user.save()
         }
 
