@@ -68,6 +68,10 @@ import { DocumentsCbed } from "./documents/documents-cbed.model";
 import { ProductModule } from './product/product.module';
 import { Product } from "./product/product.model";
 import { DocumentsProduct } from "./documents/documents-product.model";
+import { BuyerModule } from './buyer/buyer.module';
+import { Buyer } from "./buyer/buyer.model";
+import { Purchases } from "./buyer/purchases.model";
+import { DocumentsBuyer } from "./documents/documents-buyer.model";
 
 @Module({
     controllers: [],
@@ -89,23 +93,30 @@ import { DocumentsProduct } from "./documents/documents-product.model";
             models: [
                 User, 
                 Role,
+                TypeEdizm,
                 Avatars, 
                 Documents, 
                 DocumentsUser,
                 DocumentsMaterial,
+                DocumentsProviders,
+                DocumentsInstrument,
+                DocumentsDetal,
+                DocumentsOperation,
+                DocumentsTechProcess,
+                DocumentsCbed,
+                DocumentsProduct,
+                DocumentsBuyer,
+                DocumentsEquipment,
                 PodPodMaterial,
                 PodMaterial,
                 Edizm,
                 MatPodMat,
                 Material,
-                TypeEdizm,
-                DocumentsProviders,
                 Providers,
                 Instrument,
                 PInstrument,
                 NodePtTInstrument,
                 NameInstrument,
-                DocumentsInstrument,
                 ProvidersInstrument,
                 ProvidersMaterial,
                 EquipmentType,
@@ -113,18 +124,14 @@ import { DocumentsProduct } from "./documents/documents-product.model";
                 NodePTPEquipment,
                 Equipment,
                 ProvidersEquipment,
-                DocumentsEquipment,
                 InstrumentEquipment,
                 Detal,
-                DocumentsDetal,
                 DetalMaterials,
                 Operation,
                 OperationEq,
                 OperationMaterial,
-                DocumentsOperation,
                 InstrumentOperation,
                 TechProcess,
-                DocumentsTechProcess,
                 OperationTechProcess,
                 Actions,
                 TypeOperation,
@@ -133,9 +140,9 @@ import { DocumentsProduct } from "./documents/documents-product.model";
                 IssueUser,
                 Deliveries,
                 Cbed,
-                DocumentsCbed,
-                DocumentsProduct,
-                Product
+                Product,
+                Buyer,
+                Purchases,
             ],
             autoLoadModels: true,
           }),
@@ -156,6 +163,7 @@ import { DocumentsProduct } from "./documents/documents-product.model";
         IssueModule,
         CbedModule,
         ProductModule,
+        BuyerModule,
     ]
 })
 

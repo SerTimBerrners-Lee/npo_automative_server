@@ -1,5 +1,6 @@
 
 export class CreateCbedDto {
+    readonly id:                number;
     readonly name:              string;
     readonly articl:            string;
     readonly responsible:       string;
@@ -9,7 +10,8 @@ export class CreateCbedDto {
 
     readonly listDetal:         string;
     readonly listPokDet:        string
-    readonly materialList:      string;;   
+    readonly materialList:      string;   
+    readonly listCbed:          string;
 
     readonly docs:              any;
     readonly techProcessID:     number;

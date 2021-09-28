@@ -55,6 +55,10 @@ export class Cbed extends Model<Cbed, CbedCreationAttrs> {
 
     @ApiProperty({example: 12, description: 'Срок поставки'})
     @Column({type: DataType.TEXT, allowNull: true})
+    listCbed: any;
+
+    @ApiProperty({example: 12, description: 'Срок поставки'})
+    @Column({type: DataType.TEXT, allowNull: true})
     listDetal: any;
 
     @BelongsToMany(() => Documents, () => DocumentsCbed)
@@ -66,6 +70,16 @@ export class Cbed extends Model<Cbed, CbedCreationAttrs> {
 
     @HasMany(() => Detal)
     detals: Detal[];
+
+    @ForeignKey(() => Cbed)
+    @Column({type: DataType.INTEGER})
+    cbedId: number;
+
+    @BelongsTo(() => Cbed)
+    cbed: Cbed;
+
+    @HasMany(() => Cbed)
+    cbeds: Cbed[];
 
     @HasMany(() => TechProcess)
     techProcesses: TechProcess[];

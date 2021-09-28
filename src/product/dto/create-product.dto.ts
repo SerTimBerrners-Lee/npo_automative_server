@@ -1,5 +1,6 @@
 
 export class CreateProductDto {
+    readonly id:                number; 
     readonly name:              string;
     readonly articl:            string;
     readonly responsible:       string;

@@ -10,6 +10,7 @@ import { Detal } from "src/detal/detal.model";
 import { TechProcess } from "src/detal/tech-process.model";
 import { Cbed } from "src/cbed/cbed.model";
 import { Product } from "src/product/product.model";
+import { Buyer } from "src/buyer/buyer.model";
 interface ActionsCreationAttrs { 
     action: string
 }
@@ -97,6 +98,13 @@ export class Actions extends Model<Actions, ActionsCreationAttrs> {
 
     @BelongsTo(() => Product)
     product: Product;
+
+    @ForeignKey(() => Buyer)
+    @Column({type: DataType.INTEGER})
+    buyerId: number;
+
+    @BelongsTo(() => Buyer)
+    buyer: Buyer;
 
 
 

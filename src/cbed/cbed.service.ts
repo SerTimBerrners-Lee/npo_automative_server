@@ -29,9 +29,19 @@ export class CbedService {
         return await this.upCreateCbed(dto, files, cbed)
     }
 
+    async updateCbed(dto: CreateCbedDto, files: any) {
+        if(!Number(dto.id))
+            throw new HttpException('Запись не найдена', HttpStatus.BAD_REQUEST)
+        const cbed = await this.cbedReprository.findByPk(dto.id, {include: {all: true}})
+        if(!cbed)
+            throw new HttpException('Запись не найдена', HttpStatus.BAD_REQUEST)
+        cbed.name = dto.name
+        await cbed.save()
+
+        return this.upCreateCbed(dto, files, cbed)
+    }
+
     private async upCreateCbed(dto: any, files: any, cbed: Cbed) {
-        console.log(dto)
-        console.log(files)
         cbed.articl = dto.articl
         if(dto.description != 'null')
             cbed.description = dto.description
@@ -59,6 +69,15 @@ export class CbedService {
 
         await cbed.save()
 
+        cbed.materialList = ''
+        
+        if(cbed.materials && cbed.materials.length) {
+            for( let mat of cbed.materials) {
+                await cbed.$remove('materials', mat.id)
+                await cbed.save()
+            }
+        }
+
         if(dto.materialList) {
             const mList = JSON.parse(dto.materialList)
             cbed.materialList = dto.materialList
@@ -71,7 +90,9 @@ export class CbedService {
                     }
                 }
             }
-        }
+        } 
+
+        cbed.listPokDet = ''
 
         if(dto.listPokDet) {
             const mList = JSON.parse(dto.listPokDet)
@@ -87,6 +108,22 @@ export class CbedService {
             }
         }
 
+        if(Number(dto.techProcessID)) {
+            const tp = await this.techProcessReprository.findByPk(dto.techProcessID)
+            if(tp) {
+                await cbed.$add('techProcesses', tp.id)
+                await cbed.save()
+            }
+        }
+
+        cbed.listDetal = ''
+        if(cbed.detals && cbed.detals.length) {
+            for( let det of cbed.detals) {
+                await cbed.$remove('detals', det.id) 
+                await cbed.save()
+            }
+        }
+
         if(dto.listDetal) {
             const mList = JSON.parse(dto.listDetal)
             cbed.listDetal = dto.listDetal
@@ -95,6 +132,28 @@ export class CbedService {
                     let detal = await this.detalReprository.findByPk(mList[m].det.id)
                     if(detal) {
                         await cbed.$add('detals', detal.id)
+                        await cbed.save()
+                    }
+                }
+            }
+        }
+
+        cbed.listCbed = ''
+        if(cbed.cbeds && cbed.cbeds.length) {
+            for( let cb of cbed.cbeds) {
+                    await cbed.$remove('cbeds', cb.id)
+                    await cbed.save()
+            }
+        }
+
+        if(dto.listCbed) {
+            const mList = JSON.parse(dto.listCbed)
+            cbed.listCbed = dto.listCbed
+            if(mList.length) {
+                for(let m = 0; m < mList.length; m++) {
+                    let cbeds = await this.cbedReprository.findByPk(mList[m].cb.id)
+                    if(cbeds) {
+                        await cbed.$add('cbeds', cbeds.id)
                         await cbed.save()
                     }
                 }
@@ -122,13 +181,22 @@ export class CbedService {
             }
         }
 
-
+        await cbed.save()
         return cbed
     }
 
     async getAllCbed() {
         const cbed = await this.cbedReprository.findAll({include: {all: true}})
         return cbed
+    }
+
+    async banCbed(id: number) {
+        const cbed = await this.cbedReprository.findByPk(id)
+        if(cbed) {
+            cbed.ban = !cbed.ban
+            await cbed.save()
+            return cbed
+        }
     }
 }
  

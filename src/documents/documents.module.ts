@@ -7,6 +7,7 @@ import { PodPodMaterial } from 'src/settings/pod-pod-material.model';
 import { User } from 'src/users/users.model';
 import { UsersModule } from 'src/users/users.module';
 import { DocumentsOperation } from './dociments-operation.model';
+import { DocumentsBuyer } from './documents-buyer.model';
 import { DocumentsEquipment } from './documents-equipment';
 import { DocumentsInstrument } from './documents-instrument.model';
 import { DocumentsMaterial } from './documents-material.model';
@@ -31,7 +32,8 @@ import { DocumentsService } from './documents.service';
             DocumentsEquipment,
             Equipment,
             Detal,
-            DocumentsOperation
+            DocumentsOperation,
+            DocumentsBuyer
         ]),
         forwardRef(() => UsersModule),
         

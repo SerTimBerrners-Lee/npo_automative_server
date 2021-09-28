@@ -23,27 +23,29 @@ export class ProviderService {
         }
         if(!providers)
             throw new HttpException('Произошла ошибка при добавлении пользователя', HttpStatus.NOT_FOUND)
-
-        console.log(dto)
-
-        if(dto.name)
-            providers.name = dto.name
+            
+        providers.name = dto.name
         
-        if(dto.rekvisit) 
+        if(dto.rekvisit != 'null') 
             providers.rekvisit = dto.rekvisit
-        
-        if(dto.contacts) 
+        else
+            providers.rekvisit =''
+        if(dto.contacts != 'null') 
             providers.contacts = dto.contacts
-
-        if(dto.inn) 
+        else
+            providers.contacts =''
+        if(dto.inn != 'null') 
             providers.inn = dto.inn
-        
-        if(dto.cpp) 
+        else
+            providers.inn =''
+        if(dto.cpp != 'null') 
             providers.cpp = dto.cpp 
-
-        if(dto.description) 
+        else
+            providers.cpp =''
+        if(dto.description != 'null') 
             providers.description = dto.description 
-        
+        else
+            providers.description =''
         await providers.save()
         
         if(dto.docs) {

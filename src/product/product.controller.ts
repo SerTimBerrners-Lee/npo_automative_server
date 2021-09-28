@@ -1,4 +1,4 @@
-import { Body, Controller, Get, Post, UploadedFiles, UseInterceptors } from '@nestjs/common';
+import { Body, Controller, Delete, Get, Param, Post, UploadedFiles, UseInterceptors } from '@nestjs/common';
 import { FileFieldsInterceptor } from '@nestjs/platform-express';
 import { ApiOperation } from '@nestjs/swagger';
 import { CreateProductDto } from './dto/create-product.dto';
@@ -8,7 +8,7 @@ import { ProductService } from './product.service';
 export class ProductController {
     constructor(private productService: ProductService) {}
 
-    @ApiOperation({summary: 'Создаем Сборочную единицу'})
+    @ApiOperation({summary: 'Создаем Изделие'})
     @UseInterceptors(FileFieldsInterceptor([
         {name: 'document', maxCount: 40}
     ])) 
@@ -18,10 +18,28 @@ export class ProductController {
         @UploadedFiles() files: { document?: Express.Multer.File[]} ) {
         return this.productService.createNewProduct(dto, files)
     }
-    @ApiOperation({summary: 'Получаем все сборочные единицы'})
+
+    @ApiOperation({summary: 'Обновляем Изделие'})
+    @UseInterceptors(FileFieldsInterceptor([
+        {name: 'document', maxCount: 40}
+    ])) 
+    @Post('/update')
+    updateProduct(
+        @Body() dto: CreateProductDto, 
+        @UploadedFiles() files: { document?: Express.Multer.File[]} ) {
+        return this.productService.updateProduct(dto, files)
+    }
+
+    @ApiOperation({summary: 'Получаем все Изделия'})
     @Get('/')
     getAllProduct() {
         return this.productService.getAllProduct()
+    }
+
+    @ApiOperation({summary: 'Добавляем Изделие в Архив'})
+    @Delete('/:id')
+    banProduct(@Param('id') id: number) {
+        return this.productService.banProduct(id)
     }
 }
  
