@@ -72,6 +72,8 @@ import { BuyerModule } from './buyer/buyer.module';
 import { Buyer } from "./buyer/buyer.model";
 import { Purchases } from "./buyer/purchases.model";
 import { DocumentsBuyer } from "./documents/documents-buyer.model";
+import { ScladModule } from './sclad/sclad.module';
+import { Deficit } from "./sclad/deficit.model";
 
 @Module({
     controllers: [],
@@ -143,6 +145,7 @@ import { DocumentsBuyer } from "./documents/documents-buyer.model";
                 Product,
                 Buyer,
                 Purchases,
+                Deficit
             ],
             autoLoadModels: true,
           }),
@@ -164,6 +167,7 @@ import { DocumentsBuyer } from "./documents/documents-buyer.model";
         CbedModule,
         ProductModule,
         BuyerModule,
+        ScladModule,
     ]
 })
 

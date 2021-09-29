@@ -54,7 +54,7 @@ export class ProviderService {
             for(let document of files.document) {
                 let res = await this.documentService.saveDocument(
                     document, 
-                    docs[i].nameInstans, 
+                    'p', 
                     docs[i].type,
                     docs[i].version,
                     docs[i].description,

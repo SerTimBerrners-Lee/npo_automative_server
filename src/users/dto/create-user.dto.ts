@@ -41,4 +41,7 @@ export class CreateUserDto {
     readonly primetch: string; 
     @ApiProperty({example: '...', description: 'Аватарка пользователя'})
     readonly image: string; 
+
+    @ApiProperty({example: '[{name ...}]', description: 'прикрепленные файлы из базы файлов '})
+    readonly fileArrModal: any;
 }

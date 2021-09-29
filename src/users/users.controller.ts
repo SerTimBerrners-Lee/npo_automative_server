@@ -85,5 +85,11 @@ export class UsersController {
     banUser(@Body() dto: BanUserDto) {
         return this.userService.ban(dto)
     }
+
+    @ApiOperation({summary: 'Открепить файл от пользователя'})
+    @Post('/fileban')
+    deleteFile(@Body() dto: any) {
+        return this.userService.deleteFiles(dto)
+    }
 }
  

@@ -24,8 +24,6 @@ export class BuyerService {
 
         buyer.name = dto.name
 
-        console.log(dto)
-
         if(dto.rekvisit != 'null') 
             buyer.rekvisit = dto.rekvisit
         else
@@ -54,7 +52,7 @@ export class BuyerService {
             for(let document of files.document) {
                 let res = await this.documentService.saveDocument(
                     document, 
-                    docs[i].nameInstans, 
+                    'p', 
                     docs[i].type,
                     docs[i].version,
                     docs[i].description,

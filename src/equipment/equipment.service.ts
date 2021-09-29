@@ -252,7 +252,7 @@ export class EquipmentService {
             for(let document of files.document) {
                 let res = await this.documentsService.saveDocument(
                     document, 
-                    docs[i].nameInstans, 
+                    'p', 
                     docs[i].type,
                     docs[i].version,
                     docs[i].description,

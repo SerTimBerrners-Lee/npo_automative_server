@@ -182,8 +182,8 @@ export class DetalService {
             for(let document of files.document) {
                 let res = await this.documentsService.saveDocument(
                     document, 
-                    docs[i].nameInstans, 
-                    docs[i].type,
+                    'p', 
+                    docs[i].type, 
                     docs[i].version,
                     docs[i].description,
                     docs[i].name
@@ -320,7 +320,7 @@ export class DetalService {
             for(let document of files.document) {
                 let res = await this.documentsService.saveDocument(
                     document, 
-                    docs[i].nameInstans, 
+                    'p', 
                     docs[i].type,
                     docs[i].version,
                     docs[i].description,
@@ -414,7 +414,7 @@ export class DetalService {
             for(let document of files.document) {
                 let res = await this.documentsService.saveDocument(
                     document, 
-                    docs[i].nameInstans, 
+                    'p', 
                     docs[i].type,
                     docs[i].version,
                     docs[i].description,

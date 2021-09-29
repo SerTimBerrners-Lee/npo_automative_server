@@ -20,15 +20,16 @@ export class UsersService {
         const tabel     =   await this.userRepository.findOne({where: { tabel: dto.tabel }})
         if(tabel) 
             throw new HttpException("Табельный номер не может повторяться", HttpStatus.BAD_REQUEST)
-
-        const roles         =   await this.rolesService.getRoleByPk(dto.roles)
         const hashPassword  =   await bcrypt.hash(dto.password, 5);
         const user          =   await this.userRepository
             .create({...dto, password: hashPassword});
-        
-        if(roles) {
-            user.rolesId = roles.id
-            await user.save()
+     
+        if(dto.roles != 'null') {
+            const roles = await this.rolesService.getRoleByPk(dto.roles)
+            if(roles) {
+                user.rolesId = roles.id
+                await user.save()
+            }
         }
 
         if(files.image)  {
@@ -41,10 +42,26 @@ export class UsersService {
         
         if(files.document) {
             for(let file of files.document) {
-                let docks = await this.documentService.saveDocument(file) 
+                let docks = await this.documentService.saveDocument(file, 'p') 
                 await user.$add('document', docks.id)
             }
         }
+
+        if(dto.fileArrModal) {
+            let fa = JSON.parse(dto.fileArrModal)
+            if(fa.length) {
+                for(let f of fa) {
+                    let fls = await this.documentService.getFileById(f.id)
+                    if(fls) {
+                        fls.nameInstans = 'p'
+                        await fls.save()
+                        await user.$add('document', f.id)
+                    }
+                    
+                }
+            }
+        }
+        await user.save()
         
         return user  
     }
@@ -67,6 +84,20 @@ export class UsersService {
                 user.image = ava
         }
 
+        if(dto.fileArrModal) {
+            let fa = JSON.parse(dto.fileArrModal)
+            if(fa.length) {
+                for(let f of fa) {
+                    let fls = await this.documentService.getFileById(f.id)
+                    if(fls) {
+                        fls.nameInstans = 'p'
+                        await fls.save()
+                        await user.$add('document', f.id)
+                    }
+                }
+            }
+        }
+
         await user.save()
 
         if(dto.password && dto.password.length < 15) {
@@ -74,31 +105,32 @@ export class UsersService {
             user.password       = hashPassword
         }
 
-        const roles =  await this.rolesService.getRoleByPk(dto.roles)
-        if(roles) {
-            user.rolesId = roles.id
-            await user.save()
+        if(dto.roles != 'null') {
+            const roles =  await this.rolesService.getRoleByPk(dto.roles)
+            if(roles) {
+                user.rolesId = roles.id
+                await user.save()
+            }
         }
 
-        user.email          = dto.email
-        user.initial        = dto.initial
-        user.tabel          = dto.tabel
-        user.dateWork       = dto.dateWork
-        user.dateUnWork     = dto.dateUnWork
-        user.birthday       = dto.birthday
-        user.login          = dto.login
-        user.adress         = dto.adress
-        user.adressProps    = dto.adressProps
-        user.phone          = dto.phone
-        user.haracteristic  = dto.haracteristic
-        user.primetch       = dto.primetch
-        user.tabel          = dto.tabel 
+        user.email          = dto.email != 'null' ? dto.email : ''
+        user.initial        = dto.initial != 'null' ? dto.initial : ''
+        user.tabel          = dto.tabel != 'null' ? dto.tabel : ''
+        user.dateWork       = dto.dateWork != 'null' ? dto.dateWork : ''
+        user.dateUnWork     = dto.dateUnWork != 'null' ? dto.dateUnWork : ''
+        user.birthday       = dto.birthday != 'null' ? dto.birthday : ''
+        user.login          = dto.login != 'null' ? dto.login : ''
+        user.adress         = dto.adress != 'null' ? dto.adress : ''
+        user.adressProps    = dto.adressProps != 'null' ? dto.adressProps : ''
+        user.phone          = dto.phone != 'null' ? dto.phone : ''
+        user.haracteristic  = dto.haracteristic != 'null' ? dto.haracteristic : ''
+        user.primetch       = dto.primetch != 'null' ? dto.primetch : ''
 
         await user.save();
 
         if(files.document) {
             for(let file of files.document) {
-                let docks = await this.documentService.saveDocument(file) 
+                let docks = await this.documentService.saveDocument(file, 'p') 
                 await user.$add('document', docks.id)
             }
         }
@@ -120,7 +152,12 @@ export class UsersService {
     }
 
     async getUser() {
-        const users = await this.userRepository.findAll({include: {all: true}});
+        const users = await this.userRepository.findAll({
+            include: {all: true},
+            order: [
+                ['tabel', 'ASC']
+            ]
+        });
         return users;
     }
 
@@ -165,5 +202,24 @@ export class UsersService {
         user.banReason = dto.banReason; 
         await user.save();
         return user;
+    }
+
+    async deleteFiles(dto: any) {
+        const files = await this.documentService.getFileById(dto.fileId);
+        if(files) {
+            const user = await this.userRepository.findByPk(dto.userId, {include: {all: true}});
+            if(user) {
+                if(user.documents && user.documents.length) {
+                    for(let doc of user.documents) {
+                        if(doc.id == files.id) {
+                            files.nameInstans = ''
+                            await files.save()
+                            await user.$remove('document', files.id)
+                            return true
+                        }
+                    }
+                }
+            }
+        }
     }
 }
