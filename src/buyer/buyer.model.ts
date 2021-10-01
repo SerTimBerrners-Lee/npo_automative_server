@@ -1,6 +1,7 @@
 import { ApiProperty } from "@nestjs/swagger";
 import { Model, Column, DataType, Table, BelongsToMany, HasMany, ForeignKey, BelongsTo } from "sequelize-typescript";
 import { Actions } from "src/actions/actions.model";
+import { Cbed } from "src/cbed/cbed.model";
 import { DocumentsBuyer } from "src/documents/documents-buyer.model";
 import { Documents } from "src/documents/documents.model";
 import { Purchases } from "./purchases.model";
@@ -48,5 +49,8 @@ export class Buyer extends Model<Buyer, BuyerCreationAttrs> {
 
     @BelongsTo(() => Purchases)
     purchases: Purchases;
+
+    @HasMany(() => Cbed)
+    cbeds: Cbed[];
 
 }    

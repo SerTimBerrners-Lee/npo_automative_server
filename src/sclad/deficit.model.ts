@@ -20,10 +20,7 @@ export class Deficit extends Model<Deficit, DeficitCreationAttrs> {
     @ApiProperty({example: 3, description: 'Рекомендуемый остаток'})
     @Column({type: DataType.INTEGER, defaultValue: 3})
     recommendedRemainder: number; 
-    
-    
-    
-    
+     
     @AfterSync
     static async createDeficit(sync: any) {
 
