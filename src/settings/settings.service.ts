@@ -397,6 +397,6 @@ export class SettingsService {
     }
 
     async getAllPPT() {
-        return await this.podPodMaterialReprository.findAll()
+        return await this.podPodMaterialReprository.findAll({where: {ban: false}})
     }
 }
