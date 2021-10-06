@@ -11,6 +11,8 @@ import { DocumentsEquipment } from "./documents-equipment";
 import { Detal } from "src/detal/detal.model";
 import { DocumentsDetal } from "./documents-detal.model";
 import { Actions } from "src/actions/actions.model";
+import { Issue } from "src/issue/issue.model";
+import { DocumentsIssue } from "./document-issue.model";
 
 interface DocumentsCreationAttrs {
     name: string; 
@@ -68,4 +70,7 @@ export class Documents extends Model<Documents, DocumentsCreationAttrs> {
 
     @HasMany(() => Actions)
     actions: Actions[];
+
+    @BelongsToMany(() => Issue, () => DocumentsIssue)
+    issues: Issue[];
 }

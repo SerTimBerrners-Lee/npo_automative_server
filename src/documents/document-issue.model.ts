@@ -1,10 +1,10 @@
 import { Model, Column, DataType, Table, ForeignKey } from "sequelize-typescript";
-import { Operation } from "src/detal/operation.model";
+import { Issue } from "src/issue/issue.model";
 import { Documents } from "./documents.model";
 
 
-@Table({tableName: 'documents_operation', createdAt: false, updatedAt: false})
-export class DocumentsOperation extends Model<DocumentsOperation> {
+@Table({tableName: 'documents_issue', createdAt: false, updatedAt: false})
+export class DocumentsIssue extends Model<DocumentsIssue> {
 
     @Column({type: DataType.INTEGER, unique: true, autoIncrement: true, primaryKey: true})
     id: number;
@@ -13,7 +13,7 @@ export class DocumentsOperation extends Model<DocumentsOperation> {
     @Column({type: DataType.INTEGER})
     documentsId: number;    
 
-    @ForeignKey(() => Operation)
+    @ForeignKey(() => Issue)
     @Column({type: DataType.INTEGER})
-    operationId: number;
+    issueId: number;
 }   

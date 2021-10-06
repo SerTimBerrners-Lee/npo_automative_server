@@ -1,5 +1,5 @@
 import { ApiProperty } from "@nestjs/swagger";
-import { Model, Column, DataType, Table, HasMany, BeforeCreate, AfterCreate } from "sequelize-typescript";
+import { Model, Column, DataType, Table, HasMany, BeforeCreate, AfterCreate, AfterSync } from "sequelize-typescript";
 import { User } from "src/users/users.model";
 
 interface RoleCreationAttrs {
@@ -113,4 +113,16 @@ export class Role extends Model<Role, RoleCreationAttrs> {
 
         await role.save()
     }
-}    
+
+    @AfterSync
+    static async checkRole(sync: any) {
+        const role = await sync.sequelize.models.Role
+        if(!role)
+            return 
+
+        const allRole = await role.findAll()
+        if(!allRole.length) {
+            await role.create({value: 'admin', description: 'Администратор'})
+        }
+    }
+}     

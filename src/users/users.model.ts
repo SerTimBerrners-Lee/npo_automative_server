@@ -122,21 +122,34 @@ export class User extends Model<User, UserCreationAttrs> {
     @BelongsToMany(() => Issue, () => IssueUser)
     issues: Issue[];
 
+    @HasMany(() => Issue)
+    responsibleFor: Issue[];
+
+    
     @AfterSync
     static async checkUser(sync: any) {
         const user = await sync.sequelize.models.User
+        const role = await sync.sequelize.models.Role
         if(!user)
             return 
 
         const hashPassword = await bcrypt.hash('54321', 5);
         const allUser = await user.findAll()
         if(!allUser.length) {
-            user.create({
+            const admin = await user.create({
                 password: hashPassword,
                 login: 'Admin.A.A',
                 tabel: '001',
                 initial: 'Admin Admin Admin'
             })
+            // add role 
+            if(role && admin) {
+                const firstRole = await role.findByPk(1)
+                if(firstRole) 
+                    user.update({rolesId: firstRole.id}, {where: {id: admin.id}})
+                
+                
+            }
         }
     }
 

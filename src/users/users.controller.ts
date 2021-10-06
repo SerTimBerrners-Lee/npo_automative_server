@@ -91,5 +91,12 @@ export class UsersController {
     deleteFile(@Body() dto: any) {
         return this.userService.deleteFiles(dto)
     }
+
+    @ApiOperation({summary: 'Получение пользователя по ID'})
+    @Get('/:id')
+    getUserById(@Param('id') id: number) {
+        console.log(id)
+        return this.userService.getUserByPk(id)
+    }
 }
  

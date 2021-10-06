@@ -74,6 +74,7 @@ import { Purchases } from "./buyer/purchases.model";
 import { DocumentsBuyer } from "./documents/documents-buyer.model";
 import { ScladModule } from './sclad/sclad.module';
 import { Deficit } from "./sclad/deficit.model";
+import { DocumentsIssue } from "./documents/document-issue.model";
 
 @Module({
     controllers: [],
@@ -109,6 +110,7 @@ import { Deficit } from "./sclad/deficit.model";
                 DocumentsProduct,
                 DocumentsBuyer,
                 DocumentsEquipment,
+                DocumentsIssue,
                 PodPodMaterial,
                 PodMaterial,
                 Edizm,
