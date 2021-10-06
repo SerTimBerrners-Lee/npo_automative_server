@@ -3,6 +3,7 @@ import { InjectModel } from '@nestjs/sequelize';
 import { DocumentsService } from 'src/documents/documents.service';
 import { UpCreateIssueDto } from './dto/up-create-issue.dto';
 import { Issue } from './issue.model';
+import { date }  from '../../library/date';
 
 @Injectable()
 export class IssueService {
@@ -10,21 +11,21 @@ export class IssueService {
 		private documentsService: DocumentsService) {}
 
 	async createIssue(dto: UpCreateIssueDto, files: any) {
-		let numberEndIssue = await this.issueReprository.findOne(
+		const endndIssue = await this.issueReprository.findOne(
 			{
 				order: [
 					['id', 'DESC']
 				],
 				limit: 1
 			})
-		let endIssue: any; 
-		if(numberEndIssue && numberEndIssue.id) endIssue = numberEndIssue.id
-		else endIssue = 1
+		const numberEndIssue = endndIssue && endndIssue.id ?  `№${endndIssue.id + 1} от ${date()}` : `№1 от ${date()}`
 
-		const issue = await this.issueReprository.create({name: String(endIssue), instans: 1}, {include: {all: true}})
-		if(!issue) 
+		const newIssue = await this.issueReprository.create({name: String(numberEndIssue), instans: 1})
+		if(!newIssue) 
 			throw new HttpException('Не удалось создать задание', HttpStatus.BAD_REQUEST)
-		console.log('CREATED:', issue)
+		const issue = await this.issueReprository.findByPk(newIssue.id, {include: {all: true}})
+		
+		console.log(dto)
 
 		if(dto.description != 'null') issue.description = dto.description
 		else issue.description = ''
@@ -34,8 +35,12 @@ export class IssueService {
 		else issue.normTime = ''
 		if(dto.sourse != 'null') {
 			issue.sourse = dto.sourse
-			let responsible = JSON.parse(dto.sourse)
-			if(responsible) issue.responsibleUserId = responsible.id
+			try {
+				let responsible = JSON.parse(dto.sourse)
+				if(responsible) issue.responsibleUserId = responsible.id
+			} catch(e) {
+				console.log(e, "ERROR")
+			}
 		}
 		else issue.sourse = ''
 		if(dto.srok != 'null') issue.srok = dto.srok
@@ -48,7 +53,6 @@ export class IssueService {
 		else issue.shopNeeds = ''
 		
 		await issue.save()
-		console.log(dto)
 
 		if(issue.controllers && issue.controllers.length) {
 			for(let controller of issue.controllers) {
@@ -79,6 +83,15 @@ export class IssueService {
 			}
 		}
 
+		if(dto.fileArrModal !='null') {
+			let files = JSON.parse(dto.fileArrModal)
+			for(let file of files) {
+				let check = await this.documentsService.getFileById(file.id)
+				if(check)
+					await issue.$add('documents', check.id)
+			}
+		}
+
 		if(files.document) {
 			for(let document of files.document) {
 					let res = await this.documentsService.saveDocument(
@@ -95,8 +108,11 @@ export class IssueService {
 		}
 
 		await issue.save()
-		console.log(issue)
 
 		return issue
+	}
+
+	async getAllIssues() {
+		return await this.issueReprository.findAll({include: {all: true}})
 	}
 }
