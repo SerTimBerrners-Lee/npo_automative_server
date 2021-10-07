@@ -12,4 +12,8 @@ export class UpCreateIssueDto {
 	readonly izdList: 				any;
 	readonly shopNeeds: 			any;
 	readonly fileArrModal: 		any;
+	readonly srok_control:			any;
+
+	readonly id: 							any;
+	readonly name: 						any;
 }

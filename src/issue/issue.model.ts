@@ -3,6 +3,7 @@ import { Model, Column, DataType, Table,  BelongsToMany, HasMany, ForeignKey } f
 import { DocumentsIssue } from "src/documents/document-issue.model";
 import { Documents } from "src/documents/documents.model";
 import { User } from "src/users/users.model";
+import { IssueUserController } from "./issue-user-controller.model";
 import { IssueUser } from "./issue-user.model";
 
 interface IssueCreationAttrs {
@@ -43,6 +44,9 @@ export class Issue extends Model<Issue, IssueCreationAttrs> {
 
     @Column({type: DataType.TEXT})
     executorList: string;  
+    
+    @Column({type: DataType.STRING})
+    srok_control: string;
 
     @Column({type: DataType.TEXT})
     izdList: string;  
@@ -56,7 +60,7 @@ export class Issue extends Model<Issue, IssueCreationAttrs> {
     @BelongsToMany(() => User, () => IssueUser)
     users: User[];
 
-    @BelongsToMany(() => User, () => IssueUser)
+    @BelongsToMany(() => User, () => IssueUserController)
     controllers: User[];
 
     @BelongsToMany(() => Documents, () => DocumentsIssue)

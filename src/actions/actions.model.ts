@@ -11,12 +11,14 @@ import { TechProcess } from "src/detal/tech-process.model";
 import { Cbed } from "src/cbed/cbed.model";
 import { Product } from "src/product/product.model";
 import { Buyer } from "src/buyer/buyer.model";
+import { DateMethods } from "src/files/date.methods";
 interface ActionsCreationAttrs { 
     action: string
 }
 
 @Table({tableName: 'actions', createdAt: false, updatedAt: false})
 export class Actions extends Model<Actions, ActionsCreationAttrs> {
+
     @ApiProperty({example: '1', description: 'Уникальный идентификатор'})
     @Column({type: DataType.INTEGER, unique: true, autoIncrement: true, primaryKey: true})
     id: number;
@@ -110,15 +112,13 @@ export class Actions extends Model<Actions, ActionsCreationAttrs> {
 
     @BeforeCreate
     static addDateTime(action: Actions) {
-        const dt = new Date()
-        const date = dt.toISOString()
-                        .slice(0,10)
-                        .split('-')
-                        .reverse()
-                        .join('.')
-        const hours = dt.getUTCHours() + 3
-        const minute = dt.getMinutes().toString().length == 1 ? '0' + dt.getMinutes() : dt.getMinutes()
-        const seconds = dt.getSeconds().toString().length == 1 ? '0' + dt.getSeconds() : dt.getSeconds()
+
+        const dateMethods   = new DateMethods
+
+        const date          = dateMethods.date()
+        const hours         = dateMethods.hours
+        const minute        = dateMethods.minute
+        const seconds       = dateMethods.seconds
 
         action.dateTime = `${date} ${hours}:${minute}:${seconds}`
 

@@ -123,7 +123,13 @@ export class User extends Model<User, UserCreationAttrs> {
     issues: Issue[];
 
     @HasMany(() => Issue)
-    responsibleFor: Issue[];
+    responsibleForIssue: Issue[];
+
+    @HasMany(() => Product)
+    responsibleForProduct: Product[];
+
+    @HasMany(() => Documents)
+    responsibleForDocuments: Documents[];
 
     
     @AfterSync

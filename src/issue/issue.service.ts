@@ -1,9 +1,9 @@
 import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
 import { InjectModel } from '@nestjs/sequelize';
 import { DocumentsService } from 'src/documents/documents.service';
+import { DateMethods } from 'src/files/date.methods';
 import { UpCreateIssueDto } from './dto/up-create-issue.dto';
 import { Issue } from './issue.model';
-import { date }  from '../../library/date';
 
 @Injectable()
 export class IssueService {
@@ -18,15 +18,29 @@ export class IssueService {
 				],
 				limit: 1
 			})
-		const numberEndIssue = endndIssue && endndIssue.id ?  `№${endndIssue.id + 1} от ${date()}` : `№1 от ${date()}`
+		const dm = new DateMethods
+		const numberEndIssue = endndIssue && endndIssue.id ?  
+			`№${endndIssue.id + 1} от ${dm.date()}` : `№1 от ${dm.date()}`
 
 		const newIssue = await this.issueReprository.create({name: String(numberEndIssue), instans: 1})
 		if(!newIssue) 
 			throw new HttpException('Не удалось создать задание', HttpStatus.BAD_REQUEST)
 		const issue = await this.issueReprository.findByPk(newIssue.id, {include: {all: true}})
 		
-		console.log(dto)
+		return await this.upCreateIssue(dto, files, issue)
 
+	}
+
+	async updateIssue(dto: UpCreateIssueDto, files: any) {
+		const issue = await this.issueReprository.findByPk(dto.id, {include: {all: true}})
+		if(!issue) 
+			throw new HttpException('Не удалось найти задание для обновления', HttpStatus.BAD_REQUEST)
+
+		return await this.upCreateIssue(dto, files, issue);
+
+	}
+
+	private async upCreateIssue(dto: UpCreateIssueDto, files: any, issue: Issue) {
 		if(dto.description != 'null') issue.description = dto.description
 		else issue.description = ''
 		if(dto.dateUse != 'null') issue.dateUse = dto.dateUse
@@ -51,6 +65,8 @@ export class IssueService {
 		else issue.izdList = ''
 		if(dto.shopNeeds != 'null') issue.shopNeeds = dto.shopNeeds
 		else issue.shopNeeds = ''
+		if(dto.srok_control != 'null') issue.srok_control = dto.srok_control
+		else issue.srok_control = ''
 		
 		await issue.save()
 
@@ -65,6 +81,7 @@ export class IssueService {
 				await issue.$remove('users', executor.id)
 			}
 		}
+		console.log(dto)
 
 		issue.controllerList = ''
 		if(dto.controllerList != 'null') {
@@ -108,8 +125,8 @@ export class IssueService {
 		}
 
 		await issue.save()
-
 		return issue
+
 	}
 
 	async getAllIssues() {

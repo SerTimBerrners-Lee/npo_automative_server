@@ -75,6 +75,7 @@ import { DocumentsBuyer } from "./documents/documents-buyer.model";
 import { ScladModule } from './sclad/sclad.module';
 import { Deficit } from "./sclad/deficit.model";
 import { DocumentsIssue } from "./documents/document-issue.model";
+import { IssueUserController } from "./issue/issue-user-controller.model";
 
 @Module({
     controllers: [],
@@ -147,7 +148,8 @@ import { DocumentsIssue } from "./documents/document-issue.model";
                 Product,
                 Buyer,
                 Purchases,
-                Deficit
+                Deficit,
+                IssueUserController
             ],
             autoLoadModels: true,
           }),
