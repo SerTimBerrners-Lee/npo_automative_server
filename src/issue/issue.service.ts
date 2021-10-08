@@ -81,7 +81,6 @@ export class IssueService {
 				await issue.$remove('users', executor.id)
 			}
 		}
-		console.log(dto)
 
 		issue.controllerList = ''
 		if(dto.controllerList != 'null') {

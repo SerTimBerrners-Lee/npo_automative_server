@@ -28,6 +28,6 @@ import { ProductService } from './product.service';
         ]),
         DocumentsModule
     ],
-    exports: [ProductModule]
+    exports: [ProductService]
 })
 export class ProductModule {}

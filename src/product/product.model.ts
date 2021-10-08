@@ -8,6 +8,7 @@ import { DocumentsProduct } from "src/documents/documents-product.model";
 import { Documents } from "src/documents/documents.model";
 import { Sebestoim } from "src/sebestoim/sebestoim.model";
 import { PodPodMaterial } from "src/settings/pod-pod-material.model";
+import { Shipments } from "src/shipments/shipments.model";
 import { User } from "src/users/users.model";
 
 interface ProductCreationAttrs {
@@ -93,4 +94,7 @@ export class Product extends Model<Product, ProductCreationAttrs> {
 
     @HasOne(() => Sebestoim)
     sebestoim: Sebestoim;
+
+    @HasOne(() => Shipments)
+    shipmen: Shipments;
 }     

@@ -18,6 +18,6 @@ import { Purchases } from './purchases.model';
         ]),
         DocumentsModule
     ],
-    exports: [BuyerModule]
+    exports: [BuyerService]
 })
 export class BuyerModule {}

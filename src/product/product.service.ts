@@ -44,8 +44,6 @@ export class ProductService {
     }
 
     private async upCreateProduct(dto: CreateProductDto, files: any, product: Product) {
-        console.log(dto)
-        console.log(files)
         product.articl = dto.articl
         product.fabricNumber = dto.fabricNumber
         if(dto.description != 'null')
@@ -192,6 +190,10 @@ export class ProductService {
     async getAllProduct() {
         const product = await this.productReprository.findAll({include: {all: true}})
         return product
+    }
+
+    async getById(id: number) {
+        return await this.productReprository.findByPk(id)
     }
 
     async banProduct(id: number) {

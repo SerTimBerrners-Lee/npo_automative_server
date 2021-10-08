@@ -76,6 +76,10 @@ export class BuyerService {
         return buyers
     }
 
+    async getByuerById(id: number) {
+        return await this.buyerReprository.findByPk(id)
+    }
+
     async ban(id: number) {
         const buyer = await this.buyerReprository.findByPk(id)
         if(buyer) {
