@@ -7,6 +7,8 @@ import { Documents } from "src/documents/documents.model";
 import { Product } from "src/product/product.model";
 import { Sebestoim } from "src/sebestoim/sebestoim.model";
 import { PodPodMaterial } from "src/settings/pod-pod-material.model";
+import { ShipmentsDetal } from "src/shipments/shipments-detal.model";
+import { Shipments } from "src/shipments/shipments.model";
 import { User } from "src/users/users.model";
 import { DetalMaterials } from "./detal-materials.model";
 import { TechProcess } from "./tech-process.model";
@@ -30,6 +32,10 @@ export class Detal extends Model<Detal, DetalCreationAttrs> {
     @Column({type: DataType.BOOLEAN, defaultValue: false})
     ban: boolean; 
 
+    @ApiProperty({example: 12, description: 'Количество Деталей на складе'})
+    @Column({type: DataType.INTEGER})
+    detal_kolvo: number; 
+
     @ApiProperty({example: 12, description: 'Срок поставки'})
     @Column({type: DataType.STRING, allowNull: true})
     articl: string; 
@@ -38,11 +44,11 @@ export class Detal extends Model<Detal, DetalCreationAttrs> {
     @Column({type: DataType.STRING, allowNull: true})
     description: string; 
 
-    @ApiProperty({example: 12, description: 'Срок поставки'})
+    @ApiProperty({example: 12, description: 'Параметры - норма времени на изготовление'})
     @Column({type: DataType.TEXT, allowNull: true})
     parametrs: any; 
 
-    @ApiProperty({example: 12, description: 'Срок поставки'})
+    @ApiProperty({example: 12, description: 'Характеристики детали'})
     @Column({type: DataType.TEXT, allowNull: true})
     haracteriatic: any;
 
@@ -103,4 +109,7 @@ export class Detal extends Model<Detal, DetalCreationAttrs> {
 
     @HasOne(() => Sebestoim)
     sebestoim: Sebestoim;
+
+    @BelongsToMany(() => Shipments, () => ShipmentsDetal)
+    shipments: Shipments[];
 }     

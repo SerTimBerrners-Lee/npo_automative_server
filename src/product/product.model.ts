@@ -30,6 +30,10 @@ export class Product extends Model<Product, ProductCreationAttrs> {
     @Column({type: DataType.BOOLEAN, defaultValue: false})
     ban: boolean; 
 
+    @ApiProperty({example: 12, description: 'Количество Продукции на складе'})
+    @Column({type: DataType.INTEGER})
+    product_kolvo: number; 
+
     @ApiProperty({example: 12, description: 'Срок поставки'})
     @Column({type: DataType.STRING, allowNull: true})
     fabricNumber: string; 

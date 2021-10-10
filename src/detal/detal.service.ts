@@ -472,4 +472,9 @@ export class DetalService {
             throw new HttpException('Не удалось удалить тип операции', HttpStatus.BAD_REQUEST)
         return await this.typeOperationReprository.destroy({where: {id: TO.id}})
     }
+
+    async findById(id: number) {
+        return await this.detalReprository.findByPk(id)
+    }
+
 }

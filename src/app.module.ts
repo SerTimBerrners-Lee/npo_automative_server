@@ -78,6 +78,8 @@ import { DocumentsIssue } from "./documents/document-issue.model";
 import { IssueUserController } from "./issue/issue-user-controller.model";
 import { ShipmentsModule } from './shipments/shipments.module';
 import { Shipments } from "./shipments/shipments.model";
+import { ShipmentsDetal } from "./shipments/shipments-detal.model";
+import { ShipmentsCbed } from "./shipments/shipments-cbed.model";
 
 @Module({
     controllers: [],
@@ -152,7 +154,9 @@ import { Shipments } from "./shipments/shipments.model";
                 Purchases,
                 Deficit,
                 IssueUserController,
-                Shipments
+                Shipments,
+                ShipmentsDetal,
+                ShipmentsCbed
             ],
             autoLoadModels: true,
           }),

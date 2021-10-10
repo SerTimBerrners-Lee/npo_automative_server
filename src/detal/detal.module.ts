@@ -42,7 +42,7 @@ import { TypeOperation } from './type-operation.model';
         ActionsModule
     ],
     exports: [
-        DetalModule
+        DetalService
     ]
 })
 export class DetalModule {}

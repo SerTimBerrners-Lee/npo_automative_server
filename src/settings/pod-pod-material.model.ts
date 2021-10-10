@@ -33,6 +33,10 @@ export class PodPodMaterial extends Model<PodPodMaterial, PodPodMaterialCreation
     @Column({type: DataType.BOOLEAN, defaultValue: false})
     ban: boolean; 
 
+    @ApiProperty({example: 12, description: 'Количество материала на складе'})
+    @Column({type: DataType.INTEGER})
+    material_kolvo: number; 
+
     @ApiProperty({example: '{edizmId: 10, znach: 2}', description: 'Срок поставки'})
     @Column({type: DataType.STRING, allowNull: true})
     deliveryTime: any; 
@@ -120,6 +124,5 @@ export class PodPodMaterial extends Model<PodPodMaterial, PodPodMaterialCreation
 
     @BelongsTo(() => Product)
     product: Product;
-
 
 }    

@@ -7,12 +7,12 @@ export class UpCreateShipmentsDto {
 	readonly number_order: 				string;
 	readonly kolvo: 							number;
 	readonly day_when_shipments: 	string;
-	readonly bron : 							string;
+	readonly bron : 							boolean;
 	readonly base:								string;
 	readonly buyer: 							number;
 	readonly to_sklad: 						boolean;
 	readonly product: 						any;
-	readonly list_cbed_detal: 		string;
+	readonly list_cbed_detal: 		any;
 	readonly description: 				string;
 
 }

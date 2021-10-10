@@ -1,4 +1,4 @@
-import { Body, Controller, Get, Post } from '@nestjs/common';
+import { Body, Controller, Get, Param, Post, Put } from '@nestjs/common';
 import { ApiOperation, ApiTags } from '@nestjs/swagger';
 import { UpCreateShipmentsDto } from './dto/up-create-shipments.dto';
 import { ShipmentsService } from './shipments.service';
@@ -12,13 +12,25 @@ export class ShipmentsController {
 	@ApiOperation({summary: 'Создание заказа'})
   @Post()
 	createShipments(@Body() dto: UpCreateShipmentsDto) {
-			return this.shipmentsSettings.createShipments(dto);
+		return this.shipmentsSettings.createShipments(dto);
 	}
 
 	@ApiOperation({summary: 'Получить все заказы'})
   @Get()
 	getAllShipments() {
-			return this.shipmentsSettings.getAllShipments();
+		return this.shipmentsSettings.getAllShipments();
+	}
+
+	@ApiOperation({summary: 'Получить все заказы в зависимости на складе или нет'})
+  @Get('/sclad/:to_sclad')
+	getAllShipmentsSclad(@Param('to_sclad') to_sclad: boolean) {
+		return this.shipmentsSettings.getAllShipmentsSclad(to_sclad);
+	}
+
+	@ApiOperation({summary: 'Перемешаем заказ на склад или обратно'})
+  @Put('/sclad/:id')
+	changeShipmentToSclad(@Param('id') id: number) {
+		return this.shipmentsSettings.changeShipmentToSclad(id)
 	}
 }
  

@@ -9,6 +9,8 @@ import { Documents } from "src/documents/documents.model";
 import { Product } from "src/product/product.model";
 import { Sebestoim } from "src/sebestoim/sebestoim.model";
 import { PodPodMaterial } from "src/settings/pod-pod-material.model";
+import { ShipmentsCbed } from "src/shipments/shipments-cbed.model";
+import { Shipments } from "src/shipments/shipments.model";
 import { User } from "src/users/users.model";
 
 interface CbedCreationAttrs {
@@ -29,6 +31,10 @@ export class Cbed extends Model<Cbed, CbedCreationAttrs> {
     @ApiProperty({example: true, description: 'Добавляем в архив'})
     @Column({type: DataType.BOOLEAN, defaultValue: false})
     ban: boolean; 
+
+    @ApiProperty({example: 12, description: 'Количество Сборочных единиц на складе'})
+    @Column({type: DataType.INTEGER})
+    cbed_kolvo: number; 
 
     @ApiProperty({example: 12, description: 'Срок поставки'})
     @Column({type: DataType.STRING, allowNull: true})
@@ -111,4 +117,7 @@ export class Cbed extends Model<Cbed, CbedCreationAttrs> {
 
     @BelongsTo(() => Buyer)
     buer: Buyer;
+
+    @BelongsToMany(() => Shipments, () => ShipmentsCbed)
+    shipments: Shipments[]; 
 }     

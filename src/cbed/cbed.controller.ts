@@ -41,4 +41,10 @@ export class CbedController {
     banCbed(@Param('id') id: number) {
         return this.cbedService.banCbed(id)
     }
+
+    @ApiOperation({summary: 'Получаем все сборочные единицы с заказов'})
+    @Get('/shipments')
+    getAllCbedShipments() {
+        return this.cbedService.getAllCbedShipments()
+    }
 } 

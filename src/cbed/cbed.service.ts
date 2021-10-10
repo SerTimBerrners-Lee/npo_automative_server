@@ -1,6 +1,7 @@
 
 import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
 import { InjectModel } from '@nestjs/sequelize';
+import { Op } from 'sequelize';
 import { Detal } from 'src/detal/detal.model';
 import { TechProcess } from 'src/detal/tech-process.model';
 import { Documents } from 'src/documents/documents.model';
@@ -190,6 +191,10 @@ export class CbedService {
         return cbed
     }
 
+    async findById(id: number) {
+        return await this.cbedReprository.findByPk(id)
+    }
+
     async banCbed(id: number) {
         const cbed = await this.cbedReprository.findByPk(id)
         if(cbed) {
@@ -197,6 +202,19 @@ export class CbedService {
             await cbed.save()
             return cbed
         }
+    }
+
+    async getAllCbedShipments() {
+        const cbed = await this.cbedReprository.findAll({
+            include: {all:true}
+        })
+        const cbed_shipments = [];
+        for(let cb of cbed) {
+            if(cb.shipments.length)
+                cbed_shipments.push(cb)
+        }
+        
+        return cbed
     }
 }
  

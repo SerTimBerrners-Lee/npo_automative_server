@@ -1,6 +1,8 @@
 import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
 import { InjectModel } from '@nestjs/sequelize';
 import { BuyerService } from 'src/buyer/buyer.service';
+import { CbedService } from 'src/cbed/cbed.service';
+import { DetalService } from 'src/detal/detal.service';
 import { DateMethods } from 'src/files/date.methods';
 import { ProductService } from 'src/product/product.service';
 import { UpCreateShipmentsDto } from './dto/up-create-shipments.dto';
@@ -10,7 +12,9 @@ import { Shipments } from './shipments.model';
 export class ShipmentsService {
 	constructor(@InjectModel(Shipments) private shipmentsReprository: typeof Shipments,
 		private buyerService: BuyerService, 
-		private productService: ProductService) {}
+		private productService: ProductService,
+		private cbedService: CbedService,
+		private detalService: DetalService) {}
 
 	async createShipments(dto: UpCreateShipmentsDto) {
 		const dm = new DateMethods()
@@ -50,9 +54,24 @@ export class ShipmentsService {
 		shipment.base = dto.base
 		shipment.to_sklad = dto.to_sklad
 		shipment.description = dto.description
-		shipment.list_cbed_detal = dto.list_cbed_detal
 
 		console.log(dto)
+		shipment.list_cbed_detal = ''
+		if(dto.list_cbed_detal && dto.list_cbed_detal != 'null' || dto.list_cbed_detal != '[]') {
+			shipment.list_cbed_detal = dto.list_cbed_detal
+			let list_izd = JSON.parse(dto.list_cbed_detal)
+			for(let izd of list_izd) {
+				if(izd.type == 'cbed') {
+					let izdels = await this.cbedService.findById(izd.obj.id) 
+					if(izdels) 
+						shipment.$add('cbeds', izdels.id)
+				} else if(izd.type == 'detal') {
+					let izdels = await this.detalService.findById(izd.obj.id)
+					if(izdels) 
+						shipment.$add('detals', izdels.id)
+				}
+			}
+		}
 
 		if(dto.buyer) {
 			const buyer = await this.buyerService.getByuerById(dto.buyer)
@@ -76,5 +95,18 @@ export class ShipmentsService {
 	async getAllShipments() {
 		const shipments = await this.shipmentsReprository.findAll({include: {all: true}})
 		return shipments
+	}
+
+	async getAllShipmentsSclad(to_sclad: boolean) {
+		return await this.shipmentsReprository.findAll({where: {to_sklad: to_sclad}, include: {all: true}})
+	}
+
+	async changeShipmentToSclad(id: number) {
+		const shipments = await this.shipmentsReprository.findByPk(id);
+		if(shipments) {
+			shipments.to_sklad = !shipments.to_sklad
+			await shipments.save()
+			return shipments
+		}
 	}
 }

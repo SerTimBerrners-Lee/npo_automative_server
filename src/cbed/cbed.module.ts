@@ -25,7 +25,7 @@ import { CbedService } from './cbed.service';
         DocumentsModule
     ],
     exports: [
-        CbedModule
+        CbedService
     ]
 })
 export class CbedModule {}

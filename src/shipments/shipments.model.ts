@@ -1,7 +1,11 @@
 import { ApiProperty } from "@nestjs/swagger";
-import { Model, Column, DataType, Table, ForeignKey, BelongsTo} from "sequelize-typescript";
+import { Model, Column, DataType, Table, ForeignKey, BelongsTo, BelongsToMany} from "sequelize-typescript";
 import { Buyer } from "src/buyer/buyer.model";
+import { Cbed } from "src/cbed/cbed.model";
+import { Detal } from "src/detal/detal.model";
 import { Product } from "src/product/product.model";
+import { ShipmentsCbed } from "./shipments-cbed.model";
+import { ShipmentsDetal } from "./shipments-detal.model";
 
 interface ShipmentsAttrCreate {
   readonly number_order: string;
@@ -34,9 +38,9 @@ export class Shipments extends Model<Shipments, ShipmentsAttrCreate> {
     @Column({type: DataType.STRING})
     day_when_shipments: string;
 
-		@ApiProperty({example: '1', description: ''})
-    @Column({type: DataType.STRING})
-    bron: string;
+		@ApiProperty({example: false, description: 'bron'})
+    @Column({type: DataType.BOOLEAN, defaultValue: false})
+    bron: boolean;
 
 		@ApiProperty({example: '1', description: ''})
     @Column({type: DataType.STRING})
@@ -67,5 +71,10 @@ export class Shipments extends Model<Shipments, ShipmentsAttrCreate> {
     
     @BelongsTo(() =>Buyer)
     buyer: Buyer;
-   
+  
+    @BelongsToMany(() => Cbed, () => ShipmentsCbed)
+    cbeds: Cbed[];
+
+    @BelongsToMany(() => Detal, () => ShipmentsDetal)
+    detals: Detal[];
 }  
