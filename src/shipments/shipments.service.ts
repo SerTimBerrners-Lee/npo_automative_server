@@ -28,6 +28,8 @@ export class ShipmentsService {
 		let endYears = dm.date().split('.')[dm.date().split('.').length - 1].slice(2);
 		const numberEndShipments = endShipments && endShipments.id ?  
 			`№ ${endYears}-${endShipments.id + 1} от ${dm.date()}` : `№ ${endYears}-1 от ${dm.date()}`
+		
+		console.log("1:", dto)
 
 		const shipment = await this.shipmentsReprository.create({number_order: numberEndShipments});
 		if(!shipment)
@@ -56,6 +58,7 @@ export class ShipmentsService {
 		shipment.description = dto.description
 
 		console.log(dto)
+
 		shipment.list_cbed_detal = ''
 		if(dto.list_cbed_detal && dto.list_cbed_detal != 'null' || dto.list_cbed_detal != '[]') {
 			shipment.list_cbed_detal = dto.list_cbed_detal
@@ -108,5 +111,9 @@ export class ShipmentsService {
 			await shipments.save()
 			return shipments
 		}
+	}
+
+	async getById(id: number) {
+		return await this.shipmentsReprository.findByPk(id, {include: {all: true}})
 	}
 }

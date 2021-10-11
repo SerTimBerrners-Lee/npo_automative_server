@@ -218,11 +218,8 @@ export class SettingsService {
         if(!podPodMaterial || !podMaterials) 
             throw new HttpException('Не удалось создать запись ', HttpStatus.BAD_REQUEST)   
 
-        if(dto.description) {
-            let discr = JSON.parse(dto.description)
-            podPodMaterial.description = discr
-        } else 
-            podPodMaterial.description = '' 
+        if(dto.description != 'null') podPodMaterial.description = dto.description
+            else podPodMaterial.description = '' 
         
         let [deliveryTime, kolvo, density]: any[] = []
 

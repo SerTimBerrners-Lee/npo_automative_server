@@ -80,6 +80,19 @@ import { ShipmentsModule } from './shipments/shipments.module';
 import { Shipments } from "./shipments/shipments.model";
 import { ShipmentsDetal } from "./shipments/shipments-detal.model";
 import { ShipmentsCbed } from "./shipments/shipments-cbed.model";
+import { CbedMaterial } from "./cbed/cbed-material.model";
+import { ProductMaterial } from "./product/product-material.model";
+import { ProductCbed } from "./product/product-cbed.model";
+import { CbedDetals } from "./cbed/cbed-detals.model";
+import { ProductDetal } from "./product/product-detal.model";
+import { AssembleModule } from './assemble/assemble.module';
+import { Assemble } from "./assemble/assemble.model";
+import { AssembleShipments } from "./assemble/assemble-shipments.model";
+import { AssembleCbed } from "./assemble/assemble-cbed.model";
+import { MetaloworkingModule } from './metaloworking/metaloworking.module';
+import { Metaloworking } from "./metaloworking/metaloworking.model";
+import { MetaloworkingShipments } from "./metaloworking/metaloworking-shipments.model";
+import { MetaloworkingDetal } from "./metaloworking/metaloworking-detal.model";
 
 @Module({
     controllers: [],
@@ -156,7 +169,18 @@ import { ShipmentsCbed } from "./shipments/shipments-cbed.model";
                 IssueUserController,
                 Shipments,
                 ShipmentsDetal,
-                ShipmentsCbed
+                ShipmentsCbed,
+                CbedMaterial,
+                ProductMaterial,
+                ProductCbed,
+                CbedDetals,
+                ProductDetal,
+                Assemble,
+                AssembleShipments,
+                AssembleCbed,
+                Metaloworking,
+                MetaloworkingShipments,
+                MetaloworkingDetal
             ],
             autoLoadModels: true,
           }),
@@ -180,6 +204,8 @@ import { ShipmentsCbed } from "./shipments/shipments-cbed.model";
         BuyerModule,
         ScladModule,
         ShipmentsModule,
+        AssembleModule,
+        MetaloworkingModule,
     ]
 })
 

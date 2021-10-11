@@ -10,6 +10,9 @@ import { Sebestoim } from "src/sebestoim/sebestoim.model";
 import { PodPodMaterial } from "src/settings/pod-pod-material.model";
 import { Shipments } from "src/shipments/shipments.model";
 import { User } from "src/users/users.model";
+import { ProductCbed } from "./product-cbed.model";
+import { ProductDetal } from "./product-detal.model";
+import { ProductMaterial } from "./product-material.model";
 
 interface ProductCreationAttrs {
     name: string;
@@ -74,16 +77,16 @@ export class Product extends Model<Product, ProductCreationAttrs> {
     @BelongsToMany(() => Documents, () => DocumentsProduct)
     documents: Documents[];
 
-    @HasMany(() => PodPodMaterial)
+    @BelongsToMany(() => PodPodMaterial, () => ProductMaterial)
     materials: PodPodMaterial[];
 
-    @HasMany(() => Detal)
+    @BelongsToMany(() => Detal, () => ProductDetal)
     detals: Detal[];
 
-    @HasMany(() => Cbed)
-    cbeds: Cbed[];
+    @BelongsToMany(() => Cbed, () => ProductCbed)
+    cbeds: Cbed[]; 
 
-    @HasMany(() => TechProcess)
+    @HasMany(() => TechProcess) 
     techProcesses: TechProcess[];
 
     @ForeignKey(() => User)

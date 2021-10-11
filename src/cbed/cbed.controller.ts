@@ -1,9 +1,10 @@
 import { Body, Controller, Delete, Get, Param, Post, UploadedFiles, UseInterceptors } from '@nestjs/common';
 import { FileFieldsInterceptor } from '@nestjs/platform-express';
-import { ApiOperation } from '@nestjs/swagger';
+import { ApiOperation, ApiTags } from '@nestjs/swagger';
 import { CbedService } from './cbed.service';
 import { CreateCbedDto } from './dto/create-cbed.dto';
 
+@ApiTags('Сборочная единица')
 @Controller('cbed')
 export class CbedController {
     constructor(private cbedService: CbedService) {}
@@ -42,9 +43,9 @@ export class CbedController {
         return this.cbedService.banCbed(id)
     }
 
-    @ApiOperation({summary: 'Получаем все сборочные единицы с заказов'})
-    @Get('/shipments')
-    getAllCbedShipments() {
-        return this.cbedService.getAllCbedShipments()
+    @ApiOperation({summary: 'Получить одну сборочную единицу по ID'})
+    @Get('/:id')
+    getOneCbedById(@Param('id') id: number) {
+        return this.cbedService.getOneCbedById(id)
     }
 } 

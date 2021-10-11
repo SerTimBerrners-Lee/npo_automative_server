@@ -6,7 +6,7 @@ export class UpCreateShipmentsDto {
 	readonly date_shipments: 			string;
 	readonly number_order: 				string;
 	readonly kolvo: 							number;
-	readonly day_when_shipments: 	string;
+	readonly day_when_shipments: 	number;
 	readonly bron : 							boolean;
 	readonly base:								string;
 	readonly buyer: 							number;

@@ -6,12 +6,15 @@ import { Detal } from "src/detal/detal.model";
 import { TechProcess } from "src/detal/tech-process.model";
 import { DocumentsCbed } from "src/documents/documents-cbed.model";
 import { Documents } from "src/documents/documents.model";
+import { ProductCbed } from "src/product/product-cbed.model";
 import { Product } from "src/product/product.model";
 import { Sebestoim } from "src/sebestoim/sebestoim.model";
 import { PodPodMaterial } from "src/settings/pod-pod-material.model";
 import { ShipmentsCbed } from "src/shipments/shipments-cbed.model";
 import { Shipments } from "src/shipments/shipments.model";
 import { User } from "src/users/users.model";
+import { CbedDetals } from "./cbed-detals.model";
+import { CbedMaterial } from "./cbed-material.model";
 
 interface CbedCreationAttrs {
     name: string;
@@ -70,23 +73,12 @@ export class Cbed extends Model<Cbed, CbedCreationAttrs> {
 
     @BelongsToMany(() => Documents, () => DocumentsCbed)
     documents: Documents[];
-
-    // Регистрируем модель для материалов
-    @HasMany(() => PodPodMaterial)
+    
+    @BelongsToMany(() => PodPodMaterial, () => CbedMaterial)
     materials: PodPodMaterial[];
 
-    @HasMany(() => Detal)
+    @BelongsToMany(() => Detal, () => CbedDetals)
     detals: Detal[];
-
-    @ForeignKey(() => Cbed)
-    @Column({type: DataType.INTEGER})
-    cbedId: number;
-
-    @BelongsTo(() => Cbed)
-    cbed: Cbed;
-
-    @HasMany(() => Cbed)
-    cbeds: Cbed[];
 
     @HasMany(() => TechProcess)
     techProcesses: TechProcess[];
@@ -98,18 +90,14 @@ export class Cbed extends Model<Cbed, CbedCreationAttrs> {
     @BelongsTo(() => User)
     user: User;
 
-    @ForeignKey(() => Product)
-    @Column({type: DataType.INTEGER})
-    productId: number;
-
-    @BelongsTo(() => Product)
-    product: Product;
+    @BelongsToMany(() => Product, () => ProductCbed)
+    products: Product[];
 
     @HasMany(() => Actions)
     actions: Actions[];
 
     @HasOne(() => Sebestoim)
-    sebestoim: Sebestoim;
+    sebestoim: Sebestoim; 
 
     @ForeignKey(() => Buyer)
     @Column({type: DataType.INTEGER})

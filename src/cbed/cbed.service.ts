@@ -1,7 +1,6 @@
 
 import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
 import { InjectModel } from '@nestjs/sequelize';
-import { Op } from 'sequelize';
 import { Detal } from 'src/detal/detal.model';
 import { TechProcess } from 'src/detal/tech-process.model';
 import { Documents } from 'src/documents/documents.model';
@@ -138,28 +137,9 @@ export class CbedService {
                 }
             }
         }
-
-        cbed.listCbed = ''
-        if(cbed.cbeds && cbed.cbeds.length) {
-            for( let cb of cbed.cbeds) {
-                    await cbed.$remove('cbeds', cb.id)
-                    await cbed.save()
-            }
-        }
-
-        if(dto.listCbed) {
-            const mList = JSON.parse(dto.listCbed)
+        if(dto.listCbed) 
             cbed.listCbed = dto.listCbed
-            if(mList.length) {
-                for(let m = 0; m < mList.length; m++) {
-                    let cbeds = await this.cbedReprository.findByPk(mList[m].cb.id)
-                    if(cbeds) {
-                        await cbed.$add('cbeds', cbeds.id)
-                        await cbed.save()
-                    }
-                }
-            }
-        }
+        else cbed.listCbed = ''
 
         if(dto.docs) {
             let docs: any = Object.values(JSON.parse(dto.docs))
@@ -204,17 +184,8 @@ export class CbedService {
         }
     }
 
-    async getAllCbedShipments() {
-        const cbed = await this.cbedReprository.findAll({
-            include: {all:true}
-        })
-        const cbed_shipments = [];
-        for(let cb of cbed) {
-            if(cb.shipments.length)
-                cbed_shipments.push(cb)
-        }
-        
-        return cbed
+    async getOneCbedById(id: number) {
+        return await this.cbedReprository.findByPk(id, {include: {all: true}})
     }
 }
  

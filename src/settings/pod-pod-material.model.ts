@@ -1,6 +1,7 @@
 import { ApiProperty } from "@nestjs/swagger";
 import { Model, Column, DataType, Table, BelongsTo, ForeignKey, BelongsToMany, HasMany } from "sequelize-typescript";
 import { Actions } from "src/actions/actions.model";
+import { CbedMaterial } from "src/cbed/cbed-material.model";
 import { Cbed } from "src/cbed/cbed.model";
 import { DetalMaterials } from "src/detal/detal-materials.model";
 import { Detal } from "src/detal/detal.model";
@@ -8,6 +9,7 @@ import { OperationMaterial } from "src/detal/operation-material.model";
 import { Operation } from "src/detal/operation.model";
 import { DocumentsMaterial } from "src/documents/documents-material.model";
 import { Documents } from "src/documents/documents.model";
+import { ProductMaterial } from "src/product/product-material.model";
 import { Product } from "src/product/product.model";
 import { ProvidersMaterial } from "src/provider/provider-material.model";
 import { Providers } from "src/provider/provider.model";
@@ -111,18 +113,10 @@ export class PodPodMaterial extends Model<PodPodMaterial, PodPodMaterialCreation
     @HasMany(() => Actions)
     actions: Actions[];
 
-    @ForeignKey(() => Cbed)
-    @Column({type: DataType.INTEGER})
-    cbedId: number;
+    @BelongsToMany(() => Cbed, () => CbedMaterial)
+    cbeds: Cbed[];
 
-    @BelongsTo(() => Cbed)
-    cbed: Cbed;
-
-    @ForeignKey(() => Product)
-    @Column({type: DataType.INTEGER})
-    productId: number;
-
-    @BelongsTo(() => Product)
-    product: Product;
+    @BelongsToMany(() => Product, () => ProductMaterial)
+    products: Product[];
 
 }    
