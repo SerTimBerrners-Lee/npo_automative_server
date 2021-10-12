@@ -1,9 +1,8 @@
 import { ApiProperty } from "@nestjs/swagger";
-import { Model, Column, DataType, Table, BelongsToMany} from "sequelize-typescript";
+import { Model, Column, DataType, Table, BelongsToMany, ForeignKey, BelongsTo} from "sequelize-typescript";
 import { Cbed } from "src/cbed/cbed.model";
 import { Detal } from "src/detal/detal.model";
 import { Shipments } from "src/shipments/shipments.model";
-import { MetaloworkingDetal } from "./metaloworking-detal.model";
 import { MetaloworkingShipments } from "./metaloworking-shipments.model";
 
 interface MetaloworkingAttrCreate {
@@ -47,7 +46,11 @@ export class Metaloworking extends Model<Metaloworking, MetaloworkingAttrCreate>
     @BelongsToMany(() => Shipments, () => MetaloworkingShipments)
     shipments: Shipments[];
 
-    @BelongsToMany(() => Detal, () => MetaloworkingDetal)
-    detals: Detal[];
+    @ForeignKey(() => Detal)
+    @Column({type: DataType.INTEGER})
+    detal_id: number;
+
+    @BelongsTo(() => Detal)
+    detal: Cbed;
 
 }  

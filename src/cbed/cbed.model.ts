@@ -36,7 +36,7 @@ export class Cbed extends Model<Cbed, CbedCreationAttrs> {
     ban: boolean; 
 
     @ApiProperty({example: 12, description: 'Количество Сборочных единиц на складе'})
-    @Column({type: DataType.INTEGER})
+    @Column({type: DataType.INTEGER, defaultValue: 0})
     cbed_kolvo: number; 
 
     @ApiProperty({example: 12, description: 'Срок поставки'})

@@ -1,5 +1,6 @@
 import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
 import { InjectModel } from '@nestjs/sequelize';
+import { Op } from 'sequelize';
 import { BuyerService } from 'src/buyer/buyer.service';
 import { CbedService } from 'src/cbed/cbed.service';
 import { DetalService } from 'src/detal/detal.service';
@@ -114,6 +115,30 @@ export class ShipmentsService {
 	}
 
 	async getById(id: number) {
+		return await this.shipmentsReprository.findByPk(id, {include: {all: true}})
+	}
+
+	async getAllShipmentsAssemble() {
+		const shipments = await this.shipmentsReprository.findAll({include: {all: true}})
+		const assemble: any = []
+		for(let sh of shipments) {
+			if(sh.assemble.length) 
+				assemble.push(sh)
+		}
+		return assemble
+	}
+
+	async getAllShipmentsMetaloworking() {
+		const shipments = await this.shipmentsReprository.findAll({include: {all: true}})
+		const metaloworking: any = []
+		for(let sh of shipments) {
+			if(sh.metaloworking.length) 
+				metaloworking.push(sh)
+		}
+		return metaloworking
+	}
+
+	async getAllShipmentsById(id: number) {
 		return await this.shipmentsReprository.findByPk(id, {include: {all: true}})
 	}
 }

@@ -34,7 +34,7 @@ export class Detal extends Model<Detal, DetalCreationAttrs> {
     ban: boolean; 
 
     @ApiProperty({example: 12, description: 'Количество Деталей на складе'})
-    @Column({type: DataType.INTEGER})
+    @Column({type: DataType.INTEGER, defaultValue: 0})
     detal_kolvo: number; 
 
     @ApiProperty({example: 12, description: 'Срок поставки'})

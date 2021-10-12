@@ -1,17 +1,16 @@
 import { ApiProperty } from "@nestjs/swagger";
-import { Model, Column, DataType, Table, BelongsToMany} from "sequelize-typescript";
+import { Model, Column, DataType, Table, BelongsToMany, ForeignKey, BelongsTo} from "sequelize-typescript";
 import { Cbed } from "src/cbed/cbed.model";
 import { Shipments } from "src/shipments/shipments.model";
-import { AssembleCbed } from "./assemble-cbed.model";
 import { AssembleShipments } from "./assemble-shipments.model";
 
 interface AssembleAttrCreate {
    date_order: string;
    number_order: string;
-   date_shipments: string;
+   date_shipments: string; 
    description: string;
 }
-
+ 
 @Table({tableName: 'assemble'})
 export class Assemble extends Model<Assemble, AssembleAttrCreate> {
 
@@ -46,7 +45,11 @@ export class Assemble extends Model<Assemble, AssembleAttrCreate> {
     @BelongsToMany(() => Shipments, () => AssembleShipments)
     shipments: Shipments[];
 
-    @BelongsToMany(() => Cbed, () => AssembleCbed)
-    cbeds: Cbed[];
+    @ForeignKey(() => Cbed)
+    @Column({type: DataType.INTEGER})
+    cbed_id: number;
+
+    @BelongsTo(() => Cbed)
+    cbed: Cbed;
 
 }  

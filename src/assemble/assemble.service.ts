@@ -24,12 +24,23 @@ export class AssembleService {
 				assemble.$add('shipments', shipment.id)
 		}
 
+		console.log(dto)
+
 		if(dto.cbed_id) {
 			const cbed = await this.cbedReprository.findById(dto.cbed_id)
 			if(cbed) 
-				assemble.$add('cbed', cbed.id)
+				assemble.cbed_id = cbed.id
 		}
 		
 		return assemble
 	}
+
+	async getAllAssemble() {
+		return await this.assembleReprository.findAll({include: {all: true}})
+	}
+
+	async getAssembleById(id:number) {
+		return await this.assembleReprository.findByPk(id, {include: {all: true}})
+	}
 }
+ 

@@ -34,7 +34,7 @@ export class Product extends Model<Product, ProductCreationAttrs> {
     ban: boolean; 
 
     @ApiProperty({example: 12, description: 'Количество Продукции на складе'})
-    @Column({type: DataType.INTEGER})
+    @Column({type: DataType.INTEGER, defaultValue: 0})
     product_kolvo: number; 
 
     @ApiProperty({example: 12, description: 'Срок поставки'})

@@ -26,12 +26,17 @@ export class MetaloworkingService {
 		if(dto.detal_id) {
 			const detal = await this.detalService.findById(dto.detal_id)
 			if(detal) 
-				metaloworking.$add('detals', detal.id)
+				metaloworking.detal_id = detal.id
 		}
 
 		console.log(dto)
 		
 		return metaloworking
 
+	}
+
+
+	async getOneMetaloworkingById(id: number) {
+		return await this.metaloworkingReprositroy.findByPk(id, {include: {all: true}})
 	}
 }

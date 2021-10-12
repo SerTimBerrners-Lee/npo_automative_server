@@ -27,6 +27,24 @@ export class ShipmentsController {
 		return this.shipmentsSettings.getAllShipmentsSclad(to_sclad);
 	}
 
+	@ApiOperation({summary: 'Получить все заказы в сборке'})
+  @Get('/assemble')
+	getAllShipmentsAssemble() {
+		return this.shipmentsSettings.getAllShipmentsAssemble();
+	}
+
+	@ApiOperation({summary: 'Получить все детали'})
+  @Get('/metaloworking')
+	getAllShipmentsMetaloworking() {
+		return this.shipmentsSettings.getAllShipmentsMetaloworking();
+	}
+
+	@ApiOperation({summary: 'Получить все заказы в сборке'})
+  @Get('/:id')
+	getAllShipmentsById(@Param('id') id: number) {
+		return this.shipmentsSettings.getAllShipmentsById(id);
+	}
+
 	@ApiOperation({summary: 'Перемешаем заказ на склад или обратно'})
   @Put('/sclad/:id')
 	changeShipmentToSclad(@Param('id') id: number) {

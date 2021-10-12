@@ -88,11 +88,9 @@ import { ProductDetal } from "./product/product-detal.model";
 import { AssembleModule } from './assemble/assemble.module';
 import { Assemble } from "./assemble/assemble.model";
 import { AssembleShipments } from "./assemble/assemble-shipments.model";
-import { AssembleCbed } from "./assemble/assemble-cbed.model";
 import { MetaloworkingModule } from './metaloworking/metaloworking.module';
 import { Metaloworking } from "./metaloworking/metaloworking.model";
 import { MetaloworkingShipments } from "./metaloworking/metaloworking-shipments.model";
-import { MetaloworkingDetal } from "./metaloworking/metaloworking-detal.model";
 
 @Module({
     controllers: [],
@@ -177,10 +175,8 @@ import { MetaloworkingDetal } from "./metaloworking/metaloworking-detal.model";
                 ProductDetal,
                 Assemble,
                 AssembleShipments,
-                AssembleCbed,
                 Metaloworking,
                 MetaloworkingShipments,
-                MetaloworkingDetal
             ],
             autoLoadModels: true,
           }),
