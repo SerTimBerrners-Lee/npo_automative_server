@@ -9,8 +9,10 @@ import { statusShipment } from "src/files/enum";
 import { MetaloworkingShipments } from "src/metaloworking/metaloworking-shipments.model";
 import { Metaloworking } from "src/metaloworking/metaloworking.model";
 import { Product } from "src/product/product.model";
+import { PodPodMaterial } from "src/settings/pod-pod-material.model";
 import { ShipmentsCbed } from "./shipments-cbed.model";
 import { ShipmentsDetal } from "./shipments-detal.model";
+import { ShipmentsMaterial } from "./shipments-material.model";
 
 interface ShipmentsAttrCreate {
   readonly number_order: string;
@@ -37,10 +39,10 @@ export class Shipments extends Model<Shipments, ShipmentsAttrCreate> {
 
 		@ApiProperty({example: '1', description: ''})
     @Column({type: DataType.INTEGER})
-    kolvo: number;
+    kol: number;
 
 		@ApiProperty({example: '1', description: ''})
-    @Column({type: DataType.NUMBER})
+    @Column({type: DataType.INTEGER})
     day_when_shipments: number;
 
 		@ApiProperty({example: false, description: 'bron'})
@@ -58,6 +60,10 @@ export class Shipments extends Model<Shipments, ShipmentsAttrCreate> {
 		@ApiProperty({example: '1', description: ''})
     @Column({type: DataType.TEXT})
     list_cbed_detal: string;
+
+    @ApiProperty({example: '1', description: ''})
+    @Column({type: DataType.TEXT})
+    list_material: string;
 
 		@ApiProperty({example: '1', description: ''})
     @Column({type: DataType.STRING})
@@ -86,6 +92,9 @@ export class Shipments extends Model<Shipments, ShipmentsAttrCreate> {
 
     @BelongsToMany(() => Detal, () => ShipmentsDetal)
     detals: Detal[];
+
+    @BelongsToMany(() => PodPodMaterial, () => ShipmentsMaterial)
+    materials: PodPodMaterial[];
 
     @BelongsToMany(() => Assemble, () => AssembleShipments)
     assemble: Assemble[];
