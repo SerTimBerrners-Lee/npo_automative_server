@@ -28,7 +28,7 @@ export class PodPodMaterial extends Model<PodPodMaterial, PodPodMaterialCreation
     id: number;
 
     @ApiProperty({example: 'Круг 20 D', description: 'Полная запись под материала измерений'})
-    @Column({type: DataType.STRING, allowNull: true})
+    @Column({type: DataType.STRING})
     name: string;   
 
     @ApiProperty({example: true, description: 'Добавляем в архив'})
@@ -40,7 +40,7 @@ export class PodPodMaterial extends Model<PodPodMaterial, PodPodMaterialCreation
     material_kolvo: number; 
 
     @ApiProperty({example: '{edizmId: 10, znach: 2}', description: 'Срок поставки'})
-    @Column({type: DataType.STRING, allowNull: true})
+    @Column({type: DataType.STRING})
     deliveryTime: any; 
     
     @BelongsToMany(() => Documents, () => DocumentsMaterial)

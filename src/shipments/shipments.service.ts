@@ -6,6 +6,7 @@ import { CbedService } from 'src/cbed/cbed.service';
 import { DetalService } from 'src/detal/detal.service';
 import { DateMethods } from 'src/files/date.methods';
 import { ProductService } from 'src/product/product.service';
+import { SettingsService } from 'src/settings/settings.service';
 import { UpCreateShipmentsDto } from './dto/up-create-shipments.dto';
 import { Shipments } from './shipments.model';
 
@@ -15,7 +16,8 @@ export class ShipmentsService {
 		private buyerService: BuyerService, 
 		private productService: ProductService,
 		private cbedService: CbedService,
-		private detalService: DetalService) {}
+		private detalService: DetalService,
+		private setitupService: SettingsService) {}
 
 	async createShipments(dto: UpCreateShipmentsDto) {
 		const dm = new DateMethods()
@@ -51,7 +53,7 @@ export class ShipmentsService {
 	private async upCreateShipments(dto: UpCreateShipmentsDto, shipment: Shipments) {
 		shipment.date_order = dto.date_order
 		shipment.date_shipments = dto.date_shipments
-		shipment.kolvo = dto.kolvo
+		shipment.kol = dto.kol
 		shipment.day_when_shipments = dto.day_when_shipments
 		shipment.bron = dto.bron
 		shipment.base = dto.base
@@ -73,6 +75,18 @@ export class ShipmentsService {
 					let izdels = await this.detalService.findById(izd.obj.id)
 					if(izdels) 
 						shipment.$add('detals', izdels.id)
+				}
+			}
+		}
+
+		if(dto.list_material && dto.list_material != 'null' || dto.list_material != '[]') {
+			shipment.list_material = dto.list_material
+			let list_izd = JSON.parse(dto.list_material)
+			for(let izd of list_izd) {
+				if(izd.type == 'mat') {
+					let izdels = await this.setitupService.getOnePPT(izd.obj.id) 
+					if(izdels) 
+						shipment.$add('materials', izdels.id)
 				}
 			}
 		}

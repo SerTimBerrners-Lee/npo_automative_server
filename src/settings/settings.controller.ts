@@ -76,20 +76,20 @@ export class SettingsController {
     }
 
     @ApiOperation({summary: 'Создаем под тип материала'})
-    @Post('/material/podtype')
+    @Post('/podtype')
     createPodMaterial(@Body() dto: CreatePodMaterialDto) {
         console.log(dto)
         return this.settingsService.createPodMaterial(dto)
     }
 
     @ApiOperation({summary: 'Удаляем под тип материала'})
-    @Delete('/material/podtype/:id')
+    @Delete('/podtype/:id')
     removePodMaterial(@Param('id') id: number) {
         return this.settingsService.removePodMaterial(id)
     }
     
     @ApiOperation({summary: 'Обновляем подтип материала'})
-    @Post('/material/podtype/update')
+    @Post('/podtype/update')
     updatePodTypeMaterial(@Body() dto: CreatePodMaterialDto) {
         return this.settingsService.updatePodTypeMaterial(dto)
     }
@@ -98,13 +98,13 @@ export class SettingsController {
     @UseInterceptors(FileFieldsInterceptor([
         {name: 'document', maxCount: 40}
     ]))
-    @Post('/material/podpodtype/')
+    @Post('/podpodtype/')
     crteatePodPodMaterial(@Body() dto: CreatePodPodMaterial, @UploadedFiles() files: { document?: Express.Multer.File[]} ) {
         return this.settingsService.createAndUpdatePodPodMaterial(dto, files)
     }
 
     @ApiOperation({summary: 'get all typeMaterials'})
-    @Get('/materials/typematerial')
+    @Get('/typematerial')
     getAllPodTypeMaterial() {
         return this.settingsService.getAllPodTypeMaterial()
     }
@@ -116,31 +116,31 @@ export class SettingsController {
     }
 
     @ApiOperation({summary: 'get one pod typeMaterials'})
-    @Get('/materials/typematerial/:id')
+    @Get('/typematerial/:id')
     getPodMaterialById(@Param('id') id: number) {
         return this.settingsService.getPodMaterialById(id)
     }
 
     @ApiOperation({summary: 'Удаляем под подтип материала'})
-    @Delete('/material/podpodtype/:id')
+    @Delete('/podpodtype/:id')
     removePPMaterial(@Param('id') id: number) {
         return this.settingsService.removePPMById(id)
     }
     
     @ApiOperation({summary: 'Добавляем подтип материала в архив'})
-    @Get('/material/podpodtype/:id')
+    @Get('/podpodtype/:id')
     banPPM(@Param('id') id: number) {
         return this.settingsService.banPPMById(id)
     }
 
     @ApiOperation({summary: 'Получаем один Полдтип материала со всеми полями'})
-    @Get('/material/podpodtype/get/:id')
+    @Get('/podpodtype/get/:id')
     getOnePPT(@Param('id') id: number) {
         return this.settingsService.getOnePPT(id)
     }
 
     @ApiOperation({summary: 'Получаем все Полдтип материала со всеми полями'})
-    @Get('/material/podpodtype/')
+    @Get('/podpodtype/')
     getAllPPT() {
         return this.settingsService.getAllPPT()
     }

@@ -4,6 +4,7 @@ import { BuyerModule } from 'src/buyer/buyer.module';
 import { CbedModule } from 'src/cbed/cbed.module';
 import { DetalModule } from 'src/detal/detal.module';
 import { ProductModule } from 'src/product/product.module';
+import { SettingsModule } from 'src/settings/settings.module';
 import { ShipmentsController } from './shipments.controller';
 import { Shipments } from './shipments.model';
 import { ShipmentsService } from './shipments.service';
@@ -16,7 +17,8 @@ import { ShipmentsService } from './shipments.service';
 		BuyerModule,
 		ProductModule,
 		CbedModule,
-		DetalModule
+		DetalModule,
+		SettingsModule
 	],
 
 	exports: [ShipmentsService]

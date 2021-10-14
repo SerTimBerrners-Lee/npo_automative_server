@@ -318,7 +318,6 @@ export class SettingsService {
         await podPodMaterial.save()
 
         if(!Number(dto.id)) {
-            //podTypeId
             podPodMaterial.podMaterialId = podMaterials.id
             if(dto.rootParentId) { 
                 let material = await this.materialReprository.findByPk(dto.rootParentId)
@@ -389,8 +388,7 @@ export class SettingsService {
 
     async getOnePPT(id: number) {
         const PPM = await this.podPodMaterialReprository.findByPk(id, {include: {all: true}})
-        if(PPM)
-            return PPM
+        return PPM || null
     }
 
     async getAllPPT() {

@@ -91,6 +91,7 @@ import { AssembleShipments } from "./assemble/assemble-shipments.model";
 import { MetaloworkingModule } from './metaloworking/metaloworking.module';
 import { Metaloworking } from "./metaloworking/metaloworking.model";
 import { MetaloworkingShipments } from "./metaloworking/metaloworking-shipments.model";
+import { ShipmentsMaterial } from "./shipments/shipments-material.model";
 
 @Module({
     controllers: [],
@@ -168,6 +169,7 @@ import { MetaloworkingShipments } from "./metaloworking/metaloworking-shipments.
                 Shipments,
                 ShipmentsDetal,
                 ShipmentsCbed,
+                ShipmentsMaterial,
                 CbedMaterial,
                 ProductMaterial,
                 ProductCbed,

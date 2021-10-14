@@ -16,7 +16,7 @@ export class PodMaterial extends Model<PodMaterial, PodMaterialCreationAttrs> {
     id: number;
 
     @ApiProperty({example: 'Круг 20 D', description: 'Полная запись под материала измерений'})
-    @Column({type: DataType.STRING, allowNull: false})
+    @Column({type: DataType.STRING})
     name: string;    
 
     @ApiProperty({example: '{edizmId: 10, znach: 2}', description: 'Запись значений'})
