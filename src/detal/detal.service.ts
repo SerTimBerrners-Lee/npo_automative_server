@@ -112,20 +112,25 @@ export class DetalService {
 
     private async upCreateDetal(dto: any, files: any, detal: any) {
 
-        if(dto.articl)
+        if(dto.articl != 'null')
             detal.articl = dto.articl
-        if(dto.description)
+            else detal.articl = 0
+        if(dto.description != 'null')
             detal.description = dto.description
+            else detal.description = ''
         if(dto.parametrs)
             detal.parametrs = dto.parametrs
         if(dto.haracteriatic)
             detal.haracteriatic = dto.haracteriatic
-        if(dto.DxL)
+        if(dto.DxL != 'null')
             detal.DxL = dto.DxL
-        if(dto.massZag)
+            else detal.DxL = 0
+        if(dto.massZag != 'null')
             detal.massZag = dto.massZag
-        if(dto.trash)
+            else detal.massZag = 0
+        if(dto.trash != 'null')
             detal.trash = dto.trash
+            else detal.trash = 0
 
         await detal.save()
 
@@ -144,6 +149,7 @@ export class DetalService {
                 await detal.save()
             }
         }
+
         if(Number(dto.mat_zag_zam)) {
             detal.mat_zag_zam = dto.mat_zag_zam
             let material = await this.podPodMaterialReprository.findByPk(dto.mat_zag_zam)
@@ -166,7 +172,8 @@ export class DetalService {
                     }
                 }
             }
-        }
+        } else 
+            detal.materialList = ''   
 
         if(Number(dto.techProcessID)) {
             const tp = await this.techProcessReprository.findByPk(dto.techProcessID)

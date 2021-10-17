@@ -1,5 +1,6 @@
 import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
 import { InjectModel } from '@nestjs/sequelize';
+import { Op } from 'sequelize';
 import { Documents } from 'src/documents/documents.model';
 import { DocumentsService } from 'src/documents/documents.service';
 import { Providers } from 'src/provider/provider.model';
@@ -393,5 +394,18 @@ export class SettingsService {
 
     async getAllPPT() {
         return await this.podPodMaterialReprository.findAll({where: {ban: false}})
+    }
+
+    async getDeficitMaterial() {
+        const materials = await this.podPodMaterialReprository.findAll({include: {all: true}, 
+            where: {
+                shipments_kolvo: {
+                    [Op.gt]: 0
+                }
+            }
+        });
+        
+        return materials
+
     }
 }

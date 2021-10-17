@@ -39,6 +39,10 @@ export class PodPodMaterial extends Model<PodPodMaterial, PodPodMaterialCreation
     @Column({type: DataType.INTEGER, defaultValue: 0})
     material_kolvo: number; 
 
+    @ApiProperty({example: 12, description: 'Количество материала на складе'})
+    @Column({type: DataType.INTEGER, defaultValue: 0})
+    shipments_kolvo: number; 
+
     @ApiProperty({example: '{edizmId: 10, znach: 2}', description: 'Срок поставки'})
     @Column({type: DataType.STRING})
     deliveryTime: any; 

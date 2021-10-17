@@ -31,8 +31,6 @@ export class ShipmentsService {
 		let endYears = dm.date().split('.')[dm.date().split('.').length - 1].slice(2);
 		const numberEndShipments = endShipments && endShipments.id ?  
 			`№ ${endYears}-${endShipments.id + 1} от ${dm.date()}` : `№ ${endYears}-1 от ${dm.date()}`
-		
-		console.log("1:", dto)
 
 		const shipment = await this.shipmentsReprository.create({number_order: numberEndShipments});
 		if(!shipment)
@@ -58,9 +56,9 @@ export class ShipmentsService {
 		shipment.bron = dto.bron
 		shipment.base = dto.base
 		shipment.to_sklad = dto.to_sklad
-		shipment.description = dto.description
-
-		console.log(dto)
+		if(dto.description != 'null')
+			shipment.description = dto.description
+			else shipment.description = ''
 
 		shipment.list_cbed_detal = ''
 		if(dto.list_cbed_detal && dto.list_cbed_detal != 'null' || dto.list_cbed_detal != '[]') {
@@ -79,14 +77,16 @@ export class ShipmentsService {
 			}
 		}
 
+		shipment.list_material = ''
 		if(dto.list_material && dto.list_material != 'null' || dto.list_material != '[]') {
 			shipment.list_material = dto.list_material
 			let list_izd = JSON.parse(dto.list_material)
 			for(let izd of list_izd) {
 				if(izd.type == 'mat') {
-					let izdels = await this.setitupService.getOnePPT(izd.obj.id) 
-					if(izdels) 
-						shipment.$add('materials', izdels.id)
+					let material = await this.setitupService.getOnePPT(izd.obj.id) 
+					if(material) 
+						shipment.$add('materials', material.id)
+						material.shipments_kolvo = material.shipments_kolvo + izd.kol
 				}
 			}
 		}

@@ -144,4 +144,10 @@ export class SettingsController {
     getAllPPT() {
         return this.settingsService.getAllPPT()
     }
+
+    @ApiOperation({summary: 'Получаем Дефицит материала'})
+    @Get('/materialdeficit/')
+    getAllDeficit() {
+        return this.settingsService.getDeficitMaterial()
+    }
 } 
