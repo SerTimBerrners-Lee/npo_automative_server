@@ -397,10 +397,10 @@ export class SettingsService {
     }
 
     async getDeficitMaterial() {
-        const materials = await this.podPodMaterialReprository.findAll({include: {all: true}, 
+        const materials = await this.podPodMaterialReprository.findAll({include: {all: true},
             where: {
                 shipments_kolvo: {
-                    [Op.gt]: 0
+                    [Op.ne]: 0
                 }
             }
         });

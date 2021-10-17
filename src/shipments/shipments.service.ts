@@ -87,6 +87,7 @@ export class ShipmentsService {
 					if(material) 
 						shipment.$add('materials', material.id)
 						material.shipments_kolvo = material.shipments_kolvo + izd.kol
+						await material.save()
 				}
 			}
 		}
