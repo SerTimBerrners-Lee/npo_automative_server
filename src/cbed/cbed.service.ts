@@ -123,7 +123,7 @@ export class CbedService {
                 await cbed.save()
             }
         }
-
+        
         if(dto.listDetal) {
             const mList = JSON.parse(dto.listDetal)
             cbed.listDetal = dto.listDetal

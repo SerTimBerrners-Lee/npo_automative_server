@@ -13,6 +13,8 @@ import { DocumentsDetal } from "./documents-detal.model";
 import { Actions } from "src/actions/actions.model";
 import { Issue } from "src/issue/issue.model";
 import { DocumentsIssue } from "./document-issue.model";
+import { Deliveries } from "src/provider/deliveries.model";
+import { DocumentsDeliveries } from "./documents-deliveries.model";
 
 interface DocumentsCreationAttrs {
     name: string; 
@@ -77,4 +79,7 @@ export class Documents extends Model<Documents, DocumentsCreationAttrs> {
     @ForeignKey(() => User)
     @Column({type: DataType.INTEGER})
     responsible_user_id: number;
+
+    @BelongsToMany(() => Deliveries, () => DocumentsDeliveries)
+    deliveries: Deliveries[]
 } 

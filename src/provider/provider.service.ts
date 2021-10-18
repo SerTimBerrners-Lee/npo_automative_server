@@ -2,7 +2,11 @@ import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
 import { InjectModel } from '@nestjs/sequelize';
 import { Documents } from 'src/documents/documents.model';
 import { DocumentsService } from 'src/documents/documents.service';
+import { DateMethods } from 'src/files/date.methods';
 import { PodPodMaterial } from 'src/settings/pod-pod-material.model';
+import { SettingsService } from 'src/settings/settings.service';
+import { Deliveries } from './deliveries.model';
+import { CreateDeliveriesDto } from './dto/create-deliveries.dto';
 import { CreateProviderDto } from './dto/create-provider.dto';
 import { Providers } from './provider.model';
 
@@ -11,6 +15,8 @@ export class ProviderService {
     constructor(@InjectModel(Providers) private providersReprository: typeof Providers,
             @InjectModel(Documents) private documentsReprository: typeof Documents,
             @InjectModel(PodPodMaterial) private podPodMaterialReprository: typeof PodPodMaterial,
+            @InjectModel(Deliveries) private deliveriesReprository: typeof Deliveries,
+            private settingsService: SettingsService,
             private documentService: DocumentsService
     ) {}
 
@@ -85,6 +91,88 @@ export class ProviderService {
     
     }
 
+    async createDeliveries(dto: CreateDeliveriesDto, files: any) {
+        const end_deliveries = await this.deliveriesReprository.findOne(
+			{
+				order: [
+					['id', 'DESC']
+				], limit: 1
+			})
+		const numberEndDeliveries = end_deliveries && end_deliveries.id ?  
+            end_deliveries.id + 1 : 1
+        const dm = new DateMethods().date()
+
+        let deliveries = await this.deliveriesReprository.create({name: numberEndDeliveries, date_create: dm})
+        deliveries = await this.deliveriesReprository.findByPk(deliveries.id, {include: {all:true}})
+
+
+        return await this.upCreateDeliveries(dto, files, deliveries)
+        
+    }
+
+    async updateDeliveries(dto: CreateDeliveriesDto, files: any) {
+        const deliveries = await this.deliveriesReprository.findByPk(dto.id, {include: {all: true}})
+        if(!deliveries)
+            throw new HttpException('Записб не найдена', HttpStatus.BAD_REQUEST)
+
+        return await this.upCreateDeliveries(dto, files, deliveries)
+    }
+
+    private async upCreateDeliveries(dto: CreateDeliveriesDto, files: any, deliveries: Deliveries) {
+        deliveries.number_check = dto.number_check
+        deliveries.count = dto.count
+        deliveries.nds = dto.nds
+        deliveries.product = dto.material_list
+        deliveries.date_shipments = dto.date_shipments
+
+        const provider = await this.providersReprository.findByPk(dto.provider_id)
+        if(provider) {
+            deliveries.provider_id = provider.id
+            await deliveries.save()
+        }
+
+        if(deliveries.materials && deliveries.materials.length) {
+            for(let mat of deliveries.materials) {
+                deliveries.$remove('materials', mat.id)
+            }
+        }
+
+        if(dto.material_list) {
+            let mat = JSON.parse(dto.material_list)
+            if(mat.length) {
+                for(let m of mat) {
+                    let check = await this.podPodMaterialReprository.findByPk(m.id)
+                    if(check) 
+                        await deliveries.$add('materials', check.id)
+                }
+            }
+        } 
+
+        if(dto.docs) {
+            let docs: any = Object.values(JSON.parse(dto.docs))
+            let i = 0
+            for(let document of files.document) {
+                let res = await this.documentService.saveDocument(
+                    document, 
+                    'p', 
+                    docs[i].type,
+                    docs[i].version,
+                    docs[i].description,
+                    docs[i].name
+                )
+                if(res.id) {
+                    let docId = await this.documentsReprository.findByPk(res.id)
+                    await deliveries.$add('documents', docId.id)
+                }
+                i++
+            }
+        }
+
+        await deliveries.save()
+
+        return deliveries
+    }
+
     async getProviders() {
         const providers = await this.providersReprository.findAll({include: {all: true}})
         if(providers)
@@ -98,5 +186,9 @@ export class ProviderService {
             await provider.save()
             return provider
         }
+    }
+
+    async getAllDeliveried() {
+        return await this.deliveriesReprository.findAll({include: {all: true}})
     }
 }

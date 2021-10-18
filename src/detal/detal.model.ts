@@ -1,6 +1,7 @@
 import { ApiProperty } from "@nestjs/swagger";
 import { Model, Column, DataType, Table, BelongsToMany, HasMany, ForeignKey, BelongsTo, HasOne } from "sequelize-typescript";
 import { Actions } from "src/actions/actions.model";
+import { CbedDetals } from "src/cbed/cbed-detals.model";
 import { Cbed } from "src/cbed/cbed.model";
 import { DocumentsDetal } from "src/documents/documents-detal.model";
 import { Documents } from "src/documents/documents.model";
@@ -91,12 +92,8 @@ export class Detal extends Model<Detal, DetalCreationAttrs> {
     @BelongsTo(() => User)
     user: User;
 
-    @ForeignKey(() => Cbed)
-    @Column({type: DataType.INTEGER})
-    cbedId: number;
-
-    @BelongsTo(() => Cbed)
-    cbed: Cbed;
+    @BelongsToMany(() => Cbed, () => CbedDetals)
+    cbed: Cbed[];
 
     @BelongsToMany(() => Product, () => ProductDetal)
     products: Product[];

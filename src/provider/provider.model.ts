@@ -57,11 +57,7 @@ export class Providers extends Model<Providers, ProvidersCreationAttrs> {
     @HasMany(() => Actions)
     actions: Actions[];
 
-    @ForeignKey(() => Deliveries)
-    @Column({type: DataType.INTEGER})
-    deliveriesId: number;
-
-    @BelongsTo(() => Deliveries)
-    deliveries: Deliveries;
+    @HasMany(() => Deliveries)
+    deliveries: Deliveries[];
 
 }    

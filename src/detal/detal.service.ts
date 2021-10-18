@@ -40,9 +40,10 @@ export class DetalService {
     }
 
     async createNewDetal(dto: CreateDetalDto, files: any, authID: any) {
-        const detal = await this.detalReprository.create({name: dto.name})
+        let detal = await this.detalReprository.create({name: dto.name})
         if(!detal)
             throw new HttpException('Не удалось создать деталь', HttpStatus.BAD_REQUEST)
+        detal = await this.detalReprository.findByPk(detal.id, {include: {all: true}})
         
         const action = await this.actionsReprository.create({action: "Добавил детать"})
         let user: any
@@ -90,7 +91,7 @@ export class DetalService {
     }
 
     async updateDetal(dto: UpdateDetalDto, files: any, authID: any) {
-        const detal = await this.detalReprository.findByPk(dto.id)
+        const detal = await this.detalReprository.findByPk(dto.id, {include: {all: true}})
         if(!detal)
             throw new HttpException('Не удалосьм обновить деталь', HttpStatus.BAD_REQUEST)
 
@@ -133,6 +134,11 @@ export class DetalService {
             else detal.trash = 0
 
         await detal.save()
+        if(detal.materials && detal.materials.length) {
+            for(let det of detal.materials) {
+                await detal.$remove('materials', det.id)
+            }
+        }
 
         if(Number(dto.responsible)) {
             const user = await this.userRepository.findByPk(dto.responsible)
@@ -168,12 +174,13 @@ export class DetalService {
                     let material = await this.podPodMaterialReprository.findByPk(mList[m].mat.id)
                     if(material) {
                         await detal.$add('materials', material.id)
-                        await detal.save()
                     }
                 }
             }
         } else 
             detal.materialList = ''   
+
+        await detal.save()
 
         if(Number(dto.techProcessID)) {
             const tp = await this.techProcessReprository.findByPk(dto.techProcessID)

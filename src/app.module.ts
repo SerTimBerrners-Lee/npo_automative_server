@@ -92,6 +92,8 @@ import { MetaloworkingModule } from './metaloworking/metaloworking.module';
 import { Metaloworking } from "./metaloworking/metaloworking.model";
 import { MetaloworkingShipments } from "./metaloworking/metaloworking-shipments.model";
 import { ShipmentsMaterial } from "./shipments/shipments-material.model";
+import { DocumentsDeliveries } from "./documents/documents-deliveries.model";
+import { DeliveriesMaterial } from "./provider/deliveries-material.model";
 
 @Module({
     controllers: [],
@@ -127,6 +129,7 @@ import { ShipmentsMaterial } from "./shipments/shipments-material.model";
                 DocumentsProduct,
                 DocumentsBuyer,
                 DocumentsEquipment,
+                DocumentsDeliveries,
                 DocumentsIssue,
                 PodPodMaterial,
                 PodMaterial,
@@ -179,6 +182,7 @@ import { ShipmentsMaterial } from "./shipments/shipments-material.model";
                 AssembleShipments,
                 Metaloworking,
                 MetaloworkingShipments,
+                DeliveriesMaterial
             ],
             autoLoadModels: true,
           }),

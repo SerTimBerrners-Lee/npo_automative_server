@@ -11,6 +11,8 @@ import { DocumentsMaterial } from "src/documents/documents-material.model";
 import { Documents } from "src/documents/documents.model";
 import { ProductMaterial } from "src/product/product-material.model";
 import { Product } from "src/product/product.model";
+import { DeliveriesMaterial } from "src/provider/deliveries-material.model";
+import { Deliveries } from "src/provider/deliveries.model";
 import { ProvidersMaterial } from "src/provider/provider-material.model";
 import { Providers } from "src/provider/provider.model";
 import { Material } from "./material.model";
@@ -122,5 +124,8 @@ export class PodPodMaterial extends Model<PodPodMaterial, PodPodMaterialCreation
 
     @BelongsToMany(() => Product, () => ProductMaterial)
     products: Product[];
+
+    @BelongsToMany(() => Deliveries, () => DeliveriesMaterial)
+    deliveries: Deliveries[]
 
 }    

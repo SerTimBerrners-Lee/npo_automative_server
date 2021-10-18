@@ -1,5 +1,4 @@
 import { Model, Column, DataType, Table, ForeignKey } from "sequelize-typescript";
-import { Equipment } from "src/equipment/equipment.model";
 import { PodPodMaterial } from "src/settings/pod-pod-material.model";
 import { Detal } from "./detal.model";
 

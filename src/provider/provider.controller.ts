@@ -1,6 +1,7 @@
 import { Body, Controller, Get, Param, Post, UploadedFiles, UseInterceptors } from '@nestjs/common';
 import { FileFieldsInterceptor } from '@nestjs/platform-express';
 import { ApiOperation, ApiTags } from '@nestjs/swagger';
+import { CreateDeliveriesDto } from './dto/create-deliveries.dto';
 import { CreateProviderDto } from './dto/create-provider.dto';
 import { ProviderService } from './provider.service';
 
@@ -27,6 +28,29 @@ export class ProviderController {
     @Get('/ban/:id')
     banProviders(@Param('id') id: number) {
         return this.providerService.banProvider(id)
+    }
+
+    @ApiOperation({summary: 'Создаем подставку'})
+    @UseInterceptors(FileFieldsInterceptor([
+        {name: 'document', maxCount: 40}
+    ]))
+    @Post('/deliveried')
+    createDeliveries(@Body() dto: CreateDeliveriesDto, @UploadedFiles() files: { document?: Express.Multer.File[]} ) {
+        return this.providerService.createDeliveries(dto, files)
+    }
+
+    @Get('/deliveried')
+    getAllDeliveried() {
+        return this.providerService.getAllDeliveried()
+    }
+
+    @ApiOperation({summary: 'Создаем подставку'})
+    @UseInterceptors(FileFieldsInterceptor([
+        {name: 'document', maxCount: 40}
+    ]))
+    @Post('/deliveried/update')
+    updateDeliveries(@Body() dto: CreateDeliveriesDto, @UploadedFiles() files: { document?: Express.Multer.File[]} ) {
+        return this.providerService.updateDeliveries(dto, files)
     }
 }
  

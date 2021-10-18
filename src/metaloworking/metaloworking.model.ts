@@ -9,7 +9,7 @@ interface MetaloworkingAttrCreate {
    date_order: string;
    number_order: string;
    date_shipments: string;
-   description: string;
+   description: string; 
 }
 
 @Table({tableName: 'metaloworking'})
