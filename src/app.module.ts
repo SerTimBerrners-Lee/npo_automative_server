@@ -107,11 +107,11 @@ import { DeliveriesMaterial } from "./provider/deliveries-material.model";
         }),
         SequelizeModule.forRoot({
             dialect: 'postgres',
-            host: process.env.POSTGRESS_HOST,
-            port: Number(process.env.POSTGRESS_PORT),
-            username: process.env.POSTGRES_USER,
-            password: process.env.POSTGRES_PASSWORD,
-            database: process.env.POSTGRES_DB,
+            host: '127.0.0.1', //process.env.POSTGRESS_HOST,
+            port: 5432, //Number(process.env.POSTGRESS_PORT),
+            username: 'npo', //process.env.POSTGRES_USER,
+            password: '5513', //process.env.POSTGRES_PASSWORD,
+            database: 'npo_automative', //process.env.POSTGRES_DB,
             models: [
                 User, 
                 Role,
