@@ -5,6 +5,7 @@ import { Cbed } from "src/cbed/cbed.model";
 import { DocumentsBuyer } from "src/documents/documents-buyer.model";
 import { Documents } from "src/documents/documents.model";
 import { Shipments } from "src/shipments/shipments.model";
+import { BuyerCbed } from "./buyer-cbed.model";
 import { Purchases } from "./purchases.model";
 interface BuyerCreationAttrs {
     name: string;
@@ -51,7 +52,7 @@ export class Buyer extends Model<Buyer, BuyerCreationAttrs> {
     @BelongsTo(() => Purchases)
     purchases: Purchases;
 
-    @HasMany(() => Cbed)
+    @BelongsToMany(() => Cbed, () => BuyerCbed)
     cbeds: Cbed[];
 
     @HasOne(() => Shipments)

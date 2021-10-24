@@ -1,6 +1,9 @@
 import { Module } from '@nestjs/common';
 import { SequelizeModule } from '@nestjs/sequelize';
 import { CbedModule } from 'src/cbed/cbed.module';
+import { DetalModule } from 'src/detal/detal.module';
+import { MetaloworkingModule } from 'src/metaloworking/metaloworking.module';
+import { SettingsModule } from 'src/settings/settings.module';
 import { ShipmentsModule } from 'src/shipments/shipments.module';
 import { AssembleController } from './assemble.controller';
 import { Assemble } from './assemble.model';
@@ -14,7 +17,10 @@ import { AssembleService } from './assemble.service';
 			Assemble
 		]),
 		ShipmentsModule,
-		CbedModule
+		CbedModule,
+		SettingsModule,
+		DetalModule,
+		MetaloworkingModule
 ],
 	exports: [AssembleService]
 })

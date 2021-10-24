@@ -7,4 +7,5 @@ export class CreateMetaloworkingDto {
 	readonly description : 			string;
 	readonly shipments_id: 			number;
 	readonly detal_id: 					number;	
+	readonly material_list: 		any;
 } 

@@ -487,8 +487,8 @@ export class DetalService {
         return await this.typeOperationReprository.destroy({where: {id: TO.id}})
     }
 
-    async findById(id: number) {
-        return await this.detalReprository.findByPk(id)
+    async findByIdDetal(id: number) {
+        return await this.detalReprository.findByPk(id, {include: { all: true }})
     }
 
 }

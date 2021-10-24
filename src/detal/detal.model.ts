@@ -38,6 +38,10 @@ export class Detal extends Model<Detal, DetalCreationAttrs> {
     @Column({type: DataType.INTEGER, defaultValue: 0})
     detal_kolvo: number; 
 
+    @ApiProperty({example: 12, description: 'Количество деталей необходимо'})
+    @Column({type: DataType.INTEGER, defaultValue: 0})
+    shipments_kolvo: number;
+
     @ApiProperty({example: 12, description: 'Срок поставки'})
     @Column({type: DataType.STRING, allowNull: true})
     articl: string; 
@@ -54,19 +58,19 @@ export class Detal extends Model<Detal, DetalCreationAttrs> {
     @Column({type: DataType.TEXT, allowNull: true})
     haracteriatic: any;
 
-    @ApiProperty({example: 12, description: 'Срок поставки'})
+    @ApiProperty({example: 12, description: 'Параметры заготовки'})
     @Column({type: DataType.STRING, allowNull: true})
     DxL: any;
 
-    @ApiProperty({example: 12, description: 'Срок поставки'})
+    @ApiProperty({example: 12, description: 'Масса заготовки'})
     @Column({type: DataType.STRING, allowNull: true})
     massZag: any;
     
-    @ApiProperty({example: 12, description: 'Срок поставки'})
+    @ApiProperty({example: 12, description: 'Отходы'})
     @Column({type: DataType.STRING, allowNull: true})
     trash: any;
 
-    @ApiProperty({example: 12, description: 'Срок поставки'})
+    @ApiProperty({example: 12, description: 'Лист материалов'})
     @Column({type: DataType.TEXT, allowNull: true})
     materialList: any;
 

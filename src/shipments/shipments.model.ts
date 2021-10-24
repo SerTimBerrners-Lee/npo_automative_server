@@ -61,10 +61,6 @@ export class Shipments extends Model<Shipments, ShipmentsAttrCreate> {
     @Column({type: DataType.TEXT})
     list_cbed_detal: string;
 
-    @ApiProperty({example: '1', description: ''})
-    @Column({type: DataType.TEXT})
-    list_material: string;
-
 		@ApiProperty({example: '1', description: ''})
     @Column({type: DataType.STRING})
     description: string;
@@ -105,7 +101,6 @@ export class Shipments extends Model<Shipments, ShipmentsAttrCreate> {
     @AfterCreate
     static async createShipments(shipments: Shipments) {
       const sh = statusShipment.order
-      console.log(sh)
       shipments.status = sh
       await shipments.save()
     }

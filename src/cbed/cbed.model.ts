@@ -1,6 +1,7 @@
 import { ApiProperty } from "@nestjs/swagger";
 import { Model, Column, DataType, Table, BelongsToMany, HasMany, ForeignKey, BelongsTo, HasOne } from "sequelize-typescript";
 import { Actions } from "src/actions/actions.model";
+import { BuyerCbed } from "src/buyer/buyer-cbed.model";
 import { Buyer } from "src/buyer/buyer.model";
 import { Detal } from "src/detal/detal.model";
 import { TechProcess } from "src/detal/tech-process.model";
@@ -38,6 +39,10 @@ export class Cbed extends Model<Cbed, CbedCreationAttrs> {
     @ApiProperty({example: 12, description: 'Количество Сборочных единиц на складе'})
     @Column({type: DataType.INTEGER, defaultValue: 0})
     cbed_kolvo: number; 
+
+    @ApiProperty({example: 12, description: 'Количество СБ необходимо'})
+    @Column({type: DataType.INTEGER, defaultValue: 0})
+    shipments_kolvo: number;
 
     @ApiProperty({example: 12, description: 'Срок поставки'})
     @Column({type: DataType.STRING, allowNull: true})
@@ -99,12 +104,8 @@ export class Cbed extends Model<Cbed, CbedCreationAttrs> {
     @HasOne(() => Sebestoim)
     sebestoim: Sebestoim; 
 
-    @ForeignKey(() => Buyer)
-    @Column({type: DataType.INTEGER})
-    buerId: number;
-
-    @BelongsTo(() => Buyer)
-    buer: Buyer;
+    @BelongsToMany(() => Buyer, () => BuyerCbed)
+    buers: Buyer[];
 
     @BelongsToMany(() => Shipments, () => ShipmentsCbed)
     shipments: Shipments[]; 

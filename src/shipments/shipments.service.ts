@@ -67,27 +67,18 @@ export class ShipmentsService {
 			for(let izd of list_izd) {
 				if(izd.type == 'cbed') {
 					let izdels = await this.cbedService.findById(izd.obj.id) 
-					if(izdels) 
+					if(izdels) {
+						izdels.shipments_kolvo = izdels.shipments_kolvo + Number(izd.kol)
+						await izdels.save()
 						shipment.$add('cbeds', izdels.id)
+					}
 				} else if(izd.type == 'detal') {
-					let izdels = await this.detalService.findById(izd.obj.id)
-					if(izdels) 
+					let izdels = await this.detalService.findByIdDetal(izd.obj.id)
+					if(izdels) {
+						izdels.shipments_kolvo = izdels.shipments_kolvo + Number(izd.kol)
+						await izdels.save()
 						shipment.$add('detals', izdels.id)
-				}
-			}
-		}
-
-		shipment.list_material = ''
-		if(dto.list_material && dto.list_material != 'null' || dto.list_material != '[]') {
-			shipment.list_material = dto.list_material
-			let list_izd = JSON.parse(dto.list_material)
-			for(let izd of list_izd) {
-				if(izd.type == 'mat') {
-					let material = await this.setitupService.getOnePPT(izd.obj.id) 
-					if(material) 
-						shipment.$add('materials', material.id)
-						material.shipments_kolvo = material.shipments_kolvo + izd.kol
-						await material.save()
+					}
 				}
 			}
 		}

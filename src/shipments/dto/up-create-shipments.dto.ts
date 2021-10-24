@@ -13,7 +13,6 @@ export class UpCreateShipmentsDto {
 	readonly to_sklad: 						boolean;
 	readonly product: 						any;
 	readonly list_cbed_detal: 		any;
-	readonly list_material: 			any;
 	readonly description: 				string;
 
 }

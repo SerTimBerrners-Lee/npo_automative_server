@@ -94,6 +94,7 @@ import { MetaloworkingShipments } from "./metaloworking/metaloworking-shipments.
 import { ShipmentsMaterial } from "./shipments/shipments-material.model";
 import { DocumentsDeliveries } from "./documents/documents-deliveries.model";
 import { DeliveriesMaterial } from "./provider/deliveries-material.model";
+import { BuyerCbed } from "./buyer/buyer-cbed.model";
 
 @Module({
     controllers: [],
@@ -182,7 +183,8 @@ import { DeliveriesMaterial } from "./provider/deliveries-material.model";
                 AssembleShipments,
                 Metaloworking,
                 MetaloworkingShipments,
-                DeliveriesMaterial
+                DeliveriesMaterial,
+                BuyerCbed
             ],
             autoLoadModels: true,
           }),
