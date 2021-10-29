@@ -194,7 +194,25 @@ export class ProviderService {
     async getAllDeliveried() {
         return await this.deliveriesReprository.findAll({include: {all: true}})
     }
+    
     async getProviderById(id: number) {
         return await this.providersReprository.findByPk(id, {include: {all: true}})
+    }
+
+    async getAllDeliveriedComing() {
+        const deliveries = await this.deliveriesReprository.findAll({include: {all: true}})
+        
+        if(!deliveries)
+            throw new HttpException('Поставок не найдено', HttpStatus.BAD_REQUEST)
+
+        let new_dev_arr = []
+        const comparison = new DateMethods().comparison
+
+        for(let dev of deliveries) {
+            if(comparison(dev.date_shipments, undefined, '<')) 
+                new_dev_arr.push(dev)
+        }
+
+        return new_dev_arr
     }
 }

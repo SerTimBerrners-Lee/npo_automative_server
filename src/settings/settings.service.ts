@@ -418,7 +418,7 @@ export class SettingsService {
         return materials
 
     }
-
+ 
     async getAllShipmentsPPM() {
         const materials = await this.podPodMaterialReprository.findAll({include: {all: true}})
         if(!materials)
@@ -430,7 +430,7 @@ export class SettingsService {
         for(let mat of materials) {
             if(mat.deliveries && mat.deliveries.length) {
                 for(let dev of mat.deliveries) {
-                    if(comparison(dev.date_shipments,  undefined, '<' )) {
+                    if(comparison(dev.date_shipments,  undefined, '>' )) {
                         let dev_all = await this.deliveriesReprository.findByPk(dev.id, {include: ['documents', 'provider']})
                         new_mat_arr.push({mat, dev: dev_all})
                     }

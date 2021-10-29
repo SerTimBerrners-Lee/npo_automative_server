@@ -52,5 +52,10 @@ export class ProviderController {
     updateDeliveries(@Body() dto: CreateDeliveriesDto, @UploadedFiles() files: { document?: Express.Multer.File[]} ) {
         return this.providerService.updateDeliveries(dto, files)
     }
+
+    @Get('/deliveriedcoming')
+    getAllDeliveriedComing() {
+        return this.providerService.getAllDeliveriedComing()
+    }
 }
  

@@ -9,6 +9,16 @@
             "database": "npo_automative",
             "username": "npo",
             "password": "5513"
+        },
+        {
+            "previewLimit": 50,
+            "server": "localhost",
+            "port": 5432,
+            "driver": "PostgreSQL",
+            "name": "server",
+            "database": "npo_automative",
+            "username": "npo",
+            "password": "5513"
         }
     ]
 }
