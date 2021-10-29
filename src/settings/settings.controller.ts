@@ -104,9 +104,9 @@ export class SettingsController {
     }
 
     @ApiOperation({summary: 'get all typeMaterials'})
-    @Get('/typematerial')
-    getAllPodTypeMaterial() {
-        return this.settingsService.getAllPodTypeMaterial()
+    @Get('/typematerial/:instans')
+    getAllPodTypeMaterial(@Param('instans') instans: string | number) {
+        return this.settingsService.getAllPodTypeMaterial(instans)
     }
 
     @ApiOperation({summary: 'get all pod typeMaterials'})
@@ -116,7 +116,7 @@ export class SettingsController {
     }
 
     @ApiOperation({summary: 'get one pod typeMaterials'})
-    @Get('/typematerial/:id')
+    @Get('/typematerialid/:id')
     getPodMaterialById(@Param('id') id: number) {
         return this.settingsService.getPodMaterialById(id)
     }

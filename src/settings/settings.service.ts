@@ -67,11 +67,17 @@ export class SettingsService {
 
     async getAllTypeMaterial() {
         const materials = await this.materialReprository.findAll({include: {all: true}})
+        
         return materials
     }
 
-    async getAllPodTypeMaterial() {
-        const materials = await this.podMaterialReprository.findAll({include: {all: true}})
+    async getAllPodTypeMaterial(instans: string | number) {
+        let materials = []
+        if(instans == 'all')
+            materials = await this.podMaterialReprository.findAll()
+        else 
+            materials = await this.podMaterialReprository.findAll({where: { instansMaterial: instans }})
+
         return materials
     }
 
@@ -362,12 +368,13 @@ export class SettingsService {
     }
 
     async getPodPodMaterial() {
-        const podPodMaterial = this.podPodMaterialReprository.findAll({include: {all: true}})
+        const podPodMaterial = await this.podPodMaterialReprository.findAll({include: {all: true}})
         return podPodMaterial
     }
 
     async getPodMaterialById(id: number) {
-        const podMaterial = this.podMaterialReprository.findByPk(id, {include: {all:true}})
+        const podMaterial = await this.podMaterialReprository.findByPk(id, {include: {all:true}})
+        console.log(podMaterial)
         return podMaterial 
     }
 
