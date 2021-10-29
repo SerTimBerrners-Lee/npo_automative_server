@@ -3,6 +3,8 @@ import { InjectModel } from '@nestjs/sequelize';
 import { Op } from 'sequelize';
 import { Documents } from 'src/documents/documents.model';
 import { DocumentsService } from 'src/documents/documents.service';
+import { DateMethods } from 'src/files/date.methods';
+import { Deliveries } from 'src/provider/deliveries.model';
 import { Providers } from 'src/provider/provider.model';
 import { CreateEdizmDto } from './dto/create-edizm.dto';
 import { CreateMaterialDto } from './dto/create-material.dto';
@@ -27,6 +29,7 @@ export class SettingsService {
         @InjectModel(Documents) private documentsReprository: typeof Documents,
         private documentsService: DocumentsService,
         @InjectModel(Providers) private providersReprository: typeof Providers,
+        @InjectModel(Deliveries) private deliveriesReprository: typeof Deliveries,
     ) {}
 
     async createTypeEdizm(dto: CreateTypeEdizmDto) {
@@ -414,5 +417,27 @@ export class SettingsService {
         
         return materials
 
+    }
+
+    async getAllShipmentsPPM() {
+        const materials = await this.podPodMaterialReprository.findAll({include: {all: true}})
+        if(!materials)
+            throw new HttpException('Материалов не найдено', HttpStatus.BAD_GATEWAY)
+    
+        let new_mat_arr = [] 
+        const comparison = new DateMethods().comparison
+
+        for(let mat of materials) {
+            if(mat.deliveries && mat.deliveries.length) {
+                for(let dev of mat.deliveries) {
+                    if(comparison(dev.date_shipments,  undefined, '<' )) {
+                        let dev_all = await this.deliveriesReprository.findByPk(dev.id, {include: ['documents', 'provider']})
+                        new_mat_arr.push({mat, dev: dev_all})
+                    }
+                }
+            }
+        }
+
+        return new_mat_arr
     }
 }

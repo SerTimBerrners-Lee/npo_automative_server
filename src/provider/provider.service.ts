@@ -191,4 +191,7 @@ export class ProviderService {
     async getAllDeliveried() {
         return await this.deliveriesReprository.findAll({include: {all: true}})
     }
+    async getProviderById(id: number) {
+        return await this.providersReprository.findByPk(id, {include: {all: true}})
+    }
 }

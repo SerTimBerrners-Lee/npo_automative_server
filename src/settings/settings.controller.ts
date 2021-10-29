@@ -113,7 +113,7 @@ export class SettingsController {
     @Get('/materials/podtypematerial')
     getPodPodMaterial() {
         return this.settingsService.getPodPodMaterial()
-    }
+    } 
 
     @ApiOperation({summary: 'get one pod typeMaterials'})
     @Get('/typematerialid/:id')
@@ -150,4 +150,10 @@ export class SettingsController {
     getAllDeficit() {
         return this.settingsService.getDeficitMaterial()
     }
-} 
+
+    @ApiOperation({summary: 'Получаем Заказаный материал'})
+    @Get('/materialshipment')
+    getAllShipmentsPPM() {
+        return this.settingsService.getAllShipmentsPPM()
+    }
+}
