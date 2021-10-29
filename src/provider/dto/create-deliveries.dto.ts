@@ -8,4 +8,5 @@ export class CreateDeliveriesDto {
   readonly material_list: any;
   readonly docs:          string;
   readonly date_shipments: string;
+  readonly description:   string;
 }

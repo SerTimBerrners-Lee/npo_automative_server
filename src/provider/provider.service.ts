@@ -124,6 +124,9 @@ export class ProviderService {
         deliveries.nds = dto.nds
         deliveries.product = dto.material_list
         deliveries.date_shipments = dto.date_shipments
+        
+        if(dto.description !== 'null') deliveries.description = dto.description
+        else deliveries.description = ''
 
         const provider = await this.providersReprository.findByPk(dto.provider_id)
         if(provider) {

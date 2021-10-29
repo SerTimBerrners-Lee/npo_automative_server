@@ -16,6 +16,7 @@ export class DateMethods {
 
 	public time = () => `${this.hours}:${this.minute}:${this.seconds}`;
 
+	// Сравнение дат
 	public comparison = (one_date: string = new Date().toLocaleDateString('ru-RU'), two_date: string = new Date().toLocaleDateString('ru-RU'), operation: string = '==') => {
 		let d1 = utfDate(one_date)
 		let d2 = utfDate(two_date)

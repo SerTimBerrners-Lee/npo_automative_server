@@ -43,6 +43,9 @@ export class Deliveries extends Model<Deliveries, AttrDeliveriesCreate> {
     @Column({type: DataType.TEXT})
     product: any;   // Сами поставки 
 
+    @Column({type: DataType.STRING})
+    description: string;
+
     @ForeignKey(() => Providers)
     @Column({type: DataType.INTEGER})
     provider_id: number;
