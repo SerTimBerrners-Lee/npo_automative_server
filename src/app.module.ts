@@ -95,6 +95,8 @@ import { ShipmentsMaterial } from "./shipments/shipments-material.model";
 import { DocumentsDeliveries } from "./documents/documents-deliveries.model";
 import { DeliveriesMaterial } from "./provider/deliveries-material.model";
 import { BuyerCbed } from "./buyer/buyer-cbed.model";
+import { DocumentsWaybill } from "./documents/documents-waybill.model";
+import { Waybill } from "./provider/waybill.model";
 
 @Module({
     controllers: [],
@@ -132,6 +134,7 @@ import { BuyerCbed } from "./buyer/buyer-cbed.model";
                 DocumentsEquipment,
                 DocumentsDeliveries,
                 DocumentsIssue,
+                DocumentsWaybill,
                 PodPodMaterial,
                 PodMaterial,
                 Edizm,
@@ -184,7 +187,8 @@ import { BuyerCbed } from "./buyer/buyer-cbed.model";
                 Metaloworking,
                 MetaloworkingShipments,
                 DeliveriesMaterial,
-                BuyerCbed
+                BuyerCbed,
+                Waybill
             ],
             autoLoadModels: true,
           }),

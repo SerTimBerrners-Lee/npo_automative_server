@@ -12,6 +12,7 @@ import { ProviderController } from './provider.controller';
 import { Providers } from './provider.model';
 import { ProviderService } from './provider.service';
 import { ProvidersEquipment } from './providers-equipment.model';
+import { Waybill } from './waybill.model';
 
 @Module({
     providers: [ProviderService],
@@ -24,7 +25,8 @@ import { ProvidersEquipment } from './providers-equipment.model';
             ProvidersMaterial,
             ProvidersEquipment,
             PodPodMaterial,
-            Deliveries
+            Deliveries,
+            Waybill
         ]),
         DocumentsModule,
         SettingsModule

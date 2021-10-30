@@ -10,6 +10,7 @@ import { Deliveries } from "./deliveries.model";
 import { ProvidersInstrument } from "./provider-instrument.dto";
 import { ProvidersMaterial } from "./provider-material.model";
 import { ProvidersEquipment } from "./providers-equipment.model";
+import { Waybill } from "./waybill.model";
 interface ProvidersCreationAttrs {
     name: string;
 }
@@ -59,5 +60,8 @@ export class Providers extends Model<Providers, ProvidersCreationAttrs> {
 
     @HasMany(() => Deliveries)
     deliveries: Deliveries[];
+
+    @HasMany(() => Waybill)
+    waybills: Waybill[];
 
 }    

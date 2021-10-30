@@ -67,5 +67,10 @@ export class ProviderController {
     createWaybill(@Body() dto: CreateWaybillDto, @UploadedFiles() files: { document?: Express.Multer.File[]} ) {
         return this.providerService.createWaybill(dto, files)
     }
+
+    @Get('/waylbil')
+    getAllWaybill() {
+        return this.providerService.getAllWaybill()
+    }
 }
  

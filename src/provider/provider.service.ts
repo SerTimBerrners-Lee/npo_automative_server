@@ -1,5 +1,6 @@
 import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
 import { InjectModel } from '@nestjs/sequelize';
+import { ConnectableObservable } from 'rxjs';
 import { Documents } from 'src/documents/documents.model';
 import { DocumentsService } from 'src/documents/documents.service';
 import { DateMethods } from 'src/files/date.methods';
@@ -10,6 +11,7 @@ import { CreateDeliveriesDto } from './dto/create-deliveries.dto';
 import { CreateProviderDto } from './dto/create-provider.dto';
 import { CreateWaybillDto } from './dto/create-waybill.dto';
 import { Providers } from './provider.model';
+import { Waybill } from './waybill.model';
 
 @Injectable()
 export class ProviderService {
@@ -17,8 +19,9 @@ export class ProviderService {
             @InjectModel(Documents) private documentsReprository: typeof Documents,
             @InjectModel(PodPodMaterial) private podPodMaterialReprository: typeof PodPodMaterial,
             @InjectModel(Deliveries) private deliveriesReprository: typeof Deliveries,
+            @InjectModel(Waybill) private waybillReprository: typeof Waybill,
             private settingsService: SettingsService,
-            private documentService: DocumentsService
+            private documentService: DocumentsService,
     ) {}
 
     async createProvider(dto: CreateProviderDto, files: any) {
@@ -218,7 +221,77 @@ export class ProviderService {
     }
 
     async createWaybill(dto: CreateWaybillDto, files: any) {
-        console.log(dto)
-        console.log(files)
+        const dm = new DateMethods()
+		const endShipments = await this.waybillReprository.findOne(
+			{
+				order: [
+					['id', 'DESC']
+				],
+				limit: 1
+			})
+		let endYears = dm.date().split('.')[dm.date().split('.').length - 1].slice(2);
+		const numberEndShipments = endShipments && endShipments.id ?  
+			`№ ${endYears}-${endShipments.id + 1} от ${dm.date()}` : `№ ${endYears}-1 от ${dm.date()}`
+
+        const waybill = await this.waybillReprository.create({name: numberEndShipments})
+
+        if(dto.product_list) {
+            try {
+                let pars = JSON.parse(dto.product_list)
+                waybill.product = dto.product_list
+                for(let product of pars) {
+                    let material = await this.settingsService.getOnePPT(product.id)
+                    if(material) {
+                        material.shipments_kolvo = material.shipments_kolvo - product.kol
+                        material.material_kolvo = material.material_kolvo + product.kol
+                        await material.save()
+                    }
+                }
+            } catch (e) {
+                console.log(e)
+            }
+            await waybill.save()
+        }
+
+        if(dto.provider_id) {
+            const provider = await this.providersReprository.findByPk(dto.provider_id)
+            if(provider) {
+                waybill.provider_id = provider.id
+                await waybill.save()
+            }
+        }
+
+        if(dto.description != 'null')
+            waybill.description = dto.description
+            else 
+                waybill.description = ''
+
+        if(dto.docs) {
+            let docs: any = Object.values(JSON.parse(dto.docs))
+            let i = 0
+            for(let document of files.document) {
+                let res = await this.documentService.saveDocument(
+                    document, 
+                    'p', 
+                    docs[i].type,
+                    docs[i].version,
+                    docs[i].description,
+                    docs[i].name
+                )
+                if(res.id) {
+                    let docId = await this.documentsReprository.findByPk(res.id)
+                    await waybill.$add('documents', docId.id)
+                }
+                i++
+            }
+        }
+
+
+        await waybill.save()
+        return waybill
+    }
+
+    async getAllWaybill() {
+        return await this.waybillReprository.findAll({include: {all: true}})
     }
 }
