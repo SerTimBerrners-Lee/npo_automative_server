@@ -8,6 +8,7 @@ import { SettingsService } from 'src/settings/settings.service';
 import { Deliveries } from './deliveries.model';
 import { CreateDeliveriesDto } from './dto/create-deliveries.dto';
 import { CreateProviderDto } from './dto/create-provider.dto';
+import { CreateWaybillDto } from './dto/create-waybill.dto';
 import { Providers } from './provider.model';
 
 @Injectable()
@@ -214,5 +215,10 @@ export class ProviderService {
         }
 
         return new_dev_arr
+    }
+
+    async createWaybill(dto: CreateWaybillDto, files: any) {
+        console.log(dto)
+        console.log(files)
     }
 }

@@ -77,7 +77,7 @@ export class SettingsService {
     async getAllPodTypeMaterial(instans: string | number) {
         let materials = []
         if(instans == 'all')
-            materials = await this.podMaterialReprository.findAll()
+            materials = await this.podMaterialReprository.findAll({include: {all: true}})
         else 
             materials = await this.podMaterialReprository.findAll({where: { instansMaterial: instans }})
 

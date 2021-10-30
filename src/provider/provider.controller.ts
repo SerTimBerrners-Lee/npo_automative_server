@@ -3,6 +3,7 @@ import { FileFieldsInterceptor } from '@nestjs/platform-express';
 import { ApiOperation, ApiTags } from '@nestjs/swagger';
 import { CreateDeliveriesDto } from './dto/create-deliveries.dto';
 import { CreateProviderDto } from './dto/create-provider.dto';
+import { CreateWaybillDto } from './dto/create-waybill.dto';
 import { ProviderService } from './provider.service';
 
 @ApiTags('База Поставщиков')
@@ -56,6 +57,15 @@ export class ProviderController {
     @Get('/deliveriedcoming')
     getAllDeliveriedComing() {
         return this.providerService.getAllDeliveriedComing()
+    }
+
+    @ApiOperation({summary: 'Создаем Накладную'})
+    @UseInterceptors(FileFieldsInterceptor([
+        {name: 'document', maxCount: 40}
+    ]))
+    @Post('/waylbil/create')
+    createWaybill(@Body() dto: CreateWaybillDto, @UploadedFiles() files: { document?: Express.Multer.File[]} ) {
+        return this.providerService.createWaybill(dto, files)
     }
 }
  
