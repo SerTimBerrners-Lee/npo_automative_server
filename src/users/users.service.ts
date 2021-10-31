@@ -151,14 +151,16 @@ export class UsersService {
         return 'ava_defolt.png'
     }
 
-    async getUser() {
-        const users = await this.userRepository.findAll({
-            include: {all: true},
-            order: [
-                ['tabel', 'ASC']
-            ]
-        });
-        return users;
+    async getUser(light: boolean) {
+        if(light)
+            return await this.userRepository.findAll()
+        else
+            return await this.userRepository.findAll({
+                include: {all: true},
+                order: [
+                    ['tabel', 'ASC']
+                ]
+            })
     }
 
     async getUserByPk(id: number) {

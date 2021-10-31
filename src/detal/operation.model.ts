@@ -7,9 +7,7 @@ import { Equipment } from "src/equipment/equipment.model";
 import { InstrumentOperation } from "src/instrument/instrument-operation.model";
 import { NameInstrument } from "src/instrument/name-instrument.model";
 import { PodPodMaterial } from "src/settings/pod-pod-material.model";
-import { DetalMaterials } from "./detal-materials.model";
 import { OperationEq } from "./operation-equipment.model";
-import { OperationMaterial } from "./operation-material.model";
 import { TypeOperation } from "./type-operation.model";
 
 interface OperationCreationAttrs {
@@ -32,16 +30,16 @@ export class Operation extends Model<Operation, OperationCreationAttrs> {
     ban: boolean; 
 
     @ApiProperty({example: '1', description: 'Подготовительное время ч'})
-    @Column({type: DataType.STRING, defaultValue: ''})
-    preTime: string;
+    @Column({type: DataType.INTEGER, defaultValue: 0})
+    preTime: number;
 
     @ApiProperty({example: '1', description: 'Вспомогательное время ч'})
-    @Column({type: DataType.STRING, defaultValue: ''})
-    helperTime: string;
+    @Column({type: DataType.INTEGER, defaultValue: 0})
+    helperTime: number;
 
     @ApiProperty({example: '1', description: 'Основное время  время ч'})
-    @Column({type: DataType.STRING, defaultValue: ''})
-    mainTime: string; 
+    @Column({type: DataType.INTEGER, defaultValue: 0})
+    mainTime: number; 
 
     @ApiProperty({example: '1', description: 'Общее число времени время ч'})
     @Column({type: DataType.STRING, defaultValue: ''})

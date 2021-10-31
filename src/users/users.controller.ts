@@ -56,9 +56,9 @@ export class UsersController {
     @ApiResponse({status: 200, type: [User]})
     //@Roles("ADMIN")
     //@UseGuards(RolesGuard) 
-    @Get()
-    getAll() {
-        return this.userService.getUser();
+    @Get('/data/:light')
+    getAll(@Param('light') light: boolean) {
+        return this.userService.getUser(light);
     }
 
     @ApiOperation({summary: 'Удаление пользователя по ID'})

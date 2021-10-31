@@ -34,7 +34,15 @@ export class AssembleService {
 		if(dto.cbed_id) {
 			const cbed = await this.cbedService.findById(dto.cbed_id)
 			if(cbed) {
-				console.log(dto)
+				if(cbed.techProcesses) {
+					const tp = await this.detalService.getTechProcessById(cbed.techProcesses.id)
+					if(tp) {
+						assemble.tp_id = tp.id
+						if(tp.operations && tp.operations.length)
+							assemble.operation_id = tp.operations[0].id
+						await assemble.save()
+					}
+				}
 				await this.shipmentsMaterialsForIzd(cbed, dto.kolvo_all)
 				assemble.cbed_id = cbed.id
 				if(dto.kolvo_all > dto.kolvo_order_byer) {

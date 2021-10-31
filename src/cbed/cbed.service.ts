@@ -172,7 +172,7 @@ export class CbedService {
     }
 
     async findById(id: number) {
-        return await this.cbedReprository.findByPk(id)
+        return await this.cbedReprository.findByPk(id, {include: {all: true}})
     }
 
     async banCbed(id: number) {

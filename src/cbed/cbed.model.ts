@@ -84,9 +84,9 @@ export class Cbed extends Model<Cbed, CbedCreationAttrs> {
 
     @BelongsToMany(() => Detal, () => CbedDetals)
     detals: Detal[];
-
-    @HasMany(() => TechProcess)
-    techProcesses: TechProcess[];
+ 
+    @HasOne(() => TechProcess)
+    techProcesses: TechProcess;
 
     @ForeignKey(() => User)
     @Column({type: DataType.INTEGER})

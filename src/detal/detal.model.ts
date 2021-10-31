@@ -86,8 +86,8 @@ export class Detal extends Model<Detal, DetalCreationAttrs> {
     @Column({type: DataType.INTEGER, allowNull: true})
     mat_zag_zam: number;
 
-    @HasMany(() => TechProcess)
-    techProcesses: TechProcess[];
+    @HasOne(() => TechProcess)
+    techProcesses: TechProcess;
 
     @ForeignKey(() => User)
     @Column({type: DataType.INTEGER})

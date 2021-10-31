@@ -1,9 +1,9 @@
 
 export class UpCreateOperationDto {
     readonly name:                  number;   
-    readonly preTime:               string;
-    readonly helperTime:            string;
-    readonly mainTime:              string; 
+    readonly preTime:               number;
+    readonly helperTime:            number;
+    readonly mainTime:              number; 
     readonly generalCountTime:      string; 
     readonly description:           string; 
     readonly docs:                  any;

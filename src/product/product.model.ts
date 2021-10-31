@@ -86,8 +86,8 @@ export class Product extends Model<Product, ProductCreationAttrs> {
     @BelongsToMany(() => Cbed, () => ProductCbed)
     cbeds: Cbed[]; 
 
-    @HasMany(() => TechProcess) 
-    techProcesses: TechProcess[];
+    @HasOne(() => TechProcess) 
+    techProcesses: TechProcess;
 
     @ForeignKey(() => User)
     @Column({type: DataType.INTEGER})

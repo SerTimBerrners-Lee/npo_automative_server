@@ -213,11 +213,30 @@ export class ProviderService {
         const comparison = new DateMethods().comparison
 
         for(let dev of deliveries) {
-            if(comparison(dev.date_shipments, undefined, '<')) 
+            if(comparison(dev.date_shipments, undefined, '<=')) 
                 new_dev_arr.push(dev)
         }
 
         return new_dev_arr
+    }
+
+    private async checkDeliveroedComing(product: any, coming: Array<Deliveries>) {
+        for(let com of coming) {
+            try {
+                let pars = JSON.parse(com.product)
+                console.log(pars)
+                console.log(product)
+                for(let inx = 0; inx < pars.length; inx++) {
+                    if(pars[inx].art == product.art && pars[inx].id == product.id) {
+                        pars = pars.slice(inx, 0)
+                    }
+                }
+                com.product = JSON.stringify(pars)
+                await com.save()
+            } catch(e) {
+                console.log(e)
+            }
+        }
     }
 
     async createWaybill(dto: CreateWaybillDto, files: any) {
@@ -229,20 +248,23 @@ export class ProviderService {
 				],
 				limit: 1
 			})
-		let endYears = dm.date().split('.')[dm.date().split('.').length - 1].slice(2);
 		const numberEndShipments = endShipments && endShipments.id ?  
-			`№ ${endYears}-${endShipments.id + 1} от ${dm.date()}` : `№ ${endYears}-1 от ${dm.date()}`
+			`№ ${endShipments.id + 1} от ${dm.date()}` : `№ 1 от ${dm.date()}`
 
         const waybill = await this.waybillReprository.create({name: numberEndShipments})
 
         if(dto.product_list) {
+            const comings = await this.getAllDeliveriedComing()
             try {
                 let pars = JSON.parse(dto.product_list)
                 waybill.product = dto.product_list
                 for(let product of pars) {
+                    this.checkDeliveroedComing(product, comings)
+
                     let material = await this.settingsService.getOnePPT(product.id)
                     if(material) {
-                        material.shipments_kolvo = material.shipments_kolvo - product.kol
+                        material.shipments_kolvo - product.kol <= 0 ? material.shipments_kolvo = 0 :
+                            material.shipments_kolvo  = material.shipments_kolvo - product.kol
                         material.material_kolvo = material.material_kolvo + product.kol
                         await material.save()
                     }
