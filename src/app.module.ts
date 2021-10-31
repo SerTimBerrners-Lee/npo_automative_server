@@ -97,6 +97,7 @@ import { DeliveriesMaterial } from "./provider/deliveries-material.model";
 import { BuyerCbed } from "./buyer/buyer-cbed.model";
 import { DocumentsWaybill } from "./documents/documents-waybill.model";
 import { Waybill } from "./provider/waybill.model";
+import { NormHors } from "./settings/normhors.model";
 
 @Module({
     controllers: [],
@@ -188,7 +189,8 @@ import { Waybill } from "./provider/waybill.model";
                 MetaloworkingShipments,
                 DeliveriesMaterial,
                 BuyerCbed,
-                Waybill
+                Waybill,
+                NormHors
             ],
             autoLoadModels: true,
           }),

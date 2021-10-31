@@ -15,6 +15,7 @@ import { UpdateEdizmDto } from './dto/update-edizm.dto';
 import { UpdateMaterialDto } from './dto/update-material.dto';
 import { Edizm } from './edizm.model';
 import { Material } from './material.model';
+import { NormHors } from './normhors.model';
 import { PodMaterial } from './pod-material.model';
 import { PodPodMaterial } from './pod-pod-material.model';
 import { TypeEdizm } from './type-edizm.model';
@@ -30,6 +31,7 @@ export class SettingsService {
         private documentsService: DocumentsService,
         @InjectModel(Providers) private providersReprository: typeof Providers,
         @InjectModel(Deliveries) private deliveriesReprository: typeof Deliveries,
+        @InjectModel(NormHors) private normhorsReprository: typeof NormHors,
     ) {}
 
     async createTypeEdizm(dto: CreateTypeEdizmDto) {
@@ -439,5 +441,19 @@ export class SettingsService {
         }
 
         return new_mat_arr
+    }
+
+    async getNormHors() {
+        const nh = await this.normhorsReprository.findAll()
+        console.log(nh)
+        return nh
+    }
+
+    async updateNormHors(znach: any) {
+        const nh = await this.normhorsReprository.findOne()
+        if(nh) {
+            nh.znach = znach.znach
+            nh.save()
+        }
     }
 }

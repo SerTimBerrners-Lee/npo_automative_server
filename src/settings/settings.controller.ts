@@ -156,4 +156,16 @@ export class SettingsController {
     getAllShipmentsPPM() {
         return this.settingsService.getAllShipmentsPPM()
     }
+
+    @ApiOperation({summary: 'Меняем значение для норм-часа'})
+    @Post('/normhors/')
+    updateNormHors(@Body() znach: number) {
+        return this.settingsService.updateNormHors(znach)
+    }
+
+    @ApiOperation({summary: 'Получаем Норма-час'})
+    @Get('/normhors')
+    getNormHors() {
+        return this.settingsService.getNormHors()
+    }
 }
