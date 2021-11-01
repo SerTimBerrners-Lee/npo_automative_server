@@ -185,8 +185,8 @@ export class DetalService {
         if(Number(dto.techProcessID)) {
             const tp = await this.techProcessReprository.findByPk(dto.techProcessID)
             if(tp) {
-                await detal.$add('techProcesses', tp.id)
-                await detal.save()
+                tp.detalId = detal.id
+                await tp.save()
             }
         }
 

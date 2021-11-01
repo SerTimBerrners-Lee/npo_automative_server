@@ -65,16 +65,8 @@ export class ProductService {
         if(Number(dto.techProcessID)) {
             const tp = await this.techProcessReprository.findByPk(dto.techProcessID)
             if(tp) {
-                await product.$add('techProcesses', tp.id)
-                await product.save()
-            }
-        }
-
-        if(Number(dto.techProcessID)) {
-            const tp = await this.techProcessReprository.findByPk(dto.techProcessID)
-            if(tp) {
-                await product.$add('techProcesses', tp.id)
-                await product.save()
+               tp.productId = product.id
+                await tp.save()
             }
         }
 
@@ -204,5 +196,9 @@ export class ProductService {
 
             return product
         }
+    }
+
+    async getProductByIdLight(id: number) {
+        return await this.productReprository.findByPk(id)
     }
 }

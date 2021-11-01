@@ -130,5 +130,16 @@ export class AssembleService {
 	async getAssembleById(id:number) {
 		return await this.assembleReprository.findByPk(id, {include: {all: true}})
 	}
+
+	async getAssembleByOperation(op_id: number) {
+		const assembles = await this.assembleReprository.findAll({ include: {all: true}})
+		let arr: Array<Assemble> = []
+		for(let ass of assembles) {
+			if(ass.operation.name == op_id)
+				arr.push(ass)
+		}
+
+		return arr
+	}
 }
  

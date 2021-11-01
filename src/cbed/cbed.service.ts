@@ -62,8 +62,8 @@ export class CbedService {
         if(Number(dto.techProcessID)) {
             const tp = await this.techProcessReprository.findByPk(dto.techProcessID)
             if(tp) {
-                await cbed.$add('techProcesses', tp.id)
-                await cbed.save()
+                tp.cbedId = cbed.id
+                await tp.save() 
             }
         }
 
@@ -105,14 +105,6 @@ export class CbedService {
                         await cbed.save()
                     }
                 }
-            }
-        }
-
-        if(Number(dto.techProcessID)) {
-            const tp = await this.techProcessReprository.findByPk(dto.techProcessID)
-            if(tp) {
-                await cbed.$add('techProcesses', tp.id)
-                await cbed.save()
             }
         }
 

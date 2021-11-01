@@ -36,6 +36,12 @@ export class ProductController {
         return this.productService.getAllProduct()
     }
 
+    @ApiOperation({summary: 'Получаем Изделиe by ID'})
+    @Get('/light/:id')
+    getProductByIdLight(@Param('id') id: number) {
+        return this.productService.getProductByIdLight(id)
+    }
+
     @ApiOperation({summary: 'Добавляем Изделие в Архив'})
     @Delete('/:id')
     banProduct(@Param('id') id: number) {

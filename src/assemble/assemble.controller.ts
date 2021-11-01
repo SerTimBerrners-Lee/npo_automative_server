@@ -25,5 +25,11 @@ export class AssembleController {
 	getAssembleById(@Param('id') id: number) {
 			return this.assembleService.getAssembleById(id)
 	}
+
+	@ApiOperation({summary: 'Получаем все сборки по типам операций'})
+	@Get('/typeoperation/:op_id')
+	getAssembleByOperation(@Param('op_id') op_id: number) {
+			return this.assembleService.getAssembleByOperation(op_id)
+	}
 }
  

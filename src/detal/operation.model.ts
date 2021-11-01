@@ -23,12 +23,12 @@ export class Operation extends Model<Operation, OperationCreationAttrs> {
 
     @ApiProperty({example: 'Заготовительная', description: 'Тип операции'})
     @Column({type: DataType.INTEGER, allowNull: false})
-    name: number;   
+    name: number; 
 
     @ApiProperty({example: true, description: 'Добавляем в архив'})
     @Column({type: DataType.BOOLEAN, defaultValue: false})
     ban: boolean; 
-
+ 
     @ApiProperty({example: '1', description: 'Подготовительное время ч'})
     @Column({type: DataType.INTEGER, defaultValue: 0})
     preTime: number;
