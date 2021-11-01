@@ -242,8 +242,10 @@ export class DetalService {
     }
 
     private async upAndCreateOperation(dto: UpCreateOperationDto, files: any, operation: any) {
-        if(dto.description)
+        if(dto.description != 'null')
             operation.description = dto.description
+            else
+                operation.description = ''
         if(dto.preTime)
             operation.preTime = dto.preTime
         if(dto.helperTime)
@@ -254,8 +256,7 @@ export class DetalService {
             operation.generalCountTime = dto.generalCountTime
             
         operation.tOperationId = operation.name
-        
-        // add instrument 
+
         operation.instruments = []
         await operation.save()
 
@@ -308,7 +309,6 @@ export class DetalService {
             }
         }
 
-        // add equipments 
         operation.equipments = []
         await operation.save()
 
@@ -379,14 +379,14 @@ export class DetalService {
     }
 
     async createNewTechProcess(dto: UpCreateTechProcessDto, files: any) {
-
         let [tp, description]: any[] = [];
 
         if(Number(dto.id)) {
-            tp = await this.techProcessReprository.findByPk(dto.id)
+            tp = await this.techProcessReprository.findByPk(dto.id, {include: {all: true}})
             description = 'Изменил технический процесс'
         }   else {
-            tp = await this.techProcessReprository.create()
+            let new_tp = await this.techProcessReprository.create()
+            tp = await this.techProcessReprository.findByPk(new_tp.id, {include: {all: true}})
             description = 'Добавил технический процесс'
         } 
 
@@ -421,7 +421,6 @@ export class DetalService {
             }
         }
 
-
         if(dto.docs) {
             let docs: any = Object.values(JSON.parse(dto.docs))
             let i = 0
@@ -451,6 +450,19 @@ export class DetalService {
 
         if(!tp)
             throw new HttpException('Не удалось создать операцию', HttpStatus.BAD_REQUEST)
+        
+        if(tp.operations.length) {
+            let oper_min = null
+            for(let i in tp.operations) {
+                for(let j in tp.operations) {
+                    if(tp.operations[j].name > tp.operations[i].name) {
+                        oper_min = tp.operations[i]
+                        tp.operations[i] = tp.operations[j]
+                        tp.operations[j] = oper_min
+                    }
+                }
+            }
+        }
         return tp
     }
 
@@ -461,7 +473,6 @@ export class DetalService {
         if(!TO)
             throw new HttpException('Не удалось сохранить тип операции', HttpStatus.BAD_REQUEST)
         return TO
-        
     }
 
     async updateTypeOperation(dto: UpdateTypeOperation) {
@@ -473,7 +484,6 @@ export class DetalService {
         await TO.update(dto)
         
         return TO
-        
     }
 
     async getAllTypeOperation() {
