@@ -152,7 +152,6 @@ export class UsersService {
     }
 
     async getUser(light: string) {
-        console.log(light, typeof light)
         if(light == 'true')
             return await this.userRepository.findAll()
         else

@@ -1,6 +1,7 @@
 import { Body, Controller, Get, Post } from '@nestjs/common';
 import { ApiOperation } from '@nestjs/swagger';
 import {UpdateDeficitDto } from './dto/create-deficite.dto';
+import { CreateMarkDto } from './dto/create-mark.dto';
 import { ScladService } from './sclad.service';
 
 @Controller('sclad')
@@ -19,4 +20,11 @@ export class ScladController {
     getDeficit() {
         return this.scladService.getDeficit()
     }
+
+    @ApiOperation({summary: 'Добавление отметки о выполнении'})
+    @Post('/mark')
+    createMark(@Body() dto: CreateMarkDto) {
+        return this.scladService.createMark(dto)
+    }
 }
+    

@@ -118,7 +118,6 @@ export class User extends Model<User, UserCreationAttrs> {
     @HasMany(() => Actions)
     actions: Actions[];
 
-    // Issue 
     @BelongsToMany(() => Issue, () => IssueUser)
     issues: Issue[];
 
@@ -131,7 +130,6 @@ export class User extends Model<User, UserCreationAttrs> {
     @HasMany(() => Documents)
     responsibleForDocuments: Documents[];
 
-    
     @AfterSync
     static async checkUser(sync: any) {
         const user = await sync.sequelize.models.User

@@ -1,8 +1,10 @@
 import { ApiProperty } from "@nestjs/swagger";
-import { Model, Column, DataType, Table, BelongsToMany, ForeignKey, BelongsTo} from "sequelize-typescript";
+import { Model, Column, DataType, Table, BelongsToMany, ForeignKey, BelongsTo, HasMany} from "sequelize-typescript";
 import { Cbed } from "src/cbed/cbed.model";
 import { Operation } from "src/detal/operation.model";
 import { TechProcess } from "src/detal/tech-process.model";
+import { StatusAssemble } from "src/files/enums";
+import { Marks } from "src/sclad/marks.model";
 import { Shipments } from "src/shipments/shipments.model";
 import { AssembleShipments } from "./assemble-shipments.model";
 
@@ -11,12 +13,6 @@ interface AssembleAttrCreate {
   number_order: string;
   date_shipments: string; 
   description: string;
-}
-
-enum StatusAssemble {
-  start = 'В процессе',
-  end = 'Готово',
-  expired = 'Просрочено' 
 }
  
 @Table({tableName: 'assemble'})
@@ -44,10 +40,14 @@ export class Assemble extends Model<Assemble, AssembleAttrCreate> {
 
   @ApiProperty({example: '1', description: ''})
   @Column({type: DataType.INTEGER, defaultValue: 0})
+  kolvo_create_in_operation: number;
+
+  @ApiProperty({example: '1', description: ''})
+  @Column({type: DataType.INTEGER, defaultValue: 0})
   kolvo_create: number;
 
   @ApiProperty({example: '1', description: ''})
-  @Column({type: DataType.INTEGER})
+  @Column({type: DataType.INTEGER, defaultValue: 0})
   kolvo_order_byer: number;
 
   @ApiProperty({example: '', description: ''})
@@ -55,7 +55,7 @@ export class Assemble extends Model<Assemble, AssembleAttrCreate> {
   description: string;
 
   @ApiProperty({example: '', description: ''})
-  @Column({type: DataType.STRING, defaultValue: StatusAssemble.start})
+  @Column({type: DataType.STRING, defaultValue: StatusAssemble[0]})
   status: string;
 
   @ForeignKey(() => Operation)
@@ -81,4 +81,7 @@ export class Assemble extends Model<Assemble, AssembleAttrCreate> {
 
   @BelongsTo(() => TechProcess)
   tech_process: TechProcess;
+
+  @HasMany(() => Marks)
+  marks: Marks[];
 }  

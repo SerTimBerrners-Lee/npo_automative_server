@@ -255,7 +255,15 @@ export class DetalService {
         if(dto.generalCountTime)
             operation.generalCountTime = dto.generalCountTime
             
-        operation.tOperationId = operation.name
+        // get names TP and add column (id, name for operation)
+        if(operation.name) {
+            const tp = await this.typeOperationReprository.findByPk(operation.name)
+            if(tp) {
+                console.log(tp)
+                operation.tOperationId = tp.id
+                operation.full_name = tp.name
+            }
+        }
 
         operation.instruments = []
         await operation.save()

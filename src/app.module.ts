@@ -98,6 +98,7 @@ import { BuyerCbed } from "./buyer/buyer-cbed.model";
 import { DocumentsWaybill } from "./documents/documents-waybill.model";
 import { Waybill } from "./provider/waybill.model";
 import { NormHors } from "./settings/normhors.model";
+import { Marks } from "./sclad/marks.model";
 
 @Module({
     controllers: [],
@@ -190,7 +191,8 @@ import { NormHors } from "./settings/normhors.model";
                 DeliveriesMaterial,
                 BuyerCbed,
                 Waybill,
-                NormHors
+                NormHors,
+                Marks
             ],
             autoLoadModels: true,
           }),
