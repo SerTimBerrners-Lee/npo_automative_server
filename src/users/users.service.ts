@@ -151,8 +151,9 @@ export class UsersService {
         return 'ava_defolt.png'
     }
 
-    async getUser(light: boolean) {
-        if(light)
+    async getUser(light: string) {
+        console.log(light, typeof light)
+        if(light == 'true')
             return await this.userRepository.findAll()
         else
             return await this.userRepository.findAll({

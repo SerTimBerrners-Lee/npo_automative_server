@@ -57,7 +57,7 @@ export class UsersController {
     //@Roles("ADMIN")
     //@UseGuards(RolesGuard) 
     @Get('/data/:light')
-    getAll(@Param('light') light: boolean) {
+    getAll(@Param('light') light: string) {
         return this.userService.getUser(light);
     }
 
