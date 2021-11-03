@@ -1,8 +1,11 @@
 import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
 import { InjectModel } from '@nestjs/sequelize';
+import { Assemble } from 'src/assemble/assemble.model';
 import { AssembleService } from 'src/assemble/assemble.service';
 import { DetalService } from 'src/detal/detal.service';
 import { StatusAssemble } from 'src/files/enums';
+import { Metaloworking } from 'src/metaloworking/metaloworking.model';
+import { MetaloworkingService } from 'src/metaloworking/metaloworking.service';
 import { Deficit } from './deficit.model';
 import { UpdateDeficitDto } from './dto/create-deficite.dto';
 import { CreateMarkDto } from './dto/create-mark.dto';
@@ -15,6 +18,7 @@ export class ScladService {
         @InjectModel(Marks) private marksReprository: typeof Marks,
         private assembleService: AssembleService,
         private detalService: DetalService,
+        private metaloworkingService: MetaloworkingService,
         ) {}
 
     async updateDeficit(dto: UpdateDeficitDto) {
@@ -41,27 +45,38 @@ export class ScladService {
         if(!mark) 
             throw new HttpException('Произошла ошибка при добавлении отметки.', HttpStatus.BAD_REQUEST)
 
-        if(dto.ass_id) {
-            const ass = await this.assembleService.getAssembleById(dto.ass_id)
-            if(ass) {
-                if(dto.kol + ass.kolvo_create_in_operation >= ass.kolvo_all) {
-                    const nextOperation = await this.returnNextOperation(ass.tp_id, ass.operation_id)
-                    if(nextOperation) {
-                        ass.kolvo_create_in_operation = 0;
-                        ass.operation_id = nextOperation.id
-                    } else {
-                        ass.kolvo_create_in_operation = ass.kolvo_all
-                        ass.kolvo_create = ass.kolvo_all
-                        ass.status = StatusAssemble[1]
-                    }
-                } else 
-                    ass.kolvo_create_in_operation = ass.kolvo_create_in_operation + dto.kol
+        let obj: any;
+        if(dto.ass_id) 
+            obj = await this.assembleService.getAssembleById(dto.ass_id)
+        else if(dto.metal_id) 
+            obj = await this.metaloworkingService.getOneMetaloworkingById(dto.metal_id)
 
-                await ass.save()
-            }
-        }
+        console.log(dto, obj, mark)
+            
+        if(!obj) 
+            throw new HttpException('Не удалось добавить отметку о выполнении', HttpStatus.BAD_GATEWAY)
+
+        await this.updateObjectWorking(dto, obj)
 
         return mark
+    }
+
+    async updateObjectWorking(dto: CreateMarkDto, obj: Assemble | Metaloworking) {
+        if(dto.kol + obj.kolvo_create_in_operation >= obj.kolvo_all) {
+            const nextOperation = await this.returnNextOperation(obj.tp_id, obj.operation_id)
+            if(nextOperation) {
+                obj.kolvo_create_in_operation = 0;
+                obj.operation_id = nextOperation.id
+            } else {
+                obj.kolvo_create_in_operation = obj.kolvo_all
+                obj.kolvo_create = obj.kolvo_all
+                obj.status = StatusAssemble[1]
+            }
+        } else 
+            obj.kolvo_create_in_operation = obj.kolvo_create_in_operation + dto.kol
+
+        await obj.save()
+        return obj
     }
 
     async returnNextOperation(tp_id: number, operation_id: number) {

@@ -19,5 +19,11 @@ export class MetaloworkingController {
 	getOneMetaloworkingById(@Param('id') id: number) {
 			return this.metaloworkingService.getOneMetaloworkingById(id)
 	}
+
+	@ApiOperation({summary: 'Получить по ID из металообработки'})
+	@Get('/typeoperation/:op_id')
+	getMetalloworkingByTypeOperation(@Param('op_id') op_id: number) {
+			return this.metaloworkingService.getMetalloworkingByTypeOperation(op_id)
+	}
 }
    

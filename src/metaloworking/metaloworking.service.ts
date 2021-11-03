@@ -60,9 +60,12 @@ export class MetaloworkingService {
 				// + tp + operation_default
 				if(detal.techProcesses) {
 					const tp = await this.detalService.getTechProcessById(detal.techProcesses.id)
-					metaloworking.tp_id = tp.id 
-					if(tp.operations && tp.operations.length)
-						metaloworking.operation_id = tp.operations[0].id
+					if(tp) {
+						metaloworking.tp_id = tp.id 
+						if(tp.operations && tp.operations.length)
+							metaloworking.operation_id = tp.operations[0].id
+						await metaloworking.save()
+					}
 				}
 
 				metaloworking.detal_id = detal.id
@@ -111,5 +114,16 @@ export class MetaloworkingService {
 
 	async getOneMetaloworkingById(id: number) {
 		return await this.metaloworkingReprositroy.findByPk(id, {include: {all: true}})
+	}
+
+	async getMetalloworkingByTypeOperation(op_id: number) {
+		const metaloworkings = await this.metaloworkingReprositroy.findAll({ include: {all: true}})
+		let arr: Array<Metaloworking> = []
+		for(let metal of metaloworkings) {
+			if(metal.operation && metal.operation.name == op_id)
+				arr.push(metal)
+		}
+
+		return arr
 	}
 }

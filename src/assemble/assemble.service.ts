@@ -40,9 +40,6 @@ export class AssembleService {
 					}
 				}
 			}
-				
-
-				
 		}
 
 		if(dto.cbed_id) { 
@@ -149,7 +146,7 @@ export class AssembleService {
 		const assembles = await this.assembleReprository.findAll({ include: {all: true}})
 		let arr: Array<Assemble> = []
 		for(let ass of assembles) {
-			if(ass.operation.name == op_id)
+			if(ass.operation && ass.operation.name == op_id)
 				arr.push(ass)
 		}
 
