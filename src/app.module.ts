@@ -87,10 +87,8 @@ import { CbedDetals } from "./cbed/cbed-detals.model";
 import { ProductDetal } from "./product/product-detal.model";
 import { AssembleModule } from './assemble/assemble.module';
 import { Assemble } from "./assemble/assemble.model";
-import { AssembleShipments } from "./assemble/assemble-shipments.model";
 import { MetaloworkingModule } from './metaloworking/metaloworking.module';
 import { Metaloworking } from "./metaloworking/metaloworking.model";
-import { MetaloworkingShipments } from "./metaloworking/metaloworking-shipments.model";
 import { ShipmentsMaterial } from "./shipments/shipments-material.model";
 import { DocumentsDeliveries } from "./documents/documents-deliveries.model";
 import { DeliveriesMaterial } from "./provider/deliveries-material.model";
@@ -185,9 +183,7 @@ import { Marks } from "./sclad/marks.model";
                 CbedDetals,
                 ProductDetal,
                 Assemble,
-                AssembleShipments,
                 Metaloworking,
-                MetaloworkingShipments,
                 DeliveriesMaterial,
                 BuyerCbed,
                 Waybill,

@@ -4,6 +4,7 @@ import { Cbed } from 'src/cbed/cbed.model';
 import { CbedService } from 'src/cbed/cbed.service';
 import { DetalService } from 'src/detal/detal.service';
 import { MetaloworkingService } from 'src/metaloworking/metaloworking.service';
+import { ProductService } from 'src/product/product.service';
 import { SettingsService } from 'src/settings/settings.service';
 import { ShipmentsService } from 'src/shipments/shipments.service';
 import { Assemble } from './assemble.model';
@@ -16,7 +17,8 @@ export class AssembleService {
 		private cbedService: CbedService,
 		private settingsService: SettingsService, 
 		private detalService: DetalService, 
-		private metaloworkingService: MetaloworkingService) {} 
+		private metaloworkingService: MetaloworkingService, 
+		private productService: ProductService) {} 
 
 
 	async createAssemble(dto: CreateAssembleDto) {
@@ -27,11 +29,23 @@ export class AssembleService {
 	
 		if(dto.shipments_id) {
 			const shipment = await this.shipmentService.getById(dto.shipments_id)
-			if(shipment) 
-				assemble.$add('shipments', shipment.id)
+			if(shipment) {
+				assemble.shipments_id = shipment.id
+				// +  Product
+				if(shipment.productId) {
+					const product = await this.productService.getById(shipment.productId)
+					if(product) {
+						assemble.product_id = product.id
+						await assemble.save()
+					}
+				}
+			}
+				
+
+				
 		}
 
-		if(dto.cbed_id) {
+		if(dto.cbed_id) { 
 			const cbed = await this.cbedService.findById(dto.cbed_id)
 			if(cbed) {
 				if(cbed.techProcesses) {

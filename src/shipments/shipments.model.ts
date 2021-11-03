@@ -1,12 +1,10 @@
 import { ApiProperty } from "@nestjs/swagger";
-import { Model, Column, DataType, Table, ForeignKey, BelongsTo, BelongsToMany, AfterCreate, BeforeCreate} from "sequelize-typescript";
-import { AssembleShipments } from "src/assemble/assemble-shipments.model";
+import { Model, Column, DataType, Table, ForeignKey, BelongsTo, BelongsToMany, HasMany} from "sequelize-typescript";
 import { Assemble } from "src/assemble/assemble.model";
 import { Buyer } from "src/buyer/buyer.model";
 import { Cbed } from "src/cbed/cbed.model";
 import { Detal } from "src/detal/detal.model";
-import { statusShipment } from "src/files/enum";
-import { MetaloworkingShipments } from "src/metaloworking/metaloworking-shipments.model";
+import { statusShipment } from "src/files/enums";
 import { Metaloworking } from "src/metaloworking/metaloworking.model";
 import { Product } from "src/product/product.model";
 import { PodPodMaterial } from "src/settings/pod-pod-material.model";
@@ -80,7 +78,7 @@ export class Shipments extends Model<Shipments, ShipmentsAttrCreate> {
     buyer: Buyer;
 
     @ApiProperty({example: '1', description: ''})
-    @Column({type: DataType.STRING})
+    @Column({type: DataType.STRING, defaultValue: statusShipment.order})
     status: string;
   
     @BelongsToMany(() => Cbed, () => ShipmentsCbed)
@@ -92,16 +90,9 @@ export class Shipments extends Model<Shipments, ShipmentsAttrCreate> {
     @BelongsToMany(() => PodPodMaterial, () => ShipmentsMaterial)
     materials: PodPodMaterial[];
 
-    @BelongsToMany(() => Assemble, () => AssembleShipments)
+    @HasMany(() => Assemble)
     assemble: Assemble[];
 
-    @BelongsToMany(() => Metaloworking, () => MetaloworkingShipments)
+    @HasMany(() => Metaloworking)
     metaloworking: Metaloworking[];
-
-    @AfterCreate
-    static async createShipments(shipments: Shipments) {
-      const sh = statusShipment.order
-      shipments.status = sh
-      await shipments.save()
-    }
 }  

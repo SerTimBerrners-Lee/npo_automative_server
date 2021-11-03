@@ -76,6 +76,10 @@ export class SettingsService {
         return materials
     }
 
+    async getOneMaterial(id: number) {
+        return await this.materialReprository.findByPk(id)
+    }
+
     async getAllPodTypeMaterial(instans: string | number) {
         let materials = []
         if(instans == 'all')

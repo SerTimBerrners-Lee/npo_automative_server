@@ -1,12 +1,12 @@
 import { ApiProperty } from "@nestjs/swagger";
-import { Model, Column, DataType, Table, BelongsToMany, ForeignKey, BelongsTo, HasMany} from "sequelize-typescript";
+import { Model, Column, DataType, Table, ForeignKey, BelongsTo, HasMany} from "sequelize-typescript";
 import { Cbed } from "src/cbed/cbed.model";
 import { Operation } from "src/detal/operation.model";
 import { TechProcess } from "src/detal/tech-process.model";
 import { StatusAssemble } from "src/files/enums";
+import { Product } from "src/product/product.model";
 import { Marks } from "src/sclad/marks.model";
 import { Shipments } from "src/shipments/shipments.model";
-import { AssembleShipments } from "./assemble-shipments.model";
 
 interface AssembleAttrCreate {
   date_order: string;
@@ -65,8 +65,12 @@ export class Assemble extends Model<Assemble, AssembleAttrCreate> {
   @BelongsTo(() => Operation)
   operation: Operation;
   
-  @BelongsToMany(() => Shipments, () => AssembleShipments)
-  shipments: Shipments[];
+  @ForeignKey(() => Shipments)
+  @Column({type: DataType.INTEGER})
+  shipments_id: number;
+
+  @BelongsTo(() => Shipments)
+  shipments: Shipments;
 
   @ForeignKey(() => Cbed)
   @Column({type: DataType.INTEGER})
@@ -76,7 +80,7 @@ export class Assemble extends Model<Assemble, AssembleAttrCreate> {
   cbed: Cbed;
 
   @ForeignKey(() => TechProcess)
-  @Column({type: DataType.INTEGER})
+  @Column({type: DataType.INTEGER}) 
   tp_id: number;
 
   @BelongsTo(() => TechProcess)
@@ -84,4 +88,11 @@ export class Assemble extends Model<Assemble, AssembleAttrCreate> {
 
   @HasMany(() => Marks)
   marks: Marks[];
+
+  @ForeignKey(() => Product)
+  @Column({type: DataType.INTEGER})
+  product_id: number;
+
+  @BelongsTo(() => Product)
+  product: Product;
 }  
