@@ -50,8 +50,6 @@ export class ScladService {
             obj = await this.assembleService.getAssembleById(dto.ass_id)
         else if(dto.metal_id) 
             obj = await this.metaloworkingService.getOneMetaloworkingById(dto.metal_id)
-
-        console.log(dto, obj, mark)
             
         if(!obj) 
             throw new HttpException('Не удалось добавить отметку о выполнении', HttpStatus.BAD_GATEWAY)
@@ -62,7 +60,7 @@ export class ScladService {
     }
 
     async updateObjectWorking(dto: CreateMarkDto, obj: Assemble | Metaloworking) {
-        if(dto.kol + obj.kolvo_create_in_operation >= obj.kolvo_all) {
+        if(dto.kol + obj.kolvo_create_in_operation >= obj.kolvo_all || obj.operation.ban) {
             const nextOperation = await this.returnNextOperation(obj.tp_id, obj.operation_id)
             if(nextOperation) {
                 obj.kolvo_create_in_operation = 0;

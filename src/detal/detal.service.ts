@@ -458,6 +458,9 @@ export class DetalService {
 
         if(!tp)
             throw new HttpException('Не удалось создать операцию', HttpStatus.BAD_REQUEST)
+
+        // 1. Возвращаем все операции по возрастанию 
+        // 2. Операция не должна быть в бане
         
         if(tp.operations.length) {
             let oper_min = null
@@ -470,7 +473,14 @@ export class DetalService {
                     }
                 }
             }
+            
+            for(let inx = 0; inx < tp.operations.length; inx++) {
+                if(tp.operations[inx].ban) {
+                    tp.operations.splice(inx, 1)
+                }
+            }
         }
+        console.log(tp.operations)
         return tp
     }
 
