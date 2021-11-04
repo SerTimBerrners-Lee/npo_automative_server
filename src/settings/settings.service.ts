@@ -436,7 +436,6 @@ export class SettingsService {
         });
         
         return materials
-
     }
  
     async getAllShipmentsPPM() {
@@ -463,7 +462,6 @@ export class SettingsService {
 
     async getNormHors() {
         const nh = await this.normhorsReprository.findAll()
-        console.log(nh)
         return nh
     }
 
@@ -473,5 +471,35 @@ export class SettingsService {
             nh.znach = znach.znach
             nh.save()
         }
+    }
+
+    async getAllMaterialProvider() {
+        const materials = await this.podPodMaterialReprository.findAll({include: {all:true}})
+
+        if(!materials)
+            throw new HttpException('Материалов не найдено', HttpStatus.BAD_REQUEST)
+
+        let materials_provider = []
+        for(let material of materials) {
+            if(!material.providers.length)
+                continue
+            materials_provider.push(material)
+        }
+
+        return materials_provider
+    }
+
+    async getAllMaterialProviderById(id: number) {
+        const material_providers = await this.getAllMaterialProvider()
+
+        let new_materials = []
+        for(let material of material_providers) {
+            for(let provider of material.providers) {
+                if(provider.id == id)
+                    new_materials.push(material)
+            }
+        }
+
+        return new_materials
     }
 }

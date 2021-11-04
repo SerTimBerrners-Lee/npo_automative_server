@@ -463,17 +463,16 @@ export class DetalService {
         // 2. Операция не должна быть в бане
         
         if(tp.operations.length) {
-            let oper_min = null
-            for(let i in tp.operations) {
-                for(let j in tp.operations) {
-                    if(tp.operations[j].name > tp.operations[i].name) {
-                        oper_min = tp.operations[i]
-                        tp.operations[i] = tp.operations[j]
-                        tp.operations[j] = oper_min
-                    }
-                }
-            }
-            
+            // let oper_min = null
+            // for(let i in tp.operations) {
+            //     for(let j in tp.operations) {
+            //         if(tp.operations[j].name > tp.operations[i].name) {
+            //             oper_min = tp.operations[i]
+            //             tp.operations[i] = tp.operations[j]
+            //             tp.operations[j] = oper_min
+            //         }
+            //     }
+            // }
             for(let inx = 0; inx < tp.operations.length; inx++) {
                 if(tp.operations[inx].ban) {
                     tp.operations.splice(inx, 1)

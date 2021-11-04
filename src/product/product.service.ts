@@ -179,9 +179,11 @@ export class ProductService {
         return product
     }
 
-    async getAllProduct() {
-        const product = await this.productReprository.findAll({include: {all: true}})
-        return product
+    async getAllProduct(light: string) {
+        if(light == 'false')
+            return await this.productReprository.findAll({include: {all: true}})
+
+        return await this.productReprository.findAll()
     }
 
     async getById(id: number) {

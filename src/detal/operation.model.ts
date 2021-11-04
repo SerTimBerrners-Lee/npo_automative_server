@@ -14,7 +14,7 @@ interface OperationCreationAttrs {
     name: number;
 }
 
-@Table({tableName: 'operation'})
+@Table({tableName: 'operation', updatedAt: false})
 export class Operation extends Model<Operation, OperationCreationAttrs> {
 
     @ApiProperty({example: '1', description: 'Уникальный идентификатор'})

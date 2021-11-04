@@ -31,9 +31,9 @@ export class ProductController {
     }
 
     @ApiOperation({summary: 'Получаем все Изделия'})
-    @Get('/')
-    getAllProduct() {
-        return this.productService.getAllProduct()
+    @Get('/:light')
+    getAllProduct(@Param('light') light: string) {
+        return this.productService.getAllProduct(light)
     }
 
     @ApiOperation({summary: 'Получаем Изделиe by ID'})

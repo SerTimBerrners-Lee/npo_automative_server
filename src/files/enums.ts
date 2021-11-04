@@ -16,3 +16,9 @@ export enum statusShipment {
 	performed = 'Выполняется',
 	done = 'Выполнено'
 }
+
+export enum statusDelivery {
+  'Заказано',
+  'Доставлено',
+  'Отгружено'
+}

@@ -2,6 +2,7 @@ import { ApiProperty } from "@nestjs/swagger";
 import { Model, Column, DataType, Table, HasOne, BelongsToMany, ForeignKey, BelongsTo } from "sequelize-typescript";
 import { DocumentsDeliveries } from "src/documents/documents-deliveries.model";
 import { Documents } from "src/documents/documents.model";
+import { statusDelivery } from "src/files/enums";
 import { PodPodMaterial } from "src/settings/pod-pod-material.model";
 import { DeliveriesMaterial } from "./deliveries-material.model";
 import { Providers } from "./provider.model";
@@ -37,7 +38,7 @@ export class Deliveries extends Model<Deliveries, AttrDeliveriesCreate> {
     @Column({type: DataType.INTEGER})
     nds: number;   // Дата прихода
 
-    @Column({type: DataType.STRING})
+    @Column({type: DataType.STRING, defaultValue: statusDelivery[0]})
     status: string;   
 
     @Column({type: DataType.TEXT})

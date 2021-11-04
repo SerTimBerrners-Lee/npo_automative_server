@@ -55,7 +55,7 @@ export class Buyer extends Model<Buyer, BuyerCreationAttrs> {
     @BelongsToMany(() => Cbed, () => BuyerCbed)
     cbeds: Cbed[];
 
-    @HasOne(() => Shipments)
-    shipments: Shipments;
+    @HasMany(() => Shipments)
+    shipments: Shipments[];
 
 }    
