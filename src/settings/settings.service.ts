@@ -232,7 +232,7 @@ export class SettingsService {
         const podMaterials = await this.podMaterialReprository.findByPk(dto.podTypeId)
 
         if(!podPodMaterial || !podMaterials) 
-            throw new HttpException('Не удалось создать запись ', HttpStatus.BAD_REQUEST)   
+            throw new HttpException('Не удалось создать запись ', HttpStatus.BAD_REQUEST)  
 
         if(dto.description != 'null') podPodMaterial.description = dto.description
             else podPodMaterial.description = '' 
@@ -246,22 +246,36 @@ export class SettingsService {
         podPodMaterial.kolvo = []
 
         if(kolvo) {
-            podPodMaterial.kolvo = JSON.stringify(kolvo)
-            await podPodMaterial.save()
+            try {
+                podPodMaterial.kolvo = JSON.stringify(kolvo)
+                await podPodMaterial.save()
+            } catch (e) {
+                console.log(e)
+            }
         }
             
         if(deliveryTime && deliveryTime.edizm && deliveryTime.znach) 
             await this.edizmReprository.findByPk(deliveryTime.edizm).then(res => {
-                if(res) 
-                    podPodMaterial.deliveryTime = JSON.stringify({edizm: res, znach: deliveryTime.znach})
+                if(res) {
+                    try {
+                        podPodMaterial.deliveryTime = JSON.stringify({edizm: res, znach: deliveryTime.znach})
+                    } catch(e) {
+                        console.log(e)
+                    }
+                }   
             })
         else 
             podPodMaterial.deliveryTime = null
 
         if(density && density.edizm && density.znach) 
             await this.edizmReprository.findByPk(density.edizm).then(res => {
-                if(res) 
-                    podPodMaterial.density = JSON.stringify({edizm: res, znach: density.znach})
+                if(res) {
+                    try {
+                        podPodMaterial.density = JSON.stringify({edizm: res, znach: density.znach})
+                    } catch(e) {
+                        console.log(e)
+                    }
+                }
             })
         else 
             podPodMaterial.density = null
