@@ -52,7 +52,6 @@ import { DocumentsOperation } from "./documents/dociments-operation.model";
 import { InstrumentOperation } from "./instrument/instrument-operation.model";
 import { TechProcess } from "./detal/tech-process.model";
 import { DocumentsTechProcess } from "./documents/documents-tech-process.model";
-import { OperationTechProcess } from "./detal/operation-tech-process.model";
 import { ActionsModule } from './actions/actions.module';
 import { Actions } from "./actions/actions.model";
 import { TypeOperation } from "./detal/type-operation.model";
@@ -160,7 +159,6 @@ import { Marks } from "./sclad/marks.model";
                 OperationMaterial,
                 InstrumentOperation,
                 TechProcess,
-                OperationTechProcess,
                 Actions,
                 TypeOperation,
                 Sebestoim,

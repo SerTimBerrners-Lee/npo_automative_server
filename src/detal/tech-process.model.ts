@@ -6,7 +6,6 @@ import { DocumentsTechProcess } from "src/documents/documents-tech-process.model
 import { Documents } from "src/documents/documents.model";
 import { Product } from "src/product/product.model";
 import { Detal } from "./detal.model";
-import { OperationTechProcess } from "./operation-tech-process.model";
 import { Operation } from "./operation.model";
 
 @Table({tableName: 'tech_process'})
@@ -31,7 +30,7 @@ export class TechProcess extends Model<TechProcess> {
     @BelongsToMany(() => Documents, () => DocumentsTechProcess)
     documents: Documents[];
 
-    @BelongsToMany(() => Operation, () => OperationTechProcess)
+    @HasMany(() => Operation)
     operations: Operation[];
 
     @ForeignKey(() => Detal)

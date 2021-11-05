@@ -12,8 +12,6 @@ import { DetalController } from './detal.controller';
 import { Detal } from './detal.model';
 import { DetalService } from './detal.service';
 import { OperationEq } from './operation-equipment.model';
-import { OperationMaterial } from './operation-material.model';
-import { OperationTechProcess } from './operation-tech-process.model';
 import { Operation } from './operation.model';
 import { TechProcess } from './tech-process.model';
 import { ActionsModule } from 'src/actions/actions.module';
@@ -33,7 +31,6 @@ import { TypeOperation } from './type-operation.model';
             OperationEq,
             NameInstrument,
             TechProcess,
-            OperationTechProcess,
             User,
             Actions,
             TypeOperation

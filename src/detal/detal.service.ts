@@ -224,13 +224,9 @@ export class DetalService {
     }
 
     async updateOperation(dto: UpCreateOperationDto, files: any) {
-        const operation = await this.operationReprository.findByPk(dto.id)
-
+        const operation = await this.operationReprository.findByPk(dto.id, {include: {all:true}})
         if(!operation)
             throw new HttpException('Не удалось создать операцию', HttpStatus.BAD_REQUEST)
-        
-        operation.name = dto.name
-        await operation.save()
 
         return await this.upAndCreateOperation(dto, files, operation)
     }
@@ -254,19 +250,18 @@ export class DetalService {
             operation.mainTime = dto.mainTime
         if(dto.generalCountTime)
             operation.generalCountTime = dto.generalCountTime
-            
-        // get names TP and add column (id, name for operation)
-        if(operation.name) {
+
+        if(operation.name && !operation.tOperationId) {
             const tp = await this.typeOperationReprository.findByPk(operation.name)
             if(tp) {
-                console.log(tp)
-                operation.tOperationId = tp.id
-                operation.full_name = tp.name
+                if(!operation.tOperationId) {
+                    operation.tOperationId = tp.id
+                    operation.full_name = tp.name
+                }
             }
         }
 
         operation.instruments = []
-        await operation.save()
 
         let instL: any;
         operation.instrumentList = null
@@ -318,7 +313,6 @@ export class DetalService {
         }
 
         operation.equipments = []
-        await operation.save()
 
         operation.eqList = null
         if(dto.eqList) {
@@ -364,7 +358,7 @@ export class DetalService {
     async updateOperationTech(dto: UpOperationTechDto) {
         const operation = await this.operationReprository.findByPk(dto.id)
         if(!operation)
-            throw new HttpException('Не удалось создать операцию', HttpStatus.BAD_REQUEST)
+            throw new HttpException('Не удалось обновить операцию', HttpStatus.BAD_REQUEST)
 
         operation.instrumentID      =     dto.instrumentID
         operation.instrumentMerID   =     dto.instrumentMerID
@@ -372,7 +366,6 @@ export class DetalService {
         operation.eqID              =     dto.eqID
 
         await operation.save()
-
         return operation
     }
 
@@ -414,7 +407,8 @@ export class DetalService {
 
         if(dto.description)
             tp.description = dto.description
-
+        
+        console.log(dto)
         tp.operations = []
         if(dto.operationList) {
             let OL = JSON.parse(dto.operationList)
@@ -474,12 +468,10 @@ export class DetalService {
             //     }
             // }
             for(let inx = 0; inx < tp.operations.length; inx++) {
-                if(tp.operations[inx].ban) {
+                if(tp.operations[inx].ban)
                     tp.operations.splice(inx, 1)
-                }
             }
         }
-        console.log(tp.operations)
         return tp
     }
 
