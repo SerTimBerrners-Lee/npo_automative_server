@@ -82,6 +82,20 @@ export class DetalService {
         return detal
     }
 
+    async addFileToDetal(dto: any) {
+        if(!dto.files || !dto.detal_id)
+            throw new HttpException('Не удалось добавить файлы к детали', HttpStatus.BAD_REQUEST)
+        if(dto.files.length) {
+            for(let file of dto.files) {
+                let check_document = await this.documentsService.getFileById(file.id)
+                if(check_document) {
+                    check_document.$add('detal', dto.detal_id)
+                    await check_document.save()
+                }
+            }
+        }
+    }
+
     async getDeleteById(id:number) {
         const detal = await this.detalReprository.findByPk(id, {include: {all: true}})
         if(!detal) 

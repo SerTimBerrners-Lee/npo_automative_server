@@ -1,4 +1,4 @@
-import { Body, Controller, Delete, Get, Param, Post, UploadedFiles, UseInterceptors } from '@nestjs/common';
+import { Body, Controller, Delete, Get, Param, Post, Put, UploadedFiles, UseInterceptors } from '@nestjs/common';
 import { FileFieldsInterceptor } from '@nestjs/platform-express';
 import { ApiOperation, ApiTags } from '@nestjs/swagger';
 import { CreateEdizmDto } from './dto/create-edizm.dto';
@@ -179,5 +179,35 @@ export class SettingsController {
     @Get('/materialprovider/:id')
     getAllMaterialProviderById(@Param('id') id: number) {
         return this.settingsService.getAllMaterialProviderById(id)
+    }
+
+    @ApiOperation({summary: 'Получаем резервные копии'})
+    @Get('/db')
+    getAllDB() {
+        return this.settingsService.getAllDB()
+    }
+
+    @ApiOperation({summary: 'Создать новую резервную копию'})
+    @Get('/db/new')
+    newDB() {
+        return this.settingsService.newDB()
+    }
+
+    @ApiOperation({summary: 'Создать новую резервную копию'})
+    @Delete('/db/:name_dump')
+    dropDumpDB(@Param('name_dump') name_dump: string) {
+        return this.settingsService.dropDumpDB(name_dump)
+    }
+
+    @ApiOperation({summary: 'Получить часы бездействия пользователя'})
+    @Get('/inaction')
+    inactionGet() {
+        return this.settingsService.inactionGet()
+    }
+
+    @ApiOperation({summary: 'Задать часы бездействия пользователя'})
+    @Put('/inaction/:hors')
+    inactionChange(@Param('hors') hors: number ) {
+        return this.settingsService.inactionChange(hors)
     }
 }

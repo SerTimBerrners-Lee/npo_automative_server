@@ -7,6 +7,7 @@ import * as path from 'path';
 import * as uuid from 'uuid';
 import { ChangeTypeDto } from './dto/change-type.dto';
 import { Detal } from 'src/detal/detal.model';
+import { UpdateDocumentDto } from './dto/update-document.dto';
 
 @Injectable()
 export class DocumentsService {
@@ -104,6 +105,21 @@ export class DocumentsService {
             throw new HttpException('Не удалось найти деталь или документ', HttpStatus.BAD_REQUEST)
         await document.$add('detals', detal.id)
         await document.save()
+        return document
+    }
+
+    async updateDocuments(dto: UpdateDocumentDto) {
+        const document = await this.documentReprository.findByPk(dto.id)
+        if(document) {
+            if(dto.responsible_user_id)
+                document.responsible_user_id = dto.responsible_user_id
+            document.version = dto.version
+            document.type = dto.type
+            document.name = dto.name
+            document.description = dto.description
+
+            await document.save()
+        }
         return document
     }
 

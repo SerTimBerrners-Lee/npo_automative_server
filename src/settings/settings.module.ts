@@ -4,10 +4,13 @@ import { Operation } from 'src/detal/operation.model';
 import { DocumentsMaterial } from 'src/documents/documents-material.model';
 import { Documents } from 'src/documents/documents.model';
 import { DocumentsModule } from 'src/documents/documents.module';
+import { FilesModule } from 'src/files/files.module';
+import { FilesService } from 'src/files/files.service';
 import { Deliveries } from 'src/provider/deliveries.model';
 import { ProvidersMaterial } from 'src/provider/provider-material.model';
 import { Providers } from 'src/provider/provider.model';
 import { Edizm } from './edizm.model';
+import { Inaction } from './inaction.model';
 import { MatPodMat } from './mat-pod-mat.model';
 import { Material } from './material.model';
 import { NormHors } from './normhors.model';
@@ -28,9 +31,10 @@ import { TypeEdizm } from './type-edizm.model';
       DocumentsMaterial, Documents,
       ProvidersMaterial, Providers,
       Operation, Deliveries,
-      NormHors
+      NormHors, Inaction
     ]),
-    DocumentsModule
+    DocumentsModule, 
+    FilesModule
   ],
   exports: [
     SettingsService

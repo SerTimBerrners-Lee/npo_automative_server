@@ -4,6 +4,7 @@ import { ApiOperation, ApiTags } from '@nestjs/swagger';
 import { DocumentsService } from './documents.service';
 import { ChangeTypeDto } from './dto/change-type.dto';
 import CreateDocumentsDto from './dto/create-documents.dto';
+import { UpdateDocumentDto } from './dto/update-document.dto';
 
 @ApiTags('Документы')
 @Controller('documents')
@@ -23,6 +24,12 @@ export class DocumentsController {
     ]))
     createDocuments(@Body() docs: [], @UploadedFiles() files: { document?: Express.Multer.File[]} ) {
         this.documentService.createArrDocuments(docs, files)
+    }
+
+    @ApiOperation({summary: 'Обновление Документа'})
+    @Post('/update')
+    updateDocuments(@Body() dto: UpdateDocumentDto) {
+        this.documentService.updateDocuments(dto)
     }
 
     @ApiOperation({summary: 'Получение всех документов'})

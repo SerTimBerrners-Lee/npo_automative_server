@@ -2,22 +2,69 @@ import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
 import * as fs from 'fs';
 import * as path from 'path';
 import * as uuid from 'uuid';
+import { opendir } from 'fs/promises';
+const util = require('util');
+const exec = util.promisify(require('child_process').exec);
+
+interface AttrFilesReturn {
+    readonly name: string;
+    readonly date: string;
+    readonly size: string;
+}
+
+const DIR_SCRIPT = '/etc/scripts/pgsql_dump.sh'
+const DIR_BACKUP = '/mnt/backup'
 @Injectable()
 export class FilesService {
 
-    async createFile(file): Promise<string> {
+    async getAllFilesBackup() {
         try{
-            let imgType = file.originalname.split('.')[file.originalname.split('.').length - 1]
-            const fileName = uuid.v4() + '.' + imgType;
-            const filePath = path.resolve(__dirname, '..', 'static/image')
-            if(!fs.existsSync(filePath)) {
-                fs.mkdirSync(filePath,  {recursive: true})
+            const date: Array<AttrFilesReturn> = [];
+
+            const dir = await opendir(DIR_BACKUP)
+            for await (const dirent of dir) {
+                const file = fs.statSync(`${DIR_BACKUP}/${dirent.name}`)
+                const size = String((file.size / (1024*1024)).toFixed(2)) + ' мб'
+                const date_time = String(new Date(file.birthtime).toLocaleString('ru-RU'))
+                date.push({
+                    name: dirent.name,
+                    size: size,
+                    date: date_time
+                })
             }
-            
-            fs.writeFileSync(path.join(filePath, fileName), file.buffer)
-            return String(fileName);
+            return JSON.stringify(date)
         } catch(e) {
             throw new HttpException('Произошла ошибка при записи файла', HttpStatus.INTERNAL_SERVER_ERROR)
+        }
+    }
+
+    async newBackup() {
+        try {
+            if(fs.existsSync(DIR_SCRIPT)) {
+                const { err, exicute } = await exec(`sh ${DIR_SCRIPT}`)
+                console.log("exicute", exicute)
+                console.log('err:', err)
+                console.log(DIR_SCRIPT)
+                return true
+            }
+            return false
+        } catch (e) {
+            throw new HttpException('Произошла ошибка Дириктории не найдено', HttpStatus.INTERNAL_SERVER_ERROR)
+        }
+    }
+
+    async dropDumpDB(dump_name: string) {
+        try {
+            const path = DIR_BACKUP + '/' + dump_name
+            if(fs.existsSync(path)) {
+                fs.unlink(path, (err) => {
+                    if(err)
+                        throw new HttpException('Произошла ошибка Файла не найдено', HttpStatus.INTERNAL_SERVER_ERROR)
+                    return true
+                })
+            }
+        } catch(e) {
+            throw new HttpException('Произошла ошибка Файла не найдено', HttpStatus.INTERNAL_SERVER_ERROR)
         }
     }
 }

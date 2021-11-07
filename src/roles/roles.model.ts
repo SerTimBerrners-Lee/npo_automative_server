@@ -62,6 +62,41 @@ export class Role extends Model<Role, RoleCreationAttrs> {
                 writeYour: true,
                 writeSomeone: true
             },
+            cbedAssets: {
+                read: true,
+                writeYour: true,
+                writeSomeone: true
+            },
+            detalAssets: {
+                read: true,
+                writeYour: true,
+                writeSomeone: true
+            },
+            materialAssets: {
+                read: true,
+                writeYour: true,
+                writeSomeone: true
+            },
+            equipmentAssets: {
+                read: true,
+                writeYour: true,
+                writeSomeone: true
+            },
+            instrumentAssets: {
+                read: true,
+                writeYour: true,
+                writeSomeone: true
+            },
+            providerAssets: {
+                read: true,
+                writeYour: true,
+                writeSomeone: true
+            },
+            buyerAssets: {
+                read: true,
+                writeYour: true,
+                writeSomeone: true
+            },
             basefileAssets: {
                 read: true,
                 writeYour: true,

@@ -57,14 +57,18 @@ export class RolesService {
     }
 
     async updateAssets(dto: UpdateAssetsDto) {
+        console.log(dto)
         const role = await this.roleReprository.findByPk(dto.id);
         if(!role) 
             throw new HttpException('Не удалось найти роль', HttpStatus.NOT_FOUND)
-        
-        role.assets = JSON.stringify(dto.assets)
-        await role.save()
+        try {
+            role.assets = JSON.stringify(dto.assets)
+            await role.save()
+        } catch(e) {
+            console.log(e)
+        }
 
-        return role
+        return dto.assets
     }
     
 }

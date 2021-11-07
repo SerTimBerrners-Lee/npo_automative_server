@@ -4,6 +4,7 @@ import { Op } from 'sequelize';
 import { Documents } from 'src/documents/documents.model';
 import { DocumentsService } from 'src/documents/documents.service';
 import { DateMethods } from 'src/files/date.methods';
+import { FilesService } from 'src/files/files.service';
 import { Deliveries } from 'src/provider/deliveries.model';
 import { Providers } from 'src/provider/provider.model';
 import { CreateEdizmDto } from './dto/create-edizm.dto';
@@ -14,6 +15,7 @@ import { CreateTypeEdizmDto } from './dto/create-type-edizm.dto';
 import { UpdateEdizmDto } from './dto/update-edizm.dto';
 import { UpdateMaterialDto } from './dto/update-material.dto';
 import { Edizm } from './edizm.model';
+import { Inaction } from './inaction.model';
 import { Material } from './material.model';
 import { NormHors } from './normhors.model';
 import { PodMaterial } from './pod-material.model';
@@ -28,10 +30,12 @@ export class SettingsService {
         @InjectModel(PodMaterial) private podMaterialReprository: typeof PodMaterial,
         @InjectModel(PodPodMaterial) private podPodMaterialReprository: typeof PodPodMaterial,
         @InjectModel(Documents) private documentsReprository: typeof Documents,
-        private documentsService: DocumentsService,
         @InjectModel(Providers) private providersReprository: typeof Providers,
         @InjectModel(Deliveries) private deliveriesReprository: typeof Deliveries,
         @InjectModel(NormHors) private normhorsReprository: typeof NormHors,
+        @InjectModel(Inaction) private inactionReprository: typeof Inaction,
+        private documentsService: DocumentsService,
+        private filesService: FilesService,
     ) {}
 
     async createTypeEdizm(dto: CreateTypeEdizmDto) {
@@ -501,5 +505,33 @@ export class SettingsService {
         }
 
         return new_materials
+    }
+
+    async getAllDB() {
+        const all_db = await this.filesService.getAllFilesBackup()
+        return all_db
+    }
+
+    async newDB() {
+        const new_db = await this.filesService.newBackup()
+        return new_db
+    }
+
+    async dropDumpDB(dump_name: string) {
+        const result = await this.filesService.dropDumpDB(dump_name)
+        return result
+    }
+
+    async inactionGet() {
+        return await this.inactionReprository.findOne()
+    }
+
+    async inactionChange(hors: number) {
+        const inaction = await this.inactionGet()
+        if(inaction) {
+            inaction.inaction = hors
+            await inaction.save()
+        }
+        return inaction
     }
 }

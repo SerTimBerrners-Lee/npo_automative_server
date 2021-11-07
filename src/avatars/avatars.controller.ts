@@ -8,10 +8,4 @@ export class AvatarsController {
 
     constructor(private avatarService: AvatarsService) {}
 
-    @Post() 
-    @UseInterceptors(FileInterceptor('image'))
-    createAvatars(@Body() dto: CreateAvatarsDto,
-                @UploadedFile() image) {
-        return this.avatarService.create(dto, image)
-    }
 }

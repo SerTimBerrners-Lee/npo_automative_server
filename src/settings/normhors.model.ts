@@ -22,7 +22,7 @@ export class NormHors extends Model<NormHors> {
     znach: number; 
 
     @AfterSync
-    static async checkEdizm(sync: any) {
+    static async checkNormHors(sync: any) {
       const nch = await sync.sequelize.models.NormHors
       if(!nch)
         return 

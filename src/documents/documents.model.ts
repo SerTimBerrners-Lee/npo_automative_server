@@ -1,4 +1,4 @@
-import { Model, Column, DataType, Table, BelongsToMany, HasMany, ForeignKey } from "sequelize-typescript";
+import { Model, Column, DataType, Table, BelongsToMany, HasMany, ForeignKey, HasOne, BelongsTo } from "sequelize-typescript";
 import { ApiProperty } from "@nestjs/swagger";
 import { User } from "src/users/users.model";
 import { DocumentsUser } from "./documents-user.model";
@@ -79,6 +79,9 @@ export class Documents extends Model<Documents, DocumentsCreationAttrs> {
     @ForeignKey(() => User)
     @Column({type: DataType.INTEGER})
     responsible_user_id: number;
+
+    @BelongsTo(() => User)
+    responible_user: User;
 
     @BelongsToMany(() => Deliveries, () => DocumentsDeliveries)
     deliveries: Deliveries[]

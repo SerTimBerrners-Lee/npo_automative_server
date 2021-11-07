@@ -47,6 +47,12 @@ export class DetalController {
         return this.detalService.updateDetal(dto, files, authHeader)
     }
 
+    @ApiOperation({summary: 'Добавляем файлы к детали'})
+    @Post('/file/')
+    addFileToDetal(@Body() dto: any) {
+        return this.detalService.addFileToDetal(dto)
+    }
+
     @ApiOperation({summary: 'Remove detal by id '})
     @Delete('/:id')
     removeDeleteById(@Request() req: any, @Param('id') id: number, ) {

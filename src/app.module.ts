@@ -96,6 +96,7 @@ import { DocumentsWaybill } from "./documents/documents-waybill.model";
 import { Waybill } from "./provider/waybill.model";
 import { NormHors } from "./settings/normhors.model";
 import { Marks } from "./sclad/marks.model";
+import { Inaction } from "./settings/inaction.model";
 
 @Module({
     controllers: [],
@@ -186,7 +187,8 @@ import { Marks } from "./sclad/marks.model";
                 BuyerCbed,
                 Waybill,
                 NormHors,
-                Marks
+                Marks,
+                Inaction
             ],
             autoLoadModels: true,
           }),
