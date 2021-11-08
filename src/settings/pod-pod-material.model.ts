@@ -17,14 +17,12 @@ import { ProvidersMaterial } from "src/provider/provider-material.model";
 import { Providers } from "src/provider/provider.model";
 import { Material } from "./material.model";
 import { PodMaterial } from "./pod-material.model";
-
 interface PodPodMaterialCreationAttrs {
     name: string;
 }
 
 @Table({tableName: 'pod_pod_material'})
 export class PodPodMaterial extends Model<PodPodMaterial, PodPodMaterialCreationAttrs> {
-
     @ApiProperty({example: '1', description: 'Уникальный идентификатор'})
     @Column({type: DataType.INTEGER, unique: true, autoIncrement: true, primaryKey: true})
     id: number;
@@ -44,6 +42,10 @@ export class PodPodMaterial extends Model<PodPodMaterial, PodPodMaterialCreation
     @ApiProperty({example: 12, description: 'Количество материала необходимо'})
     @Column({type: DataType.INTEGER, defaultValue: 0})
     shipments_kolvo: number; 
+
+    @ApiProperty({example: 12, description: 'Стоимость'})
+    @Column({type: DataType.INTEGER, defaultValue: 0})
+    price: number; 
 
     @ApiProperty({example: '{edizmId: 10, znach: 2}', description: 'Срок поставки'})
     @Column({type: DataType.STRING})
@@ -127,5 +129,4 @@ export class PodPodMaterial extends Model<PodPodMaterial, PodPodMaterialCreation
 
     @BelongsToMany(() => Deliveries, () => DeliveriesMaterial)
     deliveries: Deliveries[]
-
 }    
