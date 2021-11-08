@@ -3,6 +3,7 @@ import * as fs from 'fs';
 import * as path from 'path';
 import * as uuid from 'uuid';
 import { opendir } from 'fs/promises';
+import { DateMethods } from 'src/files/date.methods';
 const util = require('util');
 const exec = util.promisify(require('child_process').exec);
 
@@ -20,6 +21,7 @@ export class FilesService {
     async getAllFilesBackup() {
         try{
             const date: Array<AttrFilesReturn> = [];
+            const comparison = new DateMethods().comparison
 
             const dir = await opendir(DIR_BACKUP)
             for await (const dirent of dir) {
@@ -32,6 +34,17 @@ export class FilesService {
                     date: date_time
                 })
             }
+
+            for(let i = 0; i < date.length; i++) {
+                for(let j = 0; j < date.length; j++) {
+                    if(comparison(date[i].date.split(',')[0], date[j].date.split(',')[0], '>')) {
+                        let copy = date[i]
+                        date[i] = date[j]
+                        date[j] = copy
+                    }
+                }
+            }
+
             return JSON.stringify(date)
         } catch(e) {
             throw new HttpException('Произошла ошибка при записи файла', HttpStatus.INTERNAL_SERVER_ERROR)
