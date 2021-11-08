@@ -34,15 +34,15 @@ export class Operation extends Model<Operation, OperationCreationAttrs> {
     ban: boolean; 
  
     @ApiProperty({example: '1', description: 'Подготовительное время ч'})
-    @Column({type: DataType.INTEGER, defaultValue: 0})
+    @Column({type: DataType.FLOAT, defaultValue: 0})
     preTime: number;
 
     @ApiProperty({example: '1', description: 'Вспомогательное время ч'})
-    @Column({type: DataType.INTEGER, defaultValue: 0})
+    @Column({type: DataType.FLOAT, defaultValue: 0})
     helperTime: number;
 
     @ApiProperty({example: '1', description: 'Основное время  время ч'})
-    @Column({type: DataType.INTEGER, defaultValue: 0})
+    @Column({type: DataType.FLOAT, defaultValue: 0})
     mainTime: number; 
 
     @ApiProperty({example: '1', description: 'Общее число времени время ч'})
