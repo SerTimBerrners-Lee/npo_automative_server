@@ -124,8 +124,8 @@ export class IssueService {
 		}
 
 		await issue.save()
-		return issue
-
+		const save_issue = await this.issueReprository.findByPk(issue.id, {include: {all: true}})
+		return save_issue
 	}
 
 	async getAllIssues() {
