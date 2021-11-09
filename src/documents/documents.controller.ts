@@ -53,8 +53,13 @@ export class DocumentsController {
     @ApiOperation({summary: 'Изменение Типа документа'})
     @Post('/editype')
     changeType(@Body() dto: ChangeTypeDto) {
-        console.log(dto)
         return this.documentService.changeType(dto)
+    }
+
+    @ApiOperation({summary: 'Удалить документ'})
+    @Delete('/delete/:id')
+    deleteDocument(@Param('id') id: number) {
+        return this.documentService.deleteDocument(id)
     }
 
     @ApiOperation({summary: 'Привязываем деталь к документу'})

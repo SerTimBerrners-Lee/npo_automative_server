@@ -123,5 +123,12 @@ export class DocumentsService {
         return document
     }
 
+    async deleteDocument(id: number) {
+        const document = await this.documentReprository.findByPk(id)
+        if(!document)
+            throw new HttpException('Документ не найден', HttpStatus.NOT_FOUND) 
+    
+        return await this.documentReprository.destroy({where: {id : document.id}})
+    }
 
 }

@@ -37,6 +37,7 @@ export class CreatePodPodMaterial {
     readonly areaCrossSectional: string;   
 
     readonly providers: any;
+    readonly file_base: any;
 
 
 }

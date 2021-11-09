@@ -223,7 +223,7 @@ export class SettingsService {
     }
 
     async createAndUpdatePodPodMaterial(dto: CreatePodPodMaterial, files: any) {
-        let podPodMaterial: any
+        let podPodMaterial: any;
 
         if(Number(dto.id)) {
             podPodMaterial = await this.podPodMaterialReprository.findByPk(dto.id)
@@ -388,6 +388,18 @@ export class SettingsService {
                     await podPodMaterial.$add('documents', docId.id)
                 }
                 i++
+            }
+        }
+        if(dto.file_base && dto.file_base != '[]') {
+            try {
+                let pars = JSON.parse(dto.file_base)
+                for(let file of pars) {
+                    const check_files = await this.documentsService.getFileById(file)
+                    if(check_files)
+                        await podPodMaterial.$add('documents', check_files)
+                }
+            }   catch(e) {
+                console.log(e)
             }
         }
         await podPodMaterial.save()

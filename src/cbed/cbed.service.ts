@@ -5,6 +5,7 @@ import { Detal } from 'src/detal/detal.model';
 import { TechProcess } from 'src/detal/tech-process.model';
 import { Documents } from 'src/documents/documents.model';
 import { DocumentsService } from 'src/documents/documents.service';
+import { RemoveDocumentDto } from 'src/files/dto/remove-document.dto';
 import { PodPodMaterial } from 'src/settings/pod-pod-material.model';
 import { User } from 'src/users/users.model';
 import { Cbed } from './cbed.model';
@@ -178,6 +179,17 @@ export class CbedService {
 
     async getOneCbedById(id: number) {
         return await this.cbedReprository.findByPk(id, {include: {all: true}})
+    }
+
+    async removeDocumentCbed(dto: RemoveDocumentDto) {
+        const cbed = await this.cbedReprository.findByPk(dto.id_object, {include: {all: true}})
+        const document = await this.documentsService.getFileById(dto.id_document)
+
+        if(cbed && document) {
+            cbed.$remove('documents', document.id)
+            await cbed.save()
+        }
+        return cbed
     }
 }
  

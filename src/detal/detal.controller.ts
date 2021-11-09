@@ -1,6 +1,7 @@
 import { Body, Controller, Delete, ExecutionContext, Get, HttpException, HttpStatus, Param, Post, Put, Request, UploadedFiles, UseInterceptors } from '@nestjs/common';
 import { FileFieldsInterceptor } from '@nestjs/platform-express';
 import { ApiOperation, ApiTags } from '@nestjs/swagger';
+import { RemoveDocumentDto } from 'src/files/dto/remove-document.dto';
 import { DetalService } from './detal.service';
 import { CreateDetalDto } from './dto/create-detal.dto';
 import { CreateTypeOperation } from './dto/create-type-operation.dto';
@@ -151,5 +152,11 @@ export class DetalController {
     @Delete('/typeoperation/:id')
     deleteTypeOperationById(@Param() id: any) {
         return this.detalService.deleteTypeOperationById(id)
+    }
+    
+    @ApiOperation({summary: 'Открепляем документ от Детали'})
+    @Post('/removedocument/')
+    removeDocumentDetal(@Body() dto: RemoveDocumentDto) {
+        return this.detalService.removeDocumentDetal(dto)
     }
 }

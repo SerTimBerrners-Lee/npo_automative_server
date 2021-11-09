@@ -5,6 +5,7 @@ import { Actions } from 'src/actions/actions.model';
 import { Documents } from 'src/documents/documents.model';
 import { DocumentsService } from 'src/documents/documents.service';
 import { Equipment } from 'src/equipment/equipment.model';
+import { RemoveDocumentDto } from 'src/files/dto/remove-document.dto';
 import { NameInstrument } from 'src/instrument/name-instrument.model';
 import { PodPodMaterial } from 'src/settings/pod-pod-material.model';
 import { User } from 'src/users/users.model';
@@ -522,6 +523,17 @@ export class DetalService {
 
     async findByIdDetal(id: number) {
         return await this.detalReprository.findByPk(id, {include: { all: true }})
+    }
+
+    async removeDocumentDetal(dto: RemoveDocumentDto) {
+        const detal = await this.detalReprository.findByPk(dto.id_object, {include: {all: true}})
+        const document = await this.documentsService.getFileById(dto.id_document)
+
+        if(detal && document) {
+            detal.$remove('documents', document.id)
+            await detal.save()
+        }
+        return detal
     }
 
 }

@@ -1,6 +1,7 @@
 import { Body, Controller, Delete, Get, Param, Post, UploadedFiles, UseInterceptors } from '@nestjs/common';
 import { FileFieldsInterceptor } from '@nestjs/platform-express';
 import { ApiOperation } from '@nestjs/swagger';
+import { RemoveDocumentDto } from 'src/files/dto/remove-document.dto';
 import { CreateProductDto } from './dto/create-product.dto';
 import { ProductService } from './product.service';
 
@@ -46,6 +47,12 @@ export class ProductController {
     @Delete('/:id')
     banProduct(@Param('id') id: number) {
         return this.productService.banProduct(id)
+    }
+
+    @ApiOperation({summary: 'Открепляем документ от Продукта'})
+    @Post('/removedocument/')
+    removeDocumentProduct(@Body() dto: RemoveDocumentDto) {
+        return this.productService.removeDocumentProduct(dto)
     }
 }
  

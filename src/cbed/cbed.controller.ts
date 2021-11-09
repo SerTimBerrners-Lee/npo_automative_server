@@ -1,6 +1,7 @@
 import { Body, Controller, Delete, Get, Param, Post, UploadedFiles, UseInterceptors } from '@nestjs/common';
 import { FileFieldsInterceptor } from '@nestjs/platform-express';
 import { ApiOperation, ApiTags } from '@nestjs/swagger';
+import { RemoveDocumentDto } from 'src/files/dto/remove-document.dto';
 import { CbedService } from './cbed.service';
 import { CreateCbedDto } from './dto/create-cbed.dto';
 
@@ -47,5 +48,11 @@ export class CbedController {
     @Get('/:id')
     getOneCbedById(@Param('id') id: number) {
         return this.cbedService.getOneCbedById(id)
+    }
+
+    @ApiOperation({summary: 'Открепляем документ от Сборочной единицы'})
+    @Post('/removedocument/')
+    removeDocumentCbed(@Body() dto: RemoveDocumentDto) {
+        return this.cbedService.removeDocumentCbed(dto)
     }
 } 

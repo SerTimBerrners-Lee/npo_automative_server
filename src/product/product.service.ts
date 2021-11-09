@@ -5,6 +5,7 @@ import { Detal } from 'src/detal/detal.model';
 import { TechProcess } from 'src/detal/tech-process.model';
 import { Documents } from 'src/documents/documents.model';
 import { DocumentsService } from 'src/documents/documents.service';
+import { RemoveDocumentDto } from 'src/files/dto/remove-document.dto';
 import { PodPodMaterial } from 'src/settings/pod-pod-material.model';
 import { User } from 'src/users/users.model';
 import { CreateProductDto } from './dto/create-product.dto';
@@ -202,5 +203,16 @@ export class ProductService {
 
     async getProductByIdLight(id: number) {
         return await this.productReprository.findByPk(id)
+    }
+
+    async removeDocumentProduct(dto: RemoveDocumentDto) {
+        const product = await this.productReprository.findByPk(dto.id_object, {include: {all: true}})
+        const document = await this.documentsService.getFileById(dto.id_document)
+
+        if(product && document) {
+            product.$remove('documents', document.id)
+            await product.save()
+        }
+        return product
     }
 }
