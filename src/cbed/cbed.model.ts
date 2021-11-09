@@ -20,7 +20,6 @@ import { CbedMaterial } from "./cbed-material.model";
 interface CbedCreationAttrs {
     name: string;
 }
-
 @Table({tableName: 'cbed'})
 export class Cbed extends Model<Cbed, CbedCreationAttrs> {
 
@@ -43,6 +42,10 @@ export class Cbed extends Model<Cbed, CbedCreationAttrs> {
     @ApiProperty({example: 12, description: 'Количество СБ необходимо'})
     @Column({type: DataType.INTEGER, defaultValue: 0})
     shipments_kolvo: number;
+
+    @ApiProperty({example: 1, description: 'Количество Заказаных на сборку'})
+    @Column({type: DataType.INTEGER, defaultValue: 0})
+    assemble_kolvo: number;
 
     @ApiProperty({example: 12, description: 'Срок поставки'})
     @Column({type: DataType.STRING, allowNull: true})

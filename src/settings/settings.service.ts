@@ -196,7 +196,7 @@ export class SettingsService {
     }
 
     async removePodMaterial(id: number) {
-        const result =  this.podMaterialReprository.destroy({where: {id}})
+        const result = this.podMaterialReprository.destroy({where: {id}})
         return result
     }
 
@@ -232,12 +232,9 @@ export class SettingsService {
             podPodMaterial = await this.podPodMaterialReprository.create({ name: dto.name})
             podPodMaterial = await this.podPodMaterialReprository.findByPk(podPodMaterial.id, {include: {all: true}})
         }
-            
         
         await podPodMaterial.save()
-
         const podMaterials = await this.podMaterialReprository.findByPk(dto.podTypeId)
-
         if(!podPodMaterial || !podMaterials) 
             throw new HttpException('Не удалось создать запись ', HttpStatus.BAD_REQUEST)  
 
@@ -354,7 +351,7 @@ export class SettingsService {
 
         await podPodMaterial.save()
 
-        if(!Number(dto.id)) {
+        if(dto.rootParentId) {
             podPodMaterial.podMaterialId = podMaterials.id
             if(dto.rootParentId) { 
                 let material = await this.materialReprository.findByPk(dto.rootParentId)
@@ -423,7 +420,6 @@ export class SettingsService {
 
     async getPodMaterialById(id: number) {
         const podMaterial = await this.podMaterialReprository.findByPk(id, {include: {all:true}})
-        console.log(podMaterial)
         return podMaterial 
     }
 
