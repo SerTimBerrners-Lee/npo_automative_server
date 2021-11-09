@@ -55,7 +55,10 @@ export class AssembleService {
 					}
 				}
 				await this.shipmentsMaterialsForIzd(cbed, dto.kolvo_all)
+				console.log(dto)
 				assemble.cbed_id = cbed.id
+				cbed.assemble_kolvo = cbed.assemble_kolvo + dto.kolvo_all
+				await cbed.save()
 				if(dto.kolvo_all > dto.kolvo_order_byer) {
 					let differenc = Number(dto.kolvo_all) - Number(dto.kolvo_order_byer)
 					if(cbed.listDetal)

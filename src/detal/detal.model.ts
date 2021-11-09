@@ -42,6 +42,10 @@ export class Detal extends Model<Detal, DetalCreationAttrs> {
     @Column({type: DataType.INTEGER, defaultValue: 0})
     shipments_kolvo: number;
 
+    @ApiProperty({example: 12, description: 'Количество деталей на производстве'})
+    @Column({type: DataType.INTEGER, defaultValue: 0})
+    metalloworking_kolvo: number;
+
     @ApiProperty({example: 12, description: 'Срок поставки'})
     @Column({type: DataType.STRING, allowNull: true})
     articl: string; 

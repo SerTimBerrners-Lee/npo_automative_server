@@ -414,7 +414,7 @@ export class SettingsService {
     }
 
     async getPodPodMaterial() {
-        const podPodMaterial = await this.podPodMaterialReprository.findAll({include: {all: true}})
+        const podPodMaterial = await this.podPodMaterialReprository.findAll({where: {ban: false}, include: {all: true}})
         return podPodMaterial
     }
 

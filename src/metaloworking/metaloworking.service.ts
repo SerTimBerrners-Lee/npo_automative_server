@@ -69,6 +69,8 @@ export class MetaloworkingService {
 				}
 
 				metaloworking.detal_id = detal.id
+				detal.metalloworking_kolvo = detal.metalloworking_kolvo = dto.kolvo_all
+				await detal.save()
 				await this.shipmentsMaterialsForDetal(detal, dto.kolvo_all)
 			}
 		}

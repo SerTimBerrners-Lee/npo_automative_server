@@ -16,7 +16,7 @@ export class ShipmentsService {
 		private productService: ProductService,
 		private cbedService: CbedService,
 		private detalService: DetalService,
-		private setitupService: SettingsService) {}
+		private setingsService: SettingsService) {}
 
 	async createShipments(dto: UpCreateShipmentsDto) {
 		const dm = new DateMethods()
@@ -62,23 +62,27 @@ export class ShipmentsService {
 		shipment.list_cbed_detal = ''
 		if(dto.list_cbed_detal && dto.list_cbed_detal != 'null' || dto.list_cbed_detal != '[]') {
 			shipment.list_cbed_detal = dto.list_cbed_detal
-			let list_izd = JSON.parse(dto.list_cbed_detal)
-			for(let izd of list_izd) {
-				if(izd.type == 'cbed') {
-					let izdels = await this.cbedService.findById(izd.obj.id) 
-					if(izdels) {
-						izdels.shipments_kolvo = izdels.shipments_kolvo + Number(izd.kol)
-						await izdels.save()
-						shipment.$add('cbeds', izdels.id)
-					}
-				} else if(izd.type == 'detal') {
-					let izdels = await this.detalService.findByIdDetal(izd.obj.id)
-					if(izdels) {
-						izdels.shipments_kolvo = izdels.shipments_kolvo + Number(izd.kol)
-						await izdels.save()
-						shipment.$add('detals', izdels.id)
+			try {
+				let list_izd = JSON.parse(dto.list_cbed_detal)
+				for(let izd of list_izd) {
+					if(izd.type == 'cbed') {
+						let izdels = await this.cbedService.findById(izd.obj.id) 
+						if(izdels) {
+							izdels.shipments_kolvo = izdels.shipments_kolvo + Number(izd.kol)
+							await izdels.save()
+							shipment.$add('cbeds', izdels.id)
+						}
+					} else if(izd.type == 'detal') {
+							let izdels = await this.detalService.findByIdDetal(izd.obj.id)
+							if(izdels) {
+								izdels.shipments_kolvo = izdels.shipments_kolvo + Number(izd.kol)
+								await izdels.save()
+								shipment.$add('detals', izdels.id)
+							}
 					}
 				}
+			} catch(e) {
+				console.log(e)
 			}
 		}
 
