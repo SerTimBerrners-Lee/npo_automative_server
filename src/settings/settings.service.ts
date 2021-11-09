@@ -226,10 +226,13 @@ export class SettingsService {
         let podPodMaterial: any;
 
         if(Number(dto.id)) {
-            podPodMaterial = await this.podPodMaterialReprository.findByPk(dto.id)
+            podPodMaterial = await this.podPodMaterialReprository.findByPk(dto.id, {include: {all: true}})
             podPodMaterial.name = dto.name
-        } else 
+        } else {
             podPodMaterial = await this.podPodMaterialReprository.create({ name: dto.name})
+            podPodMaterial = await this.podPodMaterialReprository.findByPk(podPodMaterial.id, {include: {all: true}})
+        }
+            
         
         await podPodMaterial.save()
 
@@ -371,6 +374,25 @@ export class SettingsService {
             }
         }
 
+        if(podPodMaterial.documents) {
+            for(let doc of podPodMaterial.documents) {
+                podPodMaterial.$remove('documents', doc.id)
+            }
+        }
+        
+        if(dto.file_base && dto.file_base != '[]') {
+            try {
+                let pars = JSON.parse(dto.file_base)
+                for(let file of pars) {
+                    const check_files = await this.documentsService.getFileById(file)
+                    if(check_files)
+                        await podPodMaterial.$add('documents', check_files)
+                }
+            }   catch(e) {
+                console.log(e)
+            }
+        }
+
         if(dto.docs) {
             let docs: any = Object.values(JSON.parse(dto.docs))
             let i = 0
@@ -388,18 +410,6 @@ export class SettingsService {
                     await podPodMaterial.$add('documents', docId.id)
                 }
                 i++
-            }
-        }
-        if(dto.file_base && dto.file_base != '[]') {
-            try {
-                let pars = JSON.parse(dto.file_base)
-                for(let file of pars) {
-                    const check_files = await this.documentsService.getFileById(file)
-                    if(check_files)
-                        await podPodMaterial.$add('documents', check_files)
-                }
-            }   catch(e) {
-                console.log(e)
             }
         }
         await podPodMaterial.save()

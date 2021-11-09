@@ -23,9 +23,10 @@ export class CbedService {
 
 
     async createNewCbed(dto: CreateCbedDto, files: any) {
-        const cbed = await this.cbedReprository.create({name: dto.name})
-        if(!cbed)
+        const create_cbed = await this.cbedReprository.create({name: dto.name})
+        if(!create_cbed)
             throw new HttpException('Не удалось создать сборочную единицу', HttpStatus.BAD_REQUEST)
+        const cbed = await this.cbedReprository.findByPk(create_cbed.id)
 
         return await this.upCreateCbed(dto, files, cbed)
     }
@@ -133,6 +134,25 @@ export class CbedService {
         if(dto.listCbed) 
             cbed.listCbed = dto.listCbed
         else cbed.listCbed = ''
+
+        if(cbed.documents) {
+            for(let doc of cbed.documents) {
+                cbed.$remove('documents', doc.id)
+            }
+        }
+        
+        if(dto.file_base && dto.file_base != '[]') {
+            try {
+                let pars = JSON.parse(dto.file_base)
+                for(let file of pars) {
+                    const check_files = await this.documentsService.getFileById(file)
+                    if(check_files)
+                        await cbed.$add('documents', check_files)
+                }
+            }   catch(e) {
+                console.log(e)
+            }
+        }
 
         if(dto.docs) {
             let docs: any = Object.values(JSON.parse(dto.docs))

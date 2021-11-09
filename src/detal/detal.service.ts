@@ -205,6 +205,25 @@ export class DetalService {
             }
         }
 
+        if(detal.documents) {
+            for(let doc of detal.documents) {
+                detal.$remove('documents', doc.id)
+            }
+        }
+        
+        if(dto.file_base && dto.file_base != '[]') {
+            try {
+                let pars = JSON.parse(dto.file_base)
+                for(let file of pars) {
+                    const check_files = await this.documentsService.getFileById(file)
+                    if(check_files)
+                        await detal.$add('documents', check_files)
+                }
+            }   catch(e) {
+                console.log(e)
+            }
+        }
+
         if(dto.docs) {
             let docs: any = Object.values(JSON.parse(dto.docs))
             let i = 0

@@ -24,9 +24,10 @@ export class ProductService {
 
 
     async createNewProduct(dto: CreateProductDto, files: any) {
-        const product = await this.productReprository.create({name: dto.name})
-        if(!product)
+        const product_new = await this.productReprository.create({name: dto.name})
+        if(!product_new)
             throw new HttpException('Не удалось создать сборочную единицу', HttpStatus.BAD_REQUEST)
+        const product = await this.productReprository.findByPk(product_new.id)
 
         return await this.upCreateProduct(dto, files, product)
     }
@@ -152,6 +153,25 @@ export class ProductService {
                         await product.save()
                     }
                 }
+            }
+        }
+
+        if(product.documents) {
+            for(let doc of product.documents) {
+                product.$remove('documents', doc.id)
+            }
+        }
+        
+        if(dto.file_base && dto.file_base != '[]') {
+            try {
+                let pars = JSON.parse(dto.file_base)
+                for(let file of pars) {
+                    const check_files = await this.documentsService.getFileById(file)
+                    if(check_files)
+                        await product.$add('documents', check_files)
+                }
+            }   catch(e) {
+                console.log(e)
             }
         }
 
