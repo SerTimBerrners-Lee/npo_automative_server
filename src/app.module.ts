@@ -97,6 +97,8 @@ import { Waybill } from "./provider/waybill.model";
 import { NormHors } from "./settings/normhors.model";
 import { Marks } from "./sclad/marks.model";
 import { Inaction } from "./settings/inaction.model";
+import { LibraryModule } from './library/library.module';
+import { Chapter } from "./library/chapter.model";
 
 @Module({
     controllers: [],
@@ -188,7 +190,8 @@ import { Inaction } from "./settings/inaction.model";
                 Waybill,
                 NormHors,
                 Marks,
-                Inaction
+                Inaction,
+                Chapter
             ],
             autoLoadModels: true,
           }),
@@ -214,6 +217,7 @@ import { Inaction } from "./settings/inaction.model";
         ShipmentsModule,
         AssembleModule,
         MetaloworkingModule,
+        LibraryModule,
     ]
 })
 
