@@ -23,13 +23,13 @@ export class DocumentsController {
         {name: 'document', maxCount: 40}
     ]))
     createDocuments(@Body() docs: [], @UploadedFiles() files: { document?: Express.Multer.File[]} ) {
-        this.documentService.createArrDocuments(docs, files)
+        return this.documentService.createArrDocuments(docs, files)
     }
 
     @ApiOperation({summary: 'Обновление Документа'})
     @Post('/update')
     updateDocuments(@Body() dto: UpdateDocumentDto) {
-        this.documentService.updateDocuments(dto)
+        return this.documentService.updateDocuments(dto)
     }
 
     @ApiOperation({summary: 'Получение всех документов'})

@@ -21,17 +21,25 @@ export class DocumentsService {
     }
 
     async createArrDocuments(arrFolder: [], files: any) {
-        let ars = JSON.parse(Object.values(arrFolder)[0])
-        files.document.forEach((doc, index) => {
-                this.saveDocument(
-                    doc, 
-                    ars[index].nameInstans, 
-                    ars[index].type,
-                    ars[index].version,
-                    ars[index].description,
-                    ars[index].name
+        const NewArrsFile: Array<Documents> = []
+        try {
+            for(let inx in files.document) {
+                const arr = JSON.parse(Object.values(arrFolder)[0])
+                const result = await this.saveDocument(
+                    files.document[inx],
+                    arr[inx].nameInstans,
+                    arr[inx].type,
+                    arr[inx].version,
+                    arr[inx].description,
+                    arr[inx].name
                 )
-        });
+                if(result) NewArrsFile.push(result)
+            }
+            console.log(NewArrsFile)
+            return NewArrsFile
+        } catch(e) {
+            throw new HttpException('', HttpStatus.BAD_GATEWAY)
+        }
     }
 
     async saveDocument(file, nameInstans = '', type = '', version = '', description = '', name = '') {
