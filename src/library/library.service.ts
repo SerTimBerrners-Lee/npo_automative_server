@@ -23,7 +23,8 @@ export class LibraryService {
     }
 
     async getAllChapter() {
-      return await this.chapterReprository.findAll()
+      const chapters = await this.chapterReprository.findAll()
+      return chapters
     }
 
     async deleteChapterById(id: number) {

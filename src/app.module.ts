@@ -99,6 +99,9 @@ import { Marks } from "./sclad/marks.model";
 import { Inaction } from "./settings/inaction.model";
 import { LibraryModule } from './library/library.module';
 import { Chapter } from "./library/chapter.model";
+import { InventaryModule } from './inventary/inventary.module';
+import { PInventary } from "./inventary/inventary-type.model";
+import { PTInventary } from "./inventary/inventary-pt.model";
 
 @Module({
     controllers: [],
@@ -191,7 +194,9 @@ import { Chapter } from "./library/chapter.model";
                 NormHors,
                 Marks,
                 Inaction,
-                Chapter
+                Chapter,
+                PInventary,
+                PTInventary
             ],
             autoLoadModels: true,
           }),
@@ -218,6 +223,7 @@ import { Chapter } from "./library/chapter.model";
         AssembleModule,
         MetaloworkingModule,
         LibraryModule,
+        InventaryModule,
     ]
 })
 
