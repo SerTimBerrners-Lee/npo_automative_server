@@ -67,5 +67,11 @@ export class DocumentsController {
     setDetalForDocument(@Body() dto: any) {
         return this.documentService.setDetalForDocument(dto)
     }
+
+    @ApiOperation({summary: 'Привязываем деталь к документу'})
+    @Put('/convert/pdf/')
+    convertToPng(@Body() path: any) {
+        return this.documentService.convertToPng(path.path)
+    }
 }
  

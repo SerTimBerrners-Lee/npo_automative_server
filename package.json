@@ -34,6 +34,8 @@
     "class-validator": "^0.13.1",
     "cross-env": "^7.0.3",
     "mysql2": "^2.3.0",
+    "pdf-image": "^2.0.0",
+    "pdf-poppler": "^0.2.1",
     "pg": "^8.7.1",
     "pg-hstore": "^2.3.4",
     "reflect-metadata": "^0.1.13",

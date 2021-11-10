@@ -150,4 +150,5 @@ export class ShipmentsService {
 	async getAllShipmentsById(id: number) {
 		return await this.shipmentsReprository.findByPk(id, {include: {all: true}})
 	}
+
 }

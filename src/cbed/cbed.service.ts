@@ -1,6 +1,8 @@
 
 import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
 import { InjectModel } from '@nestjs/sequelize';
+import { Op } from 'sequelize';
+import { all } from 'sequelize/types/lib/operators';
 import { Detal } from 'src/detal/detal.model';
 import { TechProcess } from 'src/detal/tech-process.model';
 import { Documents } from 'src/documents/documents.model';
@@ -211,5 +213,15 @@ export class CbedService {
         }
         return cbed
     }
+
+    async getAllDeficitCbed() {
+		const cbeds = await this.cbedReprository.findAll({include: {all: true}, where: {
+            shipments_kolvo: {
+                [Op.gt]: 0
+            }
+        }})
+
+        return cbeds
+	}
 }
  
