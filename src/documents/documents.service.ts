@@ -8,8 +8,6 @@ import * as uuid from 'uuid';
 import { ChangeTypeDto } from './dto/change-type.dto';
 import { Detal } from 'src/detal/detal.model';
 import { UpdateDocumentDto } from './dto/update-document.dto';
-const PDFImage = require('pdf-image').PDFImage
-
 @Injectable()
 export class DocumentsService {
     constructor(@InjectModel(Documents)
@@ -74,18 +72,6 @@ export class DocumentsService {
         } catch(e) {
             throw new HttpException('Произошла ошибка при записи файла', HttpStatus.INTERNAL_SERVER_ERROR)
         }
-    }
-
-    async convertToPng(paths: string) {
-        const file_path = path.resolve(__dirname, '..', `static/${paths}`)
-        if(file_path) {
-            const result = new PDFImage(file_path, {
-                combinedImage: true
-            })
-            console.log(result)
-            result.convertFile().then(res => console.log(res))
-        }
-        return false
     }
 
     async getAllDocument() {
