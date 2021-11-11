@@ -5,6 +5,7 @@ import { CbedDetals } from "src/cbed/cbed-detals.model";
 import { Cbed } from "src/cbed/cbed.model";
 import { DocumentsDetal } from "src/documents/documents-detal.model";
 import { Documents } from "src/documents/documents.model";
+import { Metaloworking } from "src/metaloworking/metaloworking.model";
 import { ProductDetal } from "src/product/product-detal.model";
 import { Product } from "src/product/product.model";
 import { Sebestoim } from "src/sebestoim/sebestoim.model";
@@ -85,8 +86,13 @@ export class Detal extends Model<Detal, DetalCreationAttrs> {
     @BelongsToMany(() => PodPodMaterial, () => DetalMaterials)
     materials: PodPodMaterial[];
 
+    @ForeignKey(() => PodPodMaterial)
     @Column({type: DataType.INTEGER, allowNull: true})
-    mat_zag: number;
+    mat_zag: number; 
+
+    @BelongsTo(() => PodPodMaterial)
+    mat_za_obj: PodPodMaterial;
+
     @Column({type: DataType.INTEGER, allowNull: true})
     mat_zag_zam: number;
 
@@ -108,6 +114,9 @@ export class Detal extends Model<Detal, DetalCreationAttrs> {
 
     @HasMany(() => Actions)
     actions: Actions[];
+
+    @HasMany(() => Metaloworking)
+    metaloworking: Metaloworking[];
 
     @HasOne(() => Sebestoim)
     sebestoim: Sebestoim;

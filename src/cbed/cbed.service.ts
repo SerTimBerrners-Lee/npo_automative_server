@@ -40,7 +40,7 @@ export class CbedService {
         if(!cbed)
             throw new HttpException('Запись не найдена', HttpStatus.BAD_REQUEST)
         cbed.name = dto.name
-        await cbed.save()
+        await cbed.save() 
 
         return this.upCreateCbed(dto, files, cbed)
     }

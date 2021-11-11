@@ -3,9 +3,12 @@ import { InjectModel } from '@nestjs/sequelize';
 import { Cbed } from 'src/cbed/cbed.model';
 import { CbedService } from 'src/cbed/cbed.service';
 import { DetalService } from 'src/detal/detal.service';
+import { Operation } from 'src/detal/operation.model';
+import { TechProcess } from 'src/detal/tech-process.model';
 import { MetaloworkingService } from 'src/metaloworking/metaloworking.service';
 import { ProductService } from 'src/product/product.service';
 import { SettingsService } from 'src/settings/settings.service';
+import { Shipments } from 'src/shipments/shipments.model';
 import { ShipmentsService } from 'src/shipments/shipments.service';
 import { Assemble } from './assemble.model';
 import { CreateAssembleDto } from './dto/create-assemble.dto';
@@ -23,44 +26,30 @@ export class AssembleService {
 
 	async createAssemble(dto: CreateAssembleDto) {
 		const assemble = await this.assembleReprository
-			.create({...dto})
+			.create({
+				date_order: dto.date_order,
+				description: dto.description
+			})
 		if(!assemble)
 			throw new HttpException('Не удалось отправить в производство', HttpStatus.BAD_GATEWAY)
-	
-		if(dto.shipments_id) {
-			const shipment = await this.shipmentService.getById(dto.shipments_id)
-			if(shipment) {
-				assemble.shipments_id = shipment.id
-				// +  Product
-				if(shipment.productId) {
-					const product = await this.productService.getById(shipment.productId)
-					if(product) {
-						assemble.product_id = product.id
-						await assemble.save()
-					}
-				}
-			}
-		}
+		
+		if(!dto.number_order) 
+			assemble.number_order = String(assemble.id)
+		if(!dto.date_order) assemble.date_order = new Date().toLocaleString('ru-RU').split(',')[0]
+		else assemble.number_order = dto.number_order
 
 		if(dto.cbed_id) { 
 			const cbed = await this.cbedService.findById(dto.cbed_id)
 			if(cbed) {
-				if(cbed.techProcesses) {
-					const tp = await this.detalService.getTechProcessById(cbed.techProcesses.id)
-					if(tp) {
-						assemble.tp_id = tp.id
-						if(tp.operations && tp.operations.length)
-							assemble.operation_id = tp.operations[0].id
-						await assemble.save()
-					}
-				}
-				await this.shipmentsMaterialsForIzd(cbed, dto.kolvo_all)
-				console.log(dto)
+				await this.shipmentsMaterialsForIzd(cbed, dto.my_kolvo)
 				assemble.cbed_id = cbed.id
-				cbed.assemble_kolvo = cbed.assemble_kolvo + dto.kolvo_all
+				if(cbed.techProcesses.id)
+					assemble.tp_id = cbed.techProcesses.id
+				assemble.kolvo_shipments = dto.my_kolvo
+				cbed.assemble_kolvo = cbed.assemble_kolvo + dto.my_kolvo
 				await cbed.save()
-				if(dto.kolvo_all > dto.kolvo_order_byer) {
-					let differenc = Number(dto.kolvo_all) - Number(dto.kolvo_order_byer)
+				if(dto.my_kolvo > dto.shipments_kolvo) {
+					let differenc = Number(dto.my_kolvo) - Number(dto.shipments_kolvo)
 					if(cbed.listDetal)
 						await this.parseDetalJson(cbed.listDetal, differenc)
 					if(cbed.listCbed)
@@ -69,6 +58,7 @@ export class AssembleService {
 			}
 		}
 		
+		await assemble.save()
 		return assemble
 	}
 
@@ -131,14 +121,26 @@ export class AssembleService {
 						await mat_check.save()
 					}
 				}
-			}
+			} 
 		} catch(e) {
 			console.log(e)
 		}
 	}
 
 	async getAllAssemble() {
-		return await this.assembleReprository.findAll({include: {all: true}})
+		return await this.assembleReprository.findAll({include: [ {all: true}, {
+			model: Cbed, 
+			include: ['documents', {
+				model: Shipments, 
+				include: ['product']
+			}]
+		}, {
+			model: TechProcess,
+			include: [{
+				model: Operation, 
+				include: ['marks']
+			}]
+		}]})
 	}
 
 	async getAssembleById(id:number) {
@@ -146,13 +148,18 @@ export class AssembleService {
 	}
 
 	async getAssembleByOperation(op_id: number) {
-		const assembles = await this.assembleReprository.findAll({ include: {all: true}})
-		let arr: Array<Assemble> = []
+		const assembles = await this.getAllAssemble()
+		const arr = []
 		for(let ass of assembles) {
-			if(ass.operation && ass.operation.name == op_id)
-				arr.push(ass)
+			try {
+				for(let operation of ass.tech_process.operations) {
+					if(operation.name == op_id) {
+						const operation_new = {operation, ass}
+						arr.push(operation_new)
+					}
+				}
+			} catch (e) {console.log(e)}
 		}
-
 		return arr
 	}
 }

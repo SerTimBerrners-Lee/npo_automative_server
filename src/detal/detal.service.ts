@@ -1,6 +1,7 @@
 import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
 import { InjectModel } from '@nestjs/sequelize';
 import { isArray } from 'lodash';
+import { Op } from 'sequelize';
 import { Actions } from 'src/actions/actions.model';
 import { Documents } from 'src/documents/documents.model';
 import { DocumentsService } from 'src/documents/documents.service';
@@ -248,7 +249,7 @@ export class DetalService {
                 i++
             }
         }
-
+ 
         await detal.save()
         return detal
     } 
@@ -558,5 +559,15 @@ export class DetalService {
         }
         return detal
     }
+
+    async getAllDeficitDeficit() {
+		const detals = await this.detalReprository.findAll({include: {all: true}, where: {
+            shipments_kolvo: {
+                [Op.gt]: 0
+            }
+        }})
+
+        return detals
+	}
 
 }

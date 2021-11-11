@@ -1,10 +1,11 @@
 import { ApiProperty } from "@nestjs/swagger";
-import { Model, Column, DataType, Table, BelongsToMany, ForeignKey, BelongsTo } from "sequelize-typescript";
+import { Model, Column, DataType, Table, BelongsToMany, ForeignKey, BelongsTo, HasMany } from "sequelize-typescript";
 import { DocumentsOperation } from "src/documents/dociments-operation.model";
 import { Documents } from "src/documents/documents.model";
 import { Equipment } from "src/equipment/equipment.model";
 import { InstrumentOperation } from "src/instrument/instrument-operation.model";
 import { NameInstrument } from "src/instrument/name-instrument.model";
+import { Marks } from "src/sclad/marks.model";
 import { PodPodMaterial } from "src/settings/pod-pod-material.model";
 import { OperationEq } from "./operation-equipment.model";
 import { TechProcess } from "./tech-process.model";
@@ -103,4 +104,7 @@ export class Operation extends Model<Operation, OperationCreationAttrs> {
     
     @BelongsTo(() => TechProcess)
     tech_process: TechProcess;
+
+    @HasMany(() => Marks)
+    marks: Marks[]
 }     

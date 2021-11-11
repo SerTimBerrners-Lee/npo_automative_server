@@ -130,20 +130,16 @@ export class ShipmentsService {
 	async getAllShipmentsAssemble() {
 		const shipments = await this.shipmentsReprository.findAll({include: {all: true}})
 		const assemble: any = []
-		for(let sh of shipments) {
-			if(sh.assemble.length) 
-				assemble.push(sh)
-		}
+		for(let sh of shipments)
+			assemble.push(sh)
 		return assemble
 	}
 
 	async getAllShipmentsMetaloworking() {
 		const shipments = await this.shipmentsReprository.findAll({include: {all: true}})
 		const metaloworking: any = []
-		for(let sh of shipments) {
-			if(sh.metaloworking.length) 
-				metaloworking.push(sh)
-		}
+		for(let sh of shipments) 
+			metaloworking.push(sh)
 		return metaloworking
 	}
 

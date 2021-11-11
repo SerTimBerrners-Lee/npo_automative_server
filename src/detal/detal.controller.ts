@@ -1,4 +1,4 @@
-import { Body, Controller, Delete, ExecutionContext, Get, HttpException, HttpStatus, Param, Post, Put, Request, UploadedFiles, UseInterceptors } from '@nestjs/common';
+import { Body, Controller, Delete, Get, HttpException, HttpStatus, Param, Post, Put, Request, UploadedFiles, UseInterceptors } from '@nestjs/common';
 import { FileFieldsInterceptor } from '@nestjs/platform-express';
 import { ApiOperation, ApiTags } from '@nestjs/swagger';
 import { RemoveDocumentDto } from 'src/files/dto/remove-document.dto';
@@ -15,6 +15,12 @@ import { UpdateTypeOperation } from './dto/update-type-operation.dto';
 @Controller('detal')
 export class DetalController {
     constructor(private detalService: DetalService) {}
+
+    @ApiOperation({summary: 'Получаем все дифицитные детали'})
+    @Get('/deficit')
+    getAllDeficitCbed() {
+        return this.detalService.getAllDeficitDeficit()
+    }
 
     @ApiOperation({summary: 'Получаем все артиклы детали'})
     @Get('/articl')

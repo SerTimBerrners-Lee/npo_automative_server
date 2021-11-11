@@ -1,11 +1,9 @@
 import { ApiProperty } from "@nestjs/swagger";
-import { Model, Column, DataType, Table, ForeignKey, BelongsTo, BelongsToMany, HasMany} from "sequelize-typescript";
-import { Assemble } from "src/assemble/assemble.model";
+import { Model, Column, DataType, Table, ForeignKey, BelongsTo, BelongsToMany} from "sequelize-typescript";
 import { Buyer } from "src/buyer/buyer.model";
 import { Cbed } from "src/cbed/cbed.model";
 import { Detal } from "src/detal/detal.model";
 import { statusShipment } from "src/files/enums";
-import { Metaloworking } from "src/metaloworking/metaloworking.model";
 import { Product } from "src/product/product.model";
 import { PodPodMaterial } from "src/settings/pod-pod-material.model";
 import { ShipmentsCbed } from "./shipments-cbed.model";
@@ -89,10 +87,4 @@ export class Shipments extends Model<Shipments, ShipmentsAttrCreate> {
 
     @BelongsToMany(() => PodPodMaterial, () => ShipmentsMaterial)
     materials: PodPodMaterial[];
-
-    @HasMany(() => Assemble)
-    assemble: Assemble[];
-
-    @HasMany(() => Metaloworking)
-    metaloworking: Metaloworking[];
 }  

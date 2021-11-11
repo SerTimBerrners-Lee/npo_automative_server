@@ -1,6 +1,7 @@
 import { ApiProperty } from "@nestjs/swagger";
 import { Model, Column, DataType, Table, BelongsToMany, HasMany, ForeignKey, BelongsTo, HasOne } from "sequelize-typescript";
 import { Actions } from "src/actions/actions.model";
+import { Assemble } from "src/assemble/assemble.model";
 import { BuyerCbed } from "src/buyer/buyer-cbed.model";
 import { Buyer } from "src/buyer/buyer.model";
 import { Detal } from "src/detal/detal.model";
@@ -103,6 +104,9 @@ export class Cbed extends Model<Cbed, CbedCreationAttrs> {
 
     @HasMany(() => Actions)
     actions: Actions[];
+
+    @HasMany(() => Assemble)
+    assemble: Assemble[];
 
     @HasOne(() => Sebestoim)
     sebestoim: Sebestoim; 
