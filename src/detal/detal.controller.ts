@@ -16,6 +16,12 @@ import { UpdateTypeOperation } from './dto/update-type-operation.dto';
 export class DetalController {
     constructor(private detalService: DetalService) {}
 
+    @ApiOperation({summary: 'Получаем все артиклы детали'})
+    @Get('/articl')
+    getAllDetalArticl() {
+        return this.detalService.getAllDetalArticl()
+    }
+
     @ApiOperation({summary: 'Создаем деталь'})
     @UseInterceptors(FileFieldsInterceptor([
         {name: 'document', maxCount: 40}
@@ -26,7 +32,6 @@ export class DetalController {
         @Body() dto: CreateDetalDto, 
         @UploadedFiles() files: { document?: Express.Multer.File[]} ) {
         const authHeader = req.headers.authorization;
-        console.log(req.headers)
         if(!authHeader)
             throw new  HttpException('Пользователь не зарегестрирован', HttpStatus.BAD_REQUEST)
         return this.detalService.createNewDetal(dto, files, authHeader)
@@ -42,7 +47,6 @@ export class DetalController {
         @Body() dto: UpdateDetalDto, 
         @UploadedFiles() files: { document?: Express.Multer.File[]} ) {
         const authHeader = req.headers.authorization;
-        console.log(req.headers)
         if(!authHeader)
             throw new  HttpException('Пользователь не зарегестрирован', HttpStatus.BAD_REQUEST)
         return this.detalService.updateDetal(dto, files, authHeader)

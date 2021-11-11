@@ -34,7 +34,6 @@ export class DocumentsService {
                 )
                 if(result) NewArrsFile.push(result)
             }
-            console.log(NewArrsFile)
             return NewArrsFile
         } catch(e) {
             throw new HttpException('', HttpStatus.BAD_GATEWAY)
@@ -78,6 +77,10 @@ export class DocumentsService {
         const docsD = this.documentReprository.findAll()
         return docsD
     } 
+
+    async getAllNamesDocuments() {
+        return await this.documentReprository.findAll({attributes: ['name']})
+    }
 
     async getFileById(id:number) {
         return await this.documentReprository.findByPk(id, {include: {all: true}})

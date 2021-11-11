@@ -38,6 +38,12 @@ export class DocumentsController {
         return this.documentService.getAllDocument()
     }
 
+    @ApiOperation({summary: 'Получение наименования документов'})
+    @Get('/names')
+    getAllNamesDocuments() {
+        return this.documentService.getAllNamesDocuments()
+    }
+
     @ApiOperation({summary: 'Перенос файла в архив'})
     @Delete('/:id')
     banFile(@Param('id') id: number) {

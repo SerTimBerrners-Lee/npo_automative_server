@@ -45,6 +45,10 @@ export class CbedService {
         return this.upCreateCbed(dto, files, cbed)
     }
 
+    async getAllCbedArticl() {
+        return await this.cbedReprository.findAll({attributes: ['articl']})
+    }
+
     private async upCreateCbed(dto: any, files: any, cbed: Cbed) {
         cbed.articl = dto.articl
         if(dto.description != 'null')

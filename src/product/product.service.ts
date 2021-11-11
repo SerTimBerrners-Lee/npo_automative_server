@@ -235,4 +235,8 @@ export class ProductService {
         }
         return product
     }
+
+    async getAllProductArticl() {
+        return await this.productReprository.findAll({attributes: ['articl']})
+    }
 }

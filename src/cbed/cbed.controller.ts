@@ -38,6 +38,12 @@ export class CbedController {
         return this.cbedService.getAllCbed()
     }
 
+    @ApiOperation({summary: 'Получаем все артиклы СБ'})
+    @Get('/articl')
+    getAllCbedArticl() {
+        return this.cbedService.getAllCbedArticl()
+    }
+
     @ApiOperation({summary: 'Получаем все дифицитные сборочные единицы'})
     @Get('/deficit')
     getAllDeficitCbed() {

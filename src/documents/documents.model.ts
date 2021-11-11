@@ -15,6 +15,10 @@ import { Issue } from "src/issue/issue.model";
 import { DocumentsIssue } from "./document-issue.model";
 import { Deliveries } from "src/provider/deliveries.model";
 import { DocumentsDeliveries } from "./documents-deliveries.model";
+import { Product } from "src/product/product.model";
+import { DocumentsProduct } from "./documents-product.model";
+import { Cbed } from "src/cbed/cbed.model";
+import { DocumentsCbed } from "./documents-cbed.model";
 
 interface DocumentsCreationAttrs {
     name: string; 
@@ -69,6 +73,12 @@ export class Documents extends Model<Documents, DocumentsCreationAttrs> {
 
     @BelongsToMany(() => Detal, () => DocumentsDetal)
     detals: Detal[]
+
+    @BelongsToMany(() => Product, () => DocumentsProduct)
+    products: Product[];
+
+    @BelongsToMany(() => Cbed, () => DocumentsCbed)
+    cbeds: Cbed[];
 
     @HasMany(() => Actions)
     actions: Actions[];

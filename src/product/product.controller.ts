@@ -31,6 +31,13 @@ export class ProductController {
         return this.productService.updateProduct(dto, files)
     }
 
+    @ApiOperation({summary: 'Получаем все артиклы продукции'})
+    @Get('/articl')
+    getAllProductArticl() {
+        console.log('productArticl')
+        return this.productService.getAllProductArticl()
+    }
+
     @ApiOperation({summary: 'Получаем все Изделия'})
     @Get('/:light')
     getAllProduct(@Param('light') light: string) {

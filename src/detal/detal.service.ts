@@ -105,6 +105,10 @@ export class DetalService {
         return detal
     }
 
+    async getAllDetalArticl() {
+        return await this.detalReprository.findAll({attributes: ['articl']})
+    }
+
     async updateDetal(dto: UpdateDetalDto, files: any, authID: any) {
         const detal = await this.detalReprository.findByPk(dto.id, {include: {all: true}})
         if(!detal)
