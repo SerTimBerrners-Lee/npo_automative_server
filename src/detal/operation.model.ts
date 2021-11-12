@@ -106,5 +106,5 @@ export class Operation extends Model<Operation, OperationCreationAttrs> {
     tech_process: TechProcess;
 
     @HasMany(() => Marks)
-    marks: Marks[]
+    marks: Marks[] 
 }     

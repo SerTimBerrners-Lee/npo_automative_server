@@ -271,9 +271,11 @@ export class DetalService {
     }
 
     async getOneOperationById(id: number) {
-        const operation = await this.operationReprository.findByPk(id, {include: {all: true}})
-        if(id)
-            return operation
+        return await this.operationReprository.findByPk(id, {include: {all: true}})
+    }
+
+    async getAllOperation() {
+        return await this.operationReprository.findAll({include: {all:true}})
     }
 
     private async upAndCreateOperation(dto: UpCreateOperationDto, files: any, operation: any) {
@@ -562,7 +564,7 @@ export class DetalService {
 
     async getAllDeficitDeficit() {
 		const detals = await this.detalReprository.findAll({include: {all: true}, where: {
-            shipments_kolvo: {
+            kolvo_shipments: {
                 [Op.gt]: 0
             }
         }})

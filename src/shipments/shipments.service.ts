@@ -75,7 +75,7 @@ export class ShipmentsService {
 					} else if(izd.type == 'detal') {
 							let izdels = await this.detalService.findByIdDetal(izd.obj.id)
 							if(izdels) {
-								izdels.shipments_kolvo = izdels.shipments_kolvo + Number(izd.kol)
+								izdels.kolvo_shipments = izdels.kolvo_shipments + Number(izd.kol)
 								await izdels.save()
 								shipment.$add('detals', izdels.id)
 							}
