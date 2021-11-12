@@ -102,6 +102,9 @@ import { Chapter } from "./library/chapter.model";
 import { InventaryModule } from './inventary/inventary.module';
 import { PInventary } from "./inventary/inventary-type.model";
 import { PTInventary } from "./inventary/inventary-pt.model";
+import { DocumentsInventary } from "./documents/documents-inventary.model";
+import { ProvidersInventary } from "./provider/providers-inventary.model";
+import { Inventary } from "./inventary/inventary.model";
 
 @Module({
     controllers: [],
@@ -140,6 +143,7 @@ import { PTInventary } from "./inventary/inventary-pt.model";
                 DocumentsDeliveries,
                 DocumentsIssue,
                 DocumentsWaybill,
+                DocumentsInventary,
                 PodPodMaterial,
                 PodMaterial,
                 Edizm,
@@ -195,8 +199,10 @@ import { PTInventary } from "./inventary/inventary-pt.model";
                 Marks,
                 Inaction,
                 Chapter,
+                Inventary,
                 PInventary,
-                PTInventary
+                PTInventary,
+                ProvidersInventary
             ],
             autoLoadModels: true,
           }),

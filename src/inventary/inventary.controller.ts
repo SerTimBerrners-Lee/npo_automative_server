@@ -1,5 +1,7 @@
-import { Body, Controller, Delete, Get, Param, Post, Put } from '@nestjs/common';
+import { Body, Controller, Delete, Get, Param, Post, Put, UploadedFiles, UseInterceptors } from '@nestjs/common';
+import { FileFieldsInterceptor } from '@nestjs/platform-express';
 import { ApiOperation, ApiTags } from '@nestjs/swagger';
+import { CreateInventaryDto } from './dto/create-inventary.dto';
 import { InventaryService } from './inventary.service';
 
 @ApiTags('База Непроизводственной техники и инвентаря') 
@@ -53,5 +55,45 @@ export class InventaryController {
   @Get('/pt/')
   getAllPTInventary() {
     return this.inventaryService.getAllPTInventary()
+  }
+
+  @ApiOperation({summary: 'Получить инвентарь по id '})
+  @Get('/name/:id')
+  getInventaryById(@Param('id') id: number) {
+    return this.inventaryService.getInventaryById(id)
+  }
+
+  @ApiOperation({summary: 'Получить весь инвентарь '})
+  @Get('/name/')
+  getAllInventary() {
+    return this.inventaryService.getAllInventary()
+  }
+
+  @ApiOperation({summary: 'Создать новый инвентарь '})
+  @UseInterceptors(FileFieldsInterceptor([
+    {name: 'document', maxCount: 40}
+  ]))
+  @Post('/name/')
+  createNewInventary(
+    @Body() dto: any, @UploadedFiles() 
+    files: { document?: Express.Multer.File[]}) {
+    return this.inventaryService.createNewInventary(dto, files)
+  }
+
+  @ApiOperation({summary: 'Обновить инвентарь '})
+  @UseInterceptors(FileFieldsInterceptor([
+    {name: 'document', maxCount: 40}
+  ]))
+  @Put('/name/')
+  updateInventary(
+    @Body() dto: any, @UploadedFiles() 
+    files: { document?: Express.Multer.File[]}) {
+    return this.inventaryService.updateInventary(dto, files)
+  }
+  
+  @ApiOperation({summary: 'Удаление наименования'})
+  @Delete('/name/:id')
+  deleteInventaryById(@Param('id') id: number) {
+    return this.inventaryService.deleteInventaryById(id)
   }
 }

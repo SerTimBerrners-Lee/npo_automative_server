@@ -1,6 +1,7 @@
 import { ApiProperty } from "@nestjs/swagger";
-import { Model, Column, DataType, Table, ForeignKey, BelongsTo } from "sequelize-typescript";
+import { Model, Column, DataType, Table, ForeignKey, BelongsTo, HasMany } from "sequelize-typescript";
 import { PInventary } from "./inventary-type.model";
+import { Inventary } from "./inventary.model";
 
 interface AttrCreatePTInventary {
     readonly name: string;
@@ -23,5 +24,8 @@ export class PTInventary extends Model<PTInventary, AttrCreatePTInventary> {
 
     @BelongsTo(() => PInventary)
     parent: PInventary;
+
+    @HasMany(() => Inventary)
+    inventary: Inventary[];
 
 }     

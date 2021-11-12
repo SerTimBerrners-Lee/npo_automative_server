@@ -12,6 +12,7 @@ import { Cbed } from "src/cbed/cbed.model";
 import { Product } from "src/product/product.model";
 import { Buyer } from "src/buyer/buyer.model";
 import { DateMethods } from "src/files/date.methods";
+import { Inventary } from "src/inventary/inventary.model";
 interface ActionsCreationAttrs { 
     action: string
 }
@@ -107,6 +108,13 @@ export class Actions extends Model<Actions, ActionsCreationAttrs> {
 
     @BelongsTo(() => Buyer)
     buyer: Buyer;
+
+    @ForeignKey(() => Inventary)
+    @Column({type: DataType.INTEGER})
+    inventary_id: number;
+
+    @BelongsTo(() => Inventary)
+    inventary: Buyer;
 
 
 

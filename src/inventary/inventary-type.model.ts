@@ -1,6 +1,7 @@
 import { ApiProperty } from "@nestjs/swagger";
 import { Model, Column, DataType, Table,  BelongsToMany, HasMany } from "sequelize-typescript";
 import { PTInventary } from "./inventary-pt.model";
+import { Inventary } from "./inventary.model";
 
 
 @Table({tableName: 'p_inventary', createdAt: false, updatedAt: false})
@@ -15,4 +16,7 @@ export class PInventary extends Model<PInventary> {
 
     @HasMany(() => PTInventary)
     pt_inventary: PTInventary[]
+
+    @HasMany(() => Inventary)
+    inventary: Inventary[];
 }     
