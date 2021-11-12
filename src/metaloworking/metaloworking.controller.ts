@@ -20,6 +20,12 @@ export class MetaloworkingController {
 			return this.metaloworkingService.getOneMetaloworkingById(id)
 	}
 
+	@ApiOperation({summary: 'Получить всю металлообработку'})
+	@Get()
+	getMetolloworking() {
+			return this.metaloworkingService.getMetolloworking()
+	}
+
 	@ApiOperation({summary: 'Получить по ID из металообработки'})
 	@Get('/typeoperation/:op_id')
 	getMetalloworkingByTypeOperation(@Param('op_id') op_id: number) {

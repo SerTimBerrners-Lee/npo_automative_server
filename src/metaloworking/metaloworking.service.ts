@@ -2,8 +2,12 @@ import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
 import { InjectModel } from '@nestjs/sequelize';
 import { Detal } from 'src/detal/detal.model';
 import { DetalService } from 'src/detal/detal.service';
+import { Operation } from 'src/detal/operation.model';
+import { TechProcess } from 'src/detal/tech-process.model';
 import { ProductService } from 'src/product/product.service';
+import { PodPodMaterial } from 'src/settings/pod-pod-material.model';
 import { SettingsService } from 'src/settings/settings.service';
+import { Shipments } from 'src/shipments/shipments.model';
 import { ShipmentsService } from 'src/shipments/shipments.service';
 import { CreateMetaloworkingDto } from './dto/create-metaloworking.dto';
 import { Metaloworking } from './metaloworking.model';
@@ -19,38 +23,32 @@ export class MetaloworkingService {
 
 	async createMetaloworking(dto: CreateMetaloworkingDto) {
 		const metaloworking = await this.metaloworkingReprositroy
-			.create({...dto})
+			.create({
+				date_order: dto.date_order,
+				description: dto.description
+			})
 		if(!metaloworking)
 			throw new HttpException('Не удалось отправить в производство', HttpStatus.BAD_GATEWAY)
 
+		if(!dto.number_order) 
+			metaloworking.number_order = String(metaloworking.id)
+		if(!dto.date_order) metaloworking.date_order = new Date().toLocaleString('ru-RU').split(',')[0]
+		else metaloworking.number_order = dto.number_order
+
 		if(dto.detal_id) {
 			const detal = await this.detalService.findByIdDetal(dto.detal_id)
-			// + Detal
 			if(detal) {
-				// + podPodMaterial  + Material
-				if(detal.mat_zag) {
-					const mat_zag = await this.settingsService.getOnePPT(detal.mat_zag)
-					if(mat_zag) {
-						if(mat_zag.materialsId) {
-							const material = await this.settingsService.getOneMaterial(mat_zag.materialsId)
-							if(material)
-								metaloworking.type_material_id = material.id
-						}
-						
-						metaloworking.pod_pod_material_id = detal.mat_zag
-						await metaloworking.save()
-					}
-				}
-
+				await this.shipmentsMaterialsForDetal(detal, dto.my_kolvo)
 				metaloworking.detal_id = detal.id
-				detal.metalloworking_kolvo = detal.metalloworking_kolvo + dto.kolvo_all
+				if(detal.techProcesses.id)
+					metaloworking.tp_id = detal.techProcesses.id
+				metaloworking.kolvo_shipments = dto.my_kolvo
+				detal.metalloworking_kolvo = detal.metalloworking_kolvo + dto.my_kolvo
 				await detal.save()
-				await this.shipmentsMaterialsForDetal(detal, dto.kolvo_all)
-			}
+			} 
 		}
-
+		await metaloworking.save()
 		return metaloworking
-
 	}
 
 	async shipmentsMaterialsForDetal(detal: Detal, kolvo_all: any) {
@@ -88,17 +86,56 @@ export class MetaloworkingService {
 		}
 	}
 
+	async getMetolloworking() {
+		const metal = await this.metaloworkingReprositroy.findAll({include: [ {all: true}, {
+			model: Detal, 
+			include: ['documents', 'mat_za_obj', {
+				model: Shipments, 
+				include: ['product']
+			}, {
+				model: PodPodMaterial,
+				as: 'mat_za_obj',
+				include: ['material'],
+			}] 
+			}, {
+				model: TechProcess,
+				include: [{
+					model: Operation, 
+					include: ['marks']
+			}]
+		}]})
+
+		for(let obj of metal) {
+			for(let i in obj.tech_process.operations) {
+				for(let j in obj.tech_process.operations) {
+					if(obj.tech_process.operations[i].id < obj.tech_process.operations[j].id) {
+						const ggg = obj.tech_process.operations[i]
+						obj.tech_process.operations[i] = obj.tech_process.operations[j]
+						obj.tech_process.operations[j] = ggg
+					}
+				}
+			}
+		}
+		return metal
+	}
+
 	async getOneMetaloworkingById(id: number) {
 		return await this.metaloworkingReprositroy.findByPk(id, {include: {all: true}})
 	}
 
 	async getMetalloworkingByTypeOperation(op_id: number) {
-		const metaloworkings = await this.metaloworkingReprositroy.findAll({ include: {all: true}})
-		let arr: Array<Metaloworking> = []
+		const metaloworkings = await this.getMetolloworking()
+		const arr = []
 		for(let metal of metaloworkings) {
-			if(metal.operation && metal.operation.name == op_id)
-				arr.push(metal)
-		}
+			try {
+				for(let operation of metal.tech_process.operations) {
+					if(operation.name == op_id) {
+						const operation_new = {operation, metal}
+						arr.push(operation_new)
+					}
+				}
+			} catch (e) {console.log(e)}
+		}	
 
 		return arr
 	}

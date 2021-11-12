@@ -41,7 +41,7 @@ export class Detal extends Model<Detal, DetalCreationAttrs> {
 
     @ApiProperty({example: 12, description: 'Количество деталей необходимо'})
     @Column({type: DataType.INTEGER, defaultValue: 0})
-    shipments_kolvo: number;
+    kolvo_shipments: number;
 
     @ApiProperty({example: 12, description: 'Количество деталей на производстве'})
     @Column({type: DataType.INTEGER, defaultValue: 0})

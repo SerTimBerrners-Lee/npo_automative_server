@@ -50,6 +50,12 @@ export class CbedController {
         return this.cbedService.getAllDeficitCbed()
     }
 
+    @ApiOperation({summary: 'Получаем сборочную единицу по определенному полю'})
+    @Get('/field/:fields/:id')
+    getCbedByField(@Param('fields') fields: string, @Param('id') id: number) {
+        return this.cbedService.getCbedByField(fields, id)
+    }
+
     @ApiOperation({summary: 'Добавить в архив сборочную единицу'})
     @Delete('/:id')
     banCbed(@Param('id') id: number) {

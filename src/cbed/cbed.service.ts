@@ -194,6 +194,17 @@ export class CbedService {
         return await this.cbedReprository.findByPk(id, {include: {all: true}})
     }
 
+    async getCbedByField(field: string, id: number) {
+        console.log(field, id)
+        try {
+            const result = await this.cbedReprository.findByPk(id, {include: [field], attributes: ['id']})
+            return result
+        } catch (e) {
+            console.error(e)
+            return false
+        }
+    }
+
     async banCbed(id: number) {
         const cbed = await this.cbedReprository.findByPk(id)
         if(cbed) {

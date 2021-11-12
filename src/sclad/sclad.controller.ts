@@ -21,6 +21,12 @@ export class ScladController {
         return this.scladService.getDeficit()
     }
 
+    @ApiOperation({summary: 'Получить все марки.'})
+    @Get('/marks')
+    getMarks() {
+        return this.scladService.getMarks()
+    }
+
     @ApiOperation({summary: 'Добавление отметки о выполнении'})
     @Post('/mark')
     createMark(@Body() dto: CreateMarkDto) {

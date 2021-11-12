@@ -118,6 +118,12 @@ export class DetalController {
         return this.detalService.getOneOperationById(id)
     }
 
+    @ApiOperation({summary: 'Получаем все операции'})
+    @Get('/operation/get/')
+    getAllOperation() {
+        return this.detalService.getAllOperation()
+    }
+
     @ApiOperation({summary: 'Обновляем основной инструмент и оборудование'})
     @Post('/operation/up/tech')
     updateOperationTech(@Body() dto: UpOperationTechDto) {

@@ -77,7 +77,7 @@ export class AssembleService {
 					let det_check = await this.detalService.findByIdDetal(detal.det.id)
 					if(det_check) {
 						let deficit = detal.kol * kolvo_all
-						det_check.shipments_kolvo = det_check.shipments_kolvo + deficit
+						det_check.kolvo_shipments = det_check.kolvo_shipments + deficit
 						await det_check.save()
 						await this.metaloworkingService.shipmentsMaterialsForDetal(det_check, deficit)
 					}
@@ -128,7 +128,7 @@ export class AssembleService {
 	}
 
 	async getAllAssemble() {
-		return await this.assembleReprository.findAll({include: [ {all: true}, {
+		const assembly = await this.assembleReprository.findAll({include: [ {all: true}, {
 			model: Cbed, 
 			include: ['documents', {
 				model: Shipments, 
@@ -141,6 +141,20 @@ export class AssembleService {
 				include: ['marks']
 			}]
 		}]})
+
+		for(let obj of assembly) {
+			for(let i in obj.tech_process.operations) {
+				for(let j in obj.tech_process.operations) {
+					if(obj.tech_process.operations[i].id < obj.tech_process.operations[j].id) {
+						const ggg = obj.tech_process.operations[i]
+						obj.tech_process.operations[i] = obj.tech_process.operations[j]
+						obj.tech_process.operations[j] = ggg
+					}
+				}
+			}
+		}
+
+		return assembly
 	}
 
 	async getAssembleById(id:number) {
