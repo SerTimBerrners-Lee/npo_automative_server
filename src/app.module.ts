@@ -105,6 +105,8 @@ import { PTInventary } from "./inventary/inventary-pt.model";
 import { DocumentsInventary } from "./documents/documents-inventary.model";
 import { ProvidersInventary } from "./provider/providers-inventary.model";
 import { Inventary } from "./inventary/inventary.model";
+import { Links } from "./library/links.model";
+import { DocumentsLinks } from "./documents/documents-links.model";
 
 @Module({
     controllers: [],
@@ -144,6 +146,7 @@ import { Inventary } from "./inventary/inventary.model";
                 DocumentsIssue,
                 DocumentsWaybill,
                 DocumentsInventary,
+                DocumentsLinks, 
                 PodPodMaterial,
                 PodMaterial,
                 Edizm,
@@ -202,7 +205,8 @@ import { Inventary } from "./inventary/inventary.model";
                 Inventary,
                 PInventary,
                 PTInventary,
-                ProvidersInventary
+                ProvidersInventary,
+                Links
             ],
             autoLoadModels: true,
           }),

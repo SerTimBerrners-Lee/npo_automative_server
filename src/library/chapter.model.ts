@@ -1,5 +1,6 @@
 import { ApiProperty } from "@nestjs/swagger";
-import { Model, Column, DataType, Table} from "sequelize-typescript";
+import { Model, Column, DataType, Table, HasMany} from "sequelize-typescript";
+import { Links } from "./links.model";
 
 interface ChapterAttrCreate {
   name: string;
@@ -15,4 +16,7 @@ export class Chapter extends Model<Chapter, ChapterAttrCreate> {
     @ApiProperty({example: '1', description: 'Наименование раздела библиотеки'})
     @Column({type: DataType.STRING})
     name: string;
+
+    @HasMany(() => Links)
+    links: Links[];
 }  
