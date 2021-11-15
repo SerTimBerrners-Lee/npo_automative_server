@@ -160,7 +160,7 @@ export class UsersService {
                 order: [
                     ['tabel', 'ASC']
                 ]
-            })
+            }) 
     }
 
     async getUserByPk(id: number) {
@@ -223,5 +223,15 @@ export class UsersService {
                 }
             }
         }
+    }
+
+    async attachFileToUser(user_id: number, file_id: number) {
+        const user = await this.userRepository.findByPk(user_id)
+        const file = await this.documentService.getFileById(file_id)
+  
+        if(user && file) 
+            user.$add('documents', file.id)
+  
+        return file
     }
 }

@@ -1,9 +1,10 @@
 import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
 import { InjectModel } from '@nestjs/sequelize';
-import { ConnectableObservable } from 'rxjs';
 import { Documents } from 'src/documents/documents.model';
 import { DocumentsService } from 'src/documents/documents.service';
+import { EquipmentService } from 'src/equipment/equipment.service';
 import { DateMethods } from 'src/files/date.methods';
+import { InstrumentService } from 'src/instrument/instrument.service';
 import { PodPodMaterial } from 'src/settings/pod-pod-material.model';
 import { SettingsService } from 'src/settings/settings.service';
 import { Deliveries } from './deliveries.model';
@@ -22,14 +23,17 @@ export class ProviderService {
             @InjectModel(Waybill) private waybillReprository: typeof Waybill,
             private settingsService: SettingsService,
             private documentService: DocumentsService,
+            private equipmentService: EquipmentService,
+            private instrumentService: InstrumentService,
     ) {}
 
     async createProvider(dto: CreateProviderDto, files: any) {
         let providers: any
-        if(Number(dto.id)) {
-            providers = await this.providersReprository.findByPk(Number(dto.id))
-        } else {
-            providers = await this.providersReprository.create({ name: dto.name})
+        if(Number(dto.id)) 
+            providers = await this.providersReprository.findByPk(Number(dto.id), {include: {all: true}})
+        else {
+            const new_provider = await this.providersReprository.create({ name: dto.name})
+            providers = await this.providersReprository.findByPk(new_provider.id, {include: {all: true}})
         }
         if(!providers)
             throw new HttpException('Произошла ошибка при добавлении пользователя', HttpStatus.NOT_FOUND)
@@ -77,8 +81,42 @@ export class ProviderService {
                 i++
             }
         }
+
+        if(providers.equipments && providers.equipments.length) {
+            for(let eq of providers.equipments) {
+                providers.$remove('equipments', eq.id)
+            }
+        }
+
+        if(dto.equipmentListId) {
+            try {
+                const id_list = JSON.parse(dto.equipmentListId)
+                if(id_list.length)
+                    for(let eq of id_list) {
+                        const equipment = await this.equipmentService.getOneEquipment(eq)
+                        if(equipment) providers.$add('equipments', equipment.id)
+                    }
+            } catch (e) {console.error(e)}
+        }
+
+        if(providers.nameInstans && providers.nameInstans.length) {
+            for(let instr of providers.nameInstans) {
+                providers.$remove('nameInstans', instr.id)
+            }
+        }
+
+        if(dto.toolListId) {
+            try {
+                const id_list = JSON.parse(dto.toolListId)
+                if(id_list.length)
+                    for(let instr of id_list) {
+                        const instrument = await this.instrumentService.getNameInstrument(instr)
+                        if(instrument) providers.$add('nameInstans', instrument.id)
+                    }
+            } catch (e) {console.error(e)}
+        }
         
-        if(dto.materialList) {
+        if(dto.materialList) { 
             let mat = JSON.parse(dto.materialList)
             if(mat.length) {
                 for(let m of mat) {
@@ -315,5 +353,15 @@ export class ProviderService {
 
     async getAllWaybill() {
         return await this.waybillReprository.findAll({include: {all: true}})
+    }
+
+    async attachFileToProvider(provider_id: number, file_id: number) {
+        const provider = await this.providersReprository.findByPk(provider_id)
+        const file = await this.documentService.getFileById(file_id)
+
+        if(provider && file) 
+            provider.$add('documents', file.id)
+
+        return file
     }
 }

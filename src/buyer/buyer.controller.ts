@@ -9,7 +9,7 @@ export class BuyerController {
     constructor(private buyerService: BuyerService) {}
 
     @ApiOperation({summary: 'Создаем покупателя'})
-    @UseInterceptors(FileFieldsInterceptor([
+    @UseInterceptors(FileFieldsInterceptor([ 
         {name: 'document', maxCount: 40}
     ]))
     @Post('/')
@@ -36,6 +36,12 @@ export class BuyerController {
     @Delete('/:id')
     ban(@Param('id') id: number) { 
         return this.buyerService.ban(id)
+    }
+
+    @ApiOperation({summary: 'Прикрепить файл'})
+    @Get('/files/:buyer_id/:file_id')
+    attachFileToBuyer(@Param('buyer_id') buyer_id: number, @Param('file_id') file_id: number) {
+        return this.buyerService.attachFileToBuyer(buyer_id, file_id)
     }
 }
   

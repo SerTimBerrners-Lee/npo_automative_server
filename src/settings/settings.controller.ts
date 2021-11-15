@@ -210,4 +210,10 @@ export class SettingsController {
     inactionChange(@Param('hors') hors: number ) {
         return this.settingsService.inactionChange(hors)
     }
-}
+
+    @ApiOperation({summary: 'Прикрепить файл'})
+    @Get('/files/:mat_id/:file_id')
+    attachFileToMaterial(@Param('mat_id') mat_id: number, @Param('file_id') file_id: number) {
+        return this.settingsService.attachFileToMaterial(mat_id, file_id)
+    }
+} 

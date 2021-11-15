@@ -17,11 +17,10 @@ export class ProviderController {
     ]))
     @Post('/')
     createProvider(@Body() dto: CreateProviderDto, @UploadedFiles() files: { document?: Express.Multer.File[]} ) {
-        console.log(dto)
         return this.providerService.createProvider(dto, files)
     }
 
-    @Get('/')
+    @Get('/') 
     getProviders() {
         return this.providerService.getProviders()
     }
@@ -72,5 +71,11 @@ export class ProviderController {
     getAllWaybill() {
         return this.providerService.getAllWaybill()
     }
+
+    @ApiOperation({summary: 'Прикрепить файл'})
+    @Get('/files/:provider_id/:file_id')
+    attachFileToProvider(@Param('provider_id') provider_id: number, @Param('file_id') file_id: number) {
+        return this.providerService.attachFileToProvider(provider_id, file_id)
+    }
 }
- 
+  

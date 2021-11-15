@@ -106,4 +106,10 @@ export class EquipmentController {
         return this.equipmentService.getAllEquipment()
     }
 
+    @ApiOperation({summary: 'Прикрепить файл'})
+    @Get('/files/:eq_id/:file_id')
+    attachFileToEquipment(@Param('eq_id') eq_id: number, @Param('file_id') file_id: number) {
+        return this.equipmentService.attachFileToEquipment(eq_id, file_id)
+    } 
+
 }

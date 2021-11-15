@@ -239,4 +239,14 @@ export class ProductService {
     async getAllProductArticl() {
         return await this.productReprository.findAll({attributes: ['articl']})
     }
+
+    async attachFileToProduct(product_id: number, file_id: number) {
+        const product = await this.productReprository.findByPk(product_id)
+        const file = await this.documentsService.getFileById(file_id)
+
+        if(product && file) 
+            product.$add('documents', file.id)
+
+        return file
+    }
 }

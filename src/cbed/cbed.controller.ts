@@ -56,6 +56,12 @@ export class CbedController {
         return this.cbedService.getCbedByField(fields, id)
     }
 
+    @ApiOperation({summary: 'Прикрепить файл'})
+    @Get('/files/:cbed_id/:file_id')
+    attachFileToCbed(@Param('cbed_id') cbed_id: number, @Param('file_id') file_id: number) {
+        return this.cbedService.attachFileToCbed(cbed_id, file_id)
+    }
+
     @ApiOperation({summary: 'Добавить в архив сборочную единицу'})
     @Delete('/:id')
     banCbed(@Param('id') id: number) {
@@ -73,4 +79,4 @@ export class CbedController {
     removeDocumentCbed(@Body() dto: RemoveDocumentDto) {
         return this.cbedService.removeDocumentCbed(dto)
     }
-} 
+}  

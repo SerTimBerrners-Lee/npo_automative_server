@@ -45,10 +45,26 @@ export class LibraryController {
     return this.libraryServices.createNewLinks(dto, files)
 	}
 
+	@ApiOperation({summary: 'Обновляем линк'})
+	@Put('/links')
+	@UseInterceptors(FileFieldsInterceptor([
+		{name: 'document', maxCount: 40}
+	]))
+	updateLink(@Body() dto: CreateLinkDto, 
+		@UploadedFiles() files: { document?: Express.Multer.File[]} ) {
+    return this.libraryServices.updateLink(dto, files)
+	}
+
 	@ApiOperation({summary: 'Получаем все линки'})
 	@Get('/links')
 	getALlLinks() {
 		return this.libraryServices.getALlLinks()
+	}
+
+	@ApiOperation({summary: 'Добавление в избранное'})
+	@Get('/links/favorite/:user_id/:links_id')
+	addLinksToFavorite(@Param('user_id') user_id: number, @Param('links_id') links_id: number) {
+		return this.libraryServices.addLinksToFavorite(user_id, links_id)
 	}
 
 	@ApiOperation({summary: 'Добавляем в бан по id '})

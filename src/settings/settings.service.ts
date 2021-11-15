@@ -552,4 +552,14 @@ export class SettingsService {
         }
         return inaction
     }
+
+    async attachFileToMaterial( mat_id: number, file_id: number) {
+        const mat = await this.podPodMaterialReprository.findByPk(mat_id)
+        const file = await this.documentsService.getFileById(file_id)
+
+        if(mat && file) 
+            mat.$add('documents', file.id)
+
+        return file
+    }
 }

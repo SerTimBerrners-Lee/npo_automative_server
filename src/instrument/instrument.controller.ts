@@ -22,7 +22,7 @@ export class InstrumentController {
 
     @ApiOperation({summary: 'Получить все типы '})
     @Get('/')
-    getAllTInstrument() {
+    getAllTInstrument() { 
         return this.instrumentService.getAllTInstrument()
     }
 
@@ -109,4 +109,11 @@ export class InstrumentController {
     getAllNameInstrument() {
         return this.instrumentService.getAllNameInstrument()
     }
+
+    @ApiOperation({summary: 'Прикрепить файл'})
+    @Get('/files/:instr_id/:file_id')
+    attachFileToInstrument(@Param('instr_id') instr_id: number, @Param('file_id') file_id: number) {
+        return this.instrumentService.attachFileToInstrument(instr_id, file_id)
+    }
 }
+ 

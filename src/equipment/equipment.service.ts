@@ -294,4 +294,14 @@ export class EquipmentService {
     async getAllEquipment() {
         return await this.equipmentReprository.findAll()
     }
+
+    async attachFileToEquipment(eq_id: number, file_id: number) {
+        const equipment = await this.equipmentReprository.findByPk(eq_id)
+        const file = await this.documentsService.getFileById(file_id)
+
+        if(equipment && file) 
+            equipment.$add('documents', file.id)
+
+        return file
+    }
 } 

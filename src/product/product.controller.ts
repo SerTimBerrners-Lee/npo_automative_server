@@ -50,6 +50,12 @@ export class ProductController {
         return this.productService.getProductByIdLight(id)
     }
 
+    @ApiOperation({summary: 'Прикрепить файл'})
+    @Get('/files/:product_id/:file_id')
+    attachFileToProduct(@Param('product_id') product_id: number, @Param('file_id') file_id: number) {
+        return this.productService.attachFileToProduct(product_id, file_id)
+    }
+
     @ApiOperation({summary: 'Добавляем Изделие в Архив'})
     @Delete('/:id')
     banProduct(@Param('id') id: number) {
@@ -62,4 +68,4 @@ export class ProductController {
         return this.productService.removeDocumentProduct(dto)
     }
 }
- 
+  

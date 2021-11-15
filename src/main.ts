@@ -13,7 +13,7 @@ import { AppModule } from "./app.module";
     {
         const config = new DocumentBuilder()
             .setTitle('НПО АВТОМАТИВ')
-            .setDescription('Документация взаимодействия с APi приложения Системы атоматизации производства НПО Автоматив')
+            .setDescription('Документация взаимодействия с APi приложения Системы атоматизации производства НПО Автомотив')
             .setVersion('0.0.1')
             .addTag('NPO')
             .build()

@@ -1,6 +1,7 @@
 import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
 import { InjectModel } from '@nestjs/sequelize';
 import { DocumentsService } from 'src/documents/documents.service';
+import { UsersService } from 'src/users/users.service';
 import { Chapter } from './chapter.model';
 import { CreateChapterDto } from './dto/create-chapter.dto';
 import { CreateLinkDto } from './dto/create-link.dto';
@@ -11,7 +12,8 @@ export class LibraryService {
   constructor(
 		@InjectModel(Chapter) private chapterReprository: typeof Chapter,
     @InjectModel(Links) private linksReprository: typeof Links,
-    private documentsService: DocumentsService
+    private documentsService: DocumentsService,
+    private usersService: UsersService
     ) {}
 
     async createNewChapter(dto: CreateChapterDto) {
@@ -33,6 +35,8 @@ export class LibraryService {
           model: Links, 
           include: [{all: true}]
         }
+      ], order: [
+        ["id", "ASC"]
       ]})
       return chapters
     }
@@ -43,24 +47,22 @@ export class LibraryService {
         return await this.chapterReprository.destroy({where: {id: chapter.id}})
     }
 
-    async createNewLinks(dto: CreateLinkDto, files: any) {
-      const links = await this.linksReprository.create({name: dto.name})
-      if(!links)
-        throw new HttpException('Не удалось создать линк', HttpStatus.BAD_GATEWAY)
+    async updateLink(dto: CreateLinkDto, files: any) {
+      const link = await this.linksReprository.findByPk(dto.id, {include: {all: true}})
+      if(!link)
+        throw new HttpException('Не удалось найти линк', HttpStatus.BAD_GATEWAY)
 
+      link.name = dto.name
+      await link.save()
+
+      return await this.upCreateLink(dto, link, files)
+    }
+
+    private async upCreateLink(dto: CreateLinkDto, links: Links, files: any) {
       if(dto.description != 'null') links.description = dto.description
       else links.description = ''
       if(dto.link != 'null') links.link = dto.link
       else links.link = ''
-      
-      const user = await this.linksReprository.findByPk(dto.user_id)
-      if(user) 
-        links.responsible_id = user.id
-      if(dto.chapter_id) {
-        const chapter = await this.chapterReprository.findByPk(dto.chapter_id)
-        if(chapter) 
-          links.chapter_id = chapter.id
-      }
 
       try {
         const is_link = JSON.parse(dto.is_link)
@@ -90,14 +92,32 @@ export class LibraryService {
         }
       }
 
+      if(dto.chapter_id) {
+        const chapter = await this.chapterReprository.findByPk(dto.chapter_id)
+        if(chapter) 
+          links.chapter_id = chapter.id
+      }
+
 
       await links.save()
       const all_folter_links = await this.linksReprository.findByPk(links.id, {include: {all: true}})
       return all_folter_links
     }
 
+    async createNewLinks(dto: CreateLinkDto, files: any) {
+      const links = await this.linksReprository.create({name: dto.name})
+      if(!links)
+        throw new HttpException('Не удалось создать линк', HttpStatus.BAD_GATEWAY)
+      
+      const user = await this.linksReprository.findByPk(dto.user_id)
+      if(user) 
+        links.responsible_id = user.id
+
+      return await this.upCreateLink(dto, links, files)
+    }
+
     async getALlLinks() {
-      return await this.linksReprository.findAll({include: {all: true}})
+      return await this.linksReprository.findAll({include: {all: true}, order: ["id"]})
     }
 
     async toBanLinks(id: number) {
@@ -109,4 +129,20 @@ export class LibraryService {
       }
     }
 
+    async addLinksToFavorite(user_id: number, links_id: number) {
+      const user = await this.usersService.getUserByPk(user_id)
+      const link = await this.linksReprository.findByPk(links_id, {include: {all: true}})
+
+      if(user && link) {
+        let check: boolean = true
+        for(let usr of link.users) {
+          if(usr.id == user.id) check = false
+        }
+        if(check) return await link.$add('users', user.id)
+        else return await link.$remove('users', user.id)
+      }
+
+
+      throw new HttpException('Не удалось добавить в избранное или убрать из него', HttpStatus.BAD_GATEWAY)
+    }
 }

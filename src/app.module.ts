@@ -107,6 +107,7 @@ import { ProvidersInventary } from "./provider/providers-inventary.model";
 import { Inventary } from "./inventary/inventary.model";
 import { Links } from "./library/links.model";
 import { DocumentsLinks } from "./documents/documents-links.model";
+import { LinksUser } from "./library/links-user.model";
 
 @Module({
     controllers: [],
@@ -206,7 +207,8 @@ import { DocumentsLinks } from "./documents/documents-links.model";
                 PInventary,
                 PTInventary,
                 ProvidersInventary,
-                Links
+                Links,
+                LinksUser
             ],
             autoLoadModels: true,
           }),

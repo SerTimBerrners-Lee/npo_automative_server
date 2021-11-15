@@ -4,6 +4,7 @@ import { DocumentsLinks } from "src/documents/documents-links.model";
 import { Documents } from "src/documents/documents.model";
 import { User } from "src/users/users.model";
 import { Chapter } from "./chapter.model";
+import { LinksUser } from "./links-user.model";
 
 interface LinksCreationAttrs {
     name: string;
@@ -49,6 +50,9 @@ export class Links extends Model<Links, LinksCreationAttrs> {
 
     @BelongsTo(() => Chapter)
     chapter: Chapter; 
+
+    @BelongsToMany(() => User, () => LinksUser)
+    users: User[];
 
     @BelongsToMany(() => Documents, () => DocumentsLinks)
     documents: Documents[];

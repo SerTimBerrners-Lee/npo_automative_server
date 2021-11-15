@@ -9,7 +9,7 @@ import { PInventary } from './inventary-type.model';
 import { Inventary } from './inventary.model';
 
 @Injectable()
-export class InventaryService {
+export class InventaryService { 
   constructor(
     @InjectModel(PInventary) private pInventaryReprository: typeof PInventary,
     @InjectModel(PTInventary) private ptInventaryReprository: typeof PTInventary, 
@@ -177,5 +177,15 @@ export class InventaryService {
       inventary.ban = !inventary.ban
       await inventary.save()
       return inventary
+    }
+
+    async attachFileToInventary(inventary_id: number, file_id: number) {
+      const inventary = await this.inventaryReprository.findByPk(inventary_id)
+      const file = await this.documentsService.getFileById(file_id)
+
+      if(inventary && file) 
+          inventary.$add('documents', file.id)
+
+      return file
     }
 }

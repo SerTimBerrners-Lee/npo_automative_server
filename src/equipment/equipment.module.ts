@@ -37,7 +37,7 @@ import { NodePTPEquipment } from './node_tpt_equipment.model';
         InstrumentModule
     ],
     exports: [
-        EquipmentModule
+        EquipmentService
     ]
 })
 export class EquipmentModule {}

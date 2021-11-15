@@ -12,7 +12,7 @@ export class BuyerService {
         private documentService: DocumentsService
     ) {}
 
-    async createBuyer(dto: CreateBuyerDto, files: any) {
+    async createBuyer(dto: CreateBuyerDto, files: any) { 
         let buyer: any
         if(Number(dto.id)) {
             buyer = await this.buyerReprository.findByPk(Number(dto.id))
@@ -87,6 +87,16 @@ export class BuyerService {
             await buyer.save()
             return buyer
         }
+    }
+
+    async attachFileToBuyer(buyer_id: number, file_id: number) {
+        const buyer = await this.buyerReprository.findByPk(buyer_id)
+        const file = await this.documentService.getFileById(file_id)
+
+        if(buyer && file) 
+            buyer.$add('documents', file.id)
+
+        return file
     }
 }
  

@@ -238,5 +238,15 @@ export class CbedService {
 
         return cbeds
 	}
+
+    async attachFileToCbed(cbed_id: number, file_id: number) {
+        const cbed = await this.cbedReprository.findByPk(cbed_id)
+        const file = await this.documentsService.getFileById(file_id)
+
+        if(cbed && file) 
+            cbed.$add('documents', file.id)
+
+        return file
+    }
 }
  

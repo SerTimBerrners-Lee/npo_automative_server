@@ -16,7 +16,7 @@ import { BanUserDto } from './dto/ban-user.dto';
 import { ValidationPipe } from 'src/pipes/validation.pipe';
 import { FileFieldsInterceptor } from '@nestjs/platform-express';
 import _ from 'lodash'; 
-
+ 
 @ApiTags('Пользователи') 
 @Controller('users')
 export class UsersController { 
@@ -95,8 +95,13 @@ export class UsersController {
     @ApiOperation({summary: 'Получение пользователя по ID'})
     @Get('/:id')
     getUserById(@Param('id') id: number) {
-        console.log(id)
         return this.userService.getUserByPk(id)
+    }
+
+    @ApiOperation({summary: 'Прикрепить файл'})
+    @Get('/files/:user_id/:file_id')
+    attachFileToUser(@Param('user_id') user_id: number, @Param('file_id') file_id: number) {
+        return this.userService.attachFileToUser(user_id, file_id)
     }
 }
  

@@ -251,9 +251,19 @@ export class InstrumentService {
             nameInstrument.ban = !nameInstrument.ban
             await nameInstrument.save()
         }
-    }
+    } 
 
     async getAllNameInstrument() {
         return await this.nameInastrumentReprository.findAll({include: {all: true}})
+    }
+
+    async attachFileToInstrument(instr_id: number, file_id: number) {
+        const instrument = await this.nameInastrumentReprository.findByPk(instr_id)
+        const file = await this.documentsService.getFileById(file_id)
+
+        if(instrument && file) 
+            instrument.$add('documents', file.id)
+
+        return file
     }
 }

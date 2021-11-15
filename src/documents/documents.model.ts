@@ -19,6 +19,12 @@ import { Product } from "src/product/product.model";
 import { DocumentsProduct } from "./documents-product.model";
 import { Cbed } from "src/cbed/cbed.model";
 import { DocumentsCbed } from "./documents-cbed.model";
+import { NameInstrument } from "src/instrument/name-instrument.model";
+import { DocumentsInstrument } from "./documents-instrument.model";
+import { Inventary } from "src/inventary/inventary.model";
+import { DocumentsInventary } from "./documents-inventary.model";
+import { Buyer } from "src/buyer/buyer.model";
+import { DocumentsBuyer } from "./documents-buyer.model";
 
 interface DocumentsCreationAttrs {
     name: string; 
@@ -71,8 +77,17 @@ export class Documents extends Model<Documents, DocumentsCreationAttrs> {
     @BelongsToMany(() => Equipment, () => DocumentsEquipment)
     equipments: Equipment[];
 
+    @BelongsToMany(() => NameInstrument, () => DocumentsInstrument)
+    instrument: NameInstrument[];
+
+    @BelongsToMany(() => Inventary, () => DocumentsInventary)
+    inventary: Inventary[];
+
     @BelongsToMany(() => Detal, () => DocumentsDetal)
     detals: Detal[]
+
+    @BelongsToMany(() => Buyer, () => DocumentsBuyer)
+    buyers: Buyer[]
 
     @BelongsToMany(() => Product, () => DocumentsProduct)
     products: Product[];

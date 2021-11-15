@@ -14,7 +14,7 @@ export class InventaryController {
   createPInventary(@Body() dto: any) {
     return this.inventaryService.createPInventary(dto)
   }
-
+ 
   @ApiOperation({summary: 'Обновление типа '})
   @Put('/')
   updatePInventary(@Body() dto: any) {
@@ -96,4 +96,10 @@ export class InventaryController {
   deleteInventaryById(@Param('id') id: number) {
     return this.inventaryService.deleteInventaryById(id)
   }
-}
+
+  @ApiOperation({summary: 'Прикрепить файл'})
+  @Get('/files/:inventary_id/:file_id')
+  attachFileToInventary(@Param('inventary_id') inventary_id: number, @Param('file_id') file_id: number) {
+      return this.inventaryService.attachFileToInventary(inventary_id, file_id)
+  }
+} 
