@@ -138,6 +138,16 @@ export class DocumentsService {
                 newDocument.$add('users', izdels.id)
             }
         }
+        if(lastDocument.shipments.length) {
+            for(let izdels of lastDocument.shipments) {
+                newDocument.$add('shipments', izdels.id)
+            }
+        }
+        if(lastDocument.issues.length) {
+            for(let izdels of lastDocument.issues) {
+                newDocument.$add('issues', izdels.id)
+            }
+        }
     }
 
     async getAllDocument() {
