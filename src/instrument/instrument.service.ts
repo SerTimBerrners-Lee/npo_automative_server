@@ -160,9 +160,9 @@ export class InstrumentService {
                     docs[i].description,
                     docs[i].name
                 )
-                if(res.id) {
-                    let docId = await this.documentsReprository.findByPk(res.id)
-                    await nameInstrument.$add('documents', docId.id)
+                if(res && res.id) {
+                    const docId = await this.documentsReprository.findByPk(res.id)
+                    if(docId) await nameInstrument.$add('documents', docId.id)
                 }
                 i++
             }
@@ -220,9 +220,9 @@ export class InstrumentService {
                     docs[i].description,
                     docs[i].name
                 )
-                if(res.id) {
-                    let docId = await this.documentsReprository.findByPk(res.id)
-                    await nameInstrument.$add('documents', docId.id)
+                if(res && res.id) {
+                    const docId = await this.documentsReprository.findByPk(res.id)
+                    if(docId) await nameInstrument.$add('documents', docId.id)
                 }
                 i++
             }

@@ -74,9 +74,9 @@ export class ProviderService {
                     docs[i].description,
                     docs[i].name
                 )
-                if(res.id) {
-                    let docId = await this.documentsReprository.findByPk(res.id)
-                    await providers.$add('documents', docId.id)
+                if(res && res.id) {
+                    const docId = await this.documentsReprository.findByPk(res.id)
+                    if(docId) await providers.$add('documents', docId.id)
                 }
                 i++
             }
@@ -205,9 +205,9 @@ export class ProviderService {
                     docs[i].description,
                     docs[i].name
                 )
-                if(res.id) {
-                    let docId = await this.documentsReprository.findByPk(res.id)
-                    await deliveries.$add('documents', docId.id)
+                if(res && res.id) {
+                    const docId = await this.documentsReprository.findByPk(res.id)
+                    if(docId) await deliveries.$add('documents', docId.id)
                 }
                 i++
             }
@@ -338,9 +338,9 @@ export class ProviderService {
                     docs[i].description,
                     docs[i].name
                 )
-                if(res.id) {
-                    let docId = await this.documentsReprository.findByPk(res.id)
-                    await waybill.$add('documents', docId.id)
+                if(res && res.id) {
+                    const docId = await this.documentsReprository.findByPk(res.id)
+                    if(docId) await waybill.$add('documents', docId.id)
                 }
                 i++
             }

@@ -30,8 +30,10 @@ export class DocumentsService {
                     arr[inx].type,
                     arr[inx].version,
                     arr[inx].description,
-                    arr[inx].name
+                    arr[inx].name,
+                    arr[inx].newVersion
                 )
+                if(!result) continue;
                 if(result) NewArrsFile.push(result)
             }
             return NewArrsFile
@@ -40,7 +42,7 @@ export class DocumentsService {
         }
     }
 
-    async saveDocument(file, nameInstans = '', type = '', version = '', description = '', name = '') {
+    async saveDocument(file, nameInstans = '', type = '', version = 1, description = '', name = '', newVersion = false) {
         const imageTypes = ['bmp', 'gif', 'jpg', 'png', 'pds', 'tif', 'odg', 'jpeg', 'eps', 'pict', 'pcx', 'ico', 'svg', 'webp', 'avif']
         let folderToSave = 'doc';
         try {
@@ -57,19 +59,84 @@ export class DocumentsService {
             if(!fs.existsSync(filePath)) {
                 fs.mkdirSync(filePath,  {recursive: true})
             }
+            const findDocuments: Documents = await this.documentReprository.findOne({where: {name: file.originalname}, include: {all: true}})
+            if(newVersion && findDocuments) {
+                findDocuments.banned = true
+                findDocuments.name =  findDocuments.name + '_archive_v' + String(findDocuments.version)
+                await findDocuments.save()
+                version = Number(findDocuments.version) + 1
+            } else if(!newVersion && findDocuments) return false
+            
             fs.writeFileSync(path.join(filePath, pathName), file.buffer)
 
             const document = await this.createDocument({
-                    name: origName,  
-                    path: (folderToSave + '/' + pathName), 
-                    nameInstans: nameInstans,
-                    description: description,
-                    version: version,
-                    type: type
+                name: origName,  
+                path: (folderToSave + '/' + pathName), 
+                nameInstans: nameInstans,
+                description: description,
+                version: version,
+                type: type
             })
+
+            if(newVersion && findDocuments) 
+                await this.reBindingDocuments(findDocuments, document)
+            
             return document
         } catch(e) {
             throw new HttpException('Произошла ошибка при записи файла', HttpStatus.INTERNAL_SERVER_ERROR)
+        }
+    }
+
+    private async reBindingDocuments(lastDocument: Documents, newDocument: Documents) {
+        if(lastDocument.materials.length) {
+            for(let izdels of lastDocument.materials) {
+                newDocument.$add('materials', izdels.id)
+            }
+        }
+        if(lastDocument.cbeds.length) {
+            for(let izdels of lastDocument.cbeds) {
+                newDocument.$add('cbeds', izdels.id)
+            }
+        }
+        if(lastDocument.detals.length) {
+            for(let izdels of lastDocument.detals) {
+                newDocument.$add('detals', izdels.id)
+            }
+        }
+        if(lastDocument.providers.length) {
+            for(let izdels of lastDocument.providers) {
+                newDocument.$add('providers', izdels.id)
+            }
+        }
+        if(lastDocument.instrument.length) {
+            for(let izdels of lastDocument.instrument) {
+                newDocument.$add('instrument', izdels.id)
+            }
+        }
+        if(lastDocument.inventary.length) {
+            for(let izdels of lastDocument.inventary) {
+                newDocument.$add('inventary', izdels.id)
+            }
+        }
+        if(lastDocument.equipments.length) {
+            for(let izdels of lastDocument.equipments) {
+                newDocument.$add('equipments', izdels.id)
+            }
+        }
+        if(lastDocument.products.length) {
+            for(let izdels of lastDocument.products) {
+                newDocument.$add('products', izdels.id)
+            }
+        }
+        if(lastDocument.buyers.length) {
+            for(let izdels of lastDocument.buyers) {
+                newDocument.$add('buyers', izdels.id)
+            }
+        }
+        if(lastDocument.users.length) {
+            for(let izdels of lastDocument.users) {
+                newDocument.$add('users', izdels.id)
+            }
         }
     }
 
@@ -85,7 +152,7 @@ export class DocumentsService {
     async getFileById(id:number) {
         return await this.documentReprository.findByPk(id, {include: {all: true}})
     }
-
+ 
     async banFile(id: number) {
         const documents = await this.documentReprository.findByPk(id)
         if(!documents)

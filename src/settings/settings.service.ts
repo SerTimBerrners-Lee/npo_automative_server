@@ -402,9 +402,9 @@ export class SettingsService {
                     docs[i].description,
                     docs[i].name
                 )
-                if(res.id) {
-                    let docId = await this.documentsReprository.findByPk(res.id)
-                    await podPodMaterial.$add('documents', docId.id)
+                if(res && res.id) {
+                    const docId = await this.documentsReprository.findByPk(res.id)
+                    if(docId) await podPodMaterial.$add('documents', docId.id)
                 }
                 i++
             }

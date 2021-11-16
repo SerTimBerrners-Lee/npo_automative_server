@@ -57,9 +57,9 @@ export class Documents extends Model<Documents, DocumentsCreationAttrs> {
     @Column({type: DataType.STRING, allowNull: true})
     description: string; 
 
-    @ApiProperty({example: '12.02.12', description: 'Версия документа'})
-    @Column({type: DataType.STRING, allowNull: true})
-    version: string; 
+    @ApiProperty({example: 1, description: 'Версия документа'})
+    @Column({type: DataType.INTEGER, defaultValue: 1})
+    version: number; 
 
     @ApiProperty({example: 'false', description: 'Архивация файла'})
     @Column({type: DataType.BOOLEAN, defaultValue: false})

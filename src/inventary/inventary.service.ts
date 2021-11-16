@@ -158,9 +158,9 @@ export class InventaryService {
             docs[i].description,
             docs[i].name
           )
-          if(res.id) {
-            let docId = await this.documentsService.getFileById(res.id)
-            await inventary.$add('documents', docId.id)
+          if(res && res.id) {
+            const docId = await this.documentsService.getFileById(res.id)
+            if(docId) await inventary.$add('documents', docId.id)
           }
           i++
         }

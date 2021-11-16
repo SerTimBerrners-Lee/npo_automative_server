@@ -83,10 +83,9 @@ export class LibraryService {
             docs[i].description,
             docs[i].name
         )
-          if(res.id) {
-            let docId = await this.documentsService.getFileById(res.id)
-            await links.$add('documents', docId.id)
-            await links.save()
+          if(res && res.id) {
+            const docId = await this.documentsService.getFileById(res.id)
+            if(docId) await links.$add('documents', docId.id)
           }
           i++
         }

@@ -10,7 +10,7 @@ export default class CreateDocumentsDto {
     @ApiProperty({example: 'Новая фотография', description: 'Описание документа'})
     readonly description: string;
     @ApiProperty({example: '0.1.1', description: 'Версия документа'})
-    readonly version: string;
+    readonly version: number;
     @ApiProperty({example: 'МД', description: 'Тип документа'})
     readonly type: string;
 }

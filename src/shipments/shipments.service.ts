@@ -82,7 +82,7 @@ export class ShipmentsService {
 					}
 				}
 			} catch(e) {
-				console.log(e)
+				console.error(e)
 			}
 		}
 

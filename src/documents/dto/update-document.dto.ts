@@ -2,7 +2,7 @@
 
 export class UpdateDocumentDto {
   readonly name: string;
-  readonly version: string;
+  readonly version: number;
   readonly type: string;
   readonly responsible_user_id: number;
   readonly id: number;

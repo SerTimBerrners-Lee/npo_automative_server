@@ -172,10 +172,9 @@ export class CbedService {
                     docs[i].description,
                     docs[i].name
                 )
-                if(res.id) {
-                    let docId = await this.documentsReprository.findByPk(res.id)
-                    await cbed.$add('documents', docId.id)
-                    await cbed.save()
+                if(res && res.id) {
+                    const docId = await this.documentsReprository.findByPk(res.id)
+                    if(docId) await cbed.$add('documents', docId.id)
                 }
                 i++
             }

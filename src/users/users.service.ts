@@ -42,8 +42,8 @@ export class UsersService {
         
         if(files.document) {
             for(let file of files.document) {
-                let docks = await this.documentService.saveDocument(file, 'p') 
-                await user.$add('document', docks.id)
+                const docks = await this.documentService.saveDocument(file, 'p') 
+                if(docks) await user.$add('document', docks.id)
             }
         }
 
@@ -131,7 +131,8 @@ export class UsersService {
         if(files.document) {
             for(let file of files.document) {
                 let docks = await this.documentService.saveDocument(file, 'p') 
-                await user.$add('document', docks.id)
+                if(docks)
+                    await user.$add('document', docks.id)
             }
         }
 

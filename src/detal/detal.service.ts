@@ -241,10 +241,12 @@ export class DetalService {
                     docs[i].description,
                     docs[i].name
                 )
-                if(res.id) {
-                    let docId = await this.documentsReprository.findByPk(res.id)
-                    await detal.$add('documents', docId.id)
-                    await detal.save()
+                if(res && res.id) {
+                    const docId = await this.documentsReprository.findByPk(res.id)
+                    if(docId) {
+                        await detal.$add('documents', docId.id)
+                        await detal.save()
+                    }
                 }
                 i++
             }
@@ -383,9 +385,9 @@ export class DetalService {
                     docs[i].description,
                     docs[i].name
                 )
-                if(res.id) {
-                    let docId = await this.documentsReprository.findByPk(res.id)
-                    await operation.$add('documents', docId.id)
+                if(res && res.id) {
+                    const docId = await this.documentsReprository.findByPk(res.id)
+                    if(docId) await operation.$add('documents', docId.id)
                 }
                 i++
             }
@@ -476,9 +478,9 @@ export class DetalService {
                     docs[i].description,
                     docs[i].name
                 )
-                if(res.id) {
-                    let docId = await this.documentsReprository.findByPk(res.id)
-                    await tp.$add('documents', docId.id)
+                if(res && res.id) {
+                    const docId = await this.documentsReprository.findByPk(res.id)
+                    if(docId) await tp.$add('documents', docId.id)
                 }
                 i++
             }

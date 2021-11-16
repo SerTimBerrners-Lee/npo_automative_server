@@ -187,10 +187,10 @@ export class ProductService {
                     docs[i].description,
                     docs[i].name
                 )
-                if(res.id) {
-                    let docId = await this.documentsReprository.findByPk(res.id)
-                    await product.$add('documents', docId.id)
-                    await product.save()
+                if(res && res.id) {
+                    const docId = await this.documentsReprository.findByPk(res.id)
+                    if(docId) await product.$add('documents', docId.id)
+                    
                 }
                 i++
             }

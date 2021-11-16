@@ -36,12 +36,11 @@ export class ScladService {
     }
 
     async createMark(dto: CreateMarkDto) {
-        console.log(dto)
        const mark = await this.marksReprository.create(dto)
         if(!mark) 
             throw new HttpException('Произошла ошибка при добавлении отметки.', HttpStatus.BAD_REQUEST)
 
-        console.log(mark)
+        console.error(mark)
         return mark
     }
 

@@ -52,9 +52,7 @@ export class IssueService {
 			try {
 				let responsible = JSON.parse(dto.sourse)
 				if(responsible) issue.responsibleUserId = responsible.id
-			} catch(e) {
-				console.log(e, "ERROR")
-			}
+			} catch(e) { console.error(e)	}
 		}
 		else issue.sourse = ''
 		if(dto.srok != 'null') issue.srok = dto.srok
@@ -114,11 +112,11 @@ export class IssueService {
 							document, 
 							'p', 
 							'screen',
-							'0.0.1',
 					)
-					if(res.id) {
-							let docId = await this.documentsService.getFileById(res.id)
-							await issue.$add('documents', docId.id)
+					if(res && res.id) {
+							const docId = await this.documentsService.getFileById(res.id)
+							if(docId)
+								await issue.$add('documents', docId.id)
 					}
 			}
 		}

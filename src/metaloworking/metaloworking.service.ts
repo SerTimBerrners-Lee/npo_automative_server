@@ -81,7 +81,7 @@ export class MetaloworkingService {
 					}
 				}
 			} catch(e) {
-				console.log(e)
+				console.error(e)
 			}
 		}
 	}
@@ -134,7 +134,7 @@ export class MetaloworkingService {
 						arr.push(operation_new)
 					}
 				}
-			} catch (e) {console.log(e)}
+			} catch (e) {console.error(e)}
 		}	
 
 		return arr
