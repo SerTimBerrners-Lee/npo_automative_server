@@ -3,6 +3,8 @@ import { Model, Column, DataType, Table, ForeignKey, BelongsTo, BelongsToMany} f
 import { Buyer } from "src/buyer/buyer.model";
 import { Cbed } from "src/cbed/cbed.model";
 import { Detal } from "src/detal/detal.model";
+import { DocumentsShipments } from "src/documents/documents-shipments.mode";
+import { Documents } from "src/documents/documents.model";
 import { statusShipment } from "src/files/enums";
 import { Product } from "src/product/product.model";
 import { PodPodMaterial } from "src/settings/pod-pod-material.model";
@@ -87,4 +89,7 @@ export class Shipments extends Model<Shipments, ShipmentsAttrCreate> {
 
     @BelongsToMany(() => PodPodMaterial, () => ShipmentsMaterial)
     materials: PodPodMaterial[];
+
+    @BelongsToMany(() => Documents, () => DocumentsShipments)
+    documents: DocumentsShipments[];
 }  

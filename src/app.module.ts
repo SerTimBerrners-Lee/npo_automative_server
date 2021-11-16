@@ -108,6 +108,7 @@ import { Inventary } from "./inventary/inventary.model";
 import { Links } from "./library/links.model";
 import { DocumentsLinks } from "./documents/documents-links.model";
 import { LinksUser } from "./library/links-user.model";
+import { DocumentsShipments } from "./documents/documents-shipments.mode";
 
 @Module({
     controllers: [],
@@ -148,6 +149,7 @@ import { LinksUser } from "./library/links-user.model";
                 DocumentsWaybill,
                 DocumentsInventary,
                 DocumentsLinks, 
+                DocumentsShipments,
                 PodPodMaterial,
                 PodMaterial,
                 Edizm,
@@ -208,7 +210,7 @@ import { LinksUser } from "./library/links-user.model";
                 PTInventary,
                 ProvidersInventary,
                 Links,
-                LinksUser
+                LinksUser,
             ],
             autoLoadModels: true,
           }),
