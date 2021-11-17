@@ -17,7 +17,7 @@ import { ProductMaterial } from "./product-material.model";
 interface ProductCreationAttrs {
     name: string;
 }
-
+ 
 @Table({tableName: 'product'})
 export class Product extends Model<Product, ProductCreationAttrs> {
 
@@ -36,6 +36,10 @@ export class Product extends Model<Product, ProductCreationAttrs> {
     @ApiProperty({example: 12, description: 'Количество Продукции на складе'})
     @Column({type: DataType.INTEGER, defaultValue: 0})
     product_kolvo: number; 
+
+    @ApiProperty({example: 12, description: 'Количество Продукции Заказано'})
+    @Column({type: DataType.INTEGER, defaultValue: 0})
+    shipments_kolvo: number;
 
     @ApiProperty({example: 12, description: 'Срок поставки'})
     @Column({type: DataType.STRING, allowNull: true})

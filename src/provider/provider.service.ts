@@ -164,7 +164,7 @@ export class ProviderService {
         deliveries.number_check = dto.number_check
         deliveries.count = dto.count
         deliveries.nds = dto.nds
-        deliveries.product = dto.material_list
+        deliveries.product = dto.material_lists
         deliveries.date_shipments = dto.date_shipments
         
         if(dto.description !== 'null') deliveries.description = dto.description
@@ -182,8 +182,8 @@ export class ProviderService {
             }
         }
 
-        if(dto.material_list) {
-            let mat = JSON.parse(dto.material_list)
+        if(dto.material_lists) {
+            let mat = JSON.parse(dto.material_lists)
             if(mat.length) {
                 for(let m of mat) {
                     let check = await this.podPodMaterialReprository.findByPk(m.id)
@@ -262,8 +262,6 @@ export class ProviderService {
         for(let com of coming) {
             try {
                 let pars = JSON.parse(com.product)
-                console.log(pars)
-                console.log(product)
                 for(let inx = 0; inx < pars.length; inx++) {
                     if(pars[inx].art == product.art && pars[inx].id == product.id) {
                         pars = pars.slice(inx, 0)
@@ -272,7 +270,7 @@ export class ProviderService {
                 com.product = JSON.stringify(pars)
                 await com.save()
             } catch(e) {
-                console.log(e)
+                console.error(e)
             }
         }
     }

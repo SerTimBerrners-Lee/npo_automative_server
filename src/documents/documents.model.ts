@@ -1,4 +1,4 @@
-import { Model, Column, DataType, Table, BelongsToMany, HasMany, ForeignKey, HasOne, BelongsTo } from "sequelize-typescript";
+import { Model, Column, DataType, Table, BelongsToMany, HasMany, ForeignKey, BelongsTo } from "sequelize-typescript";
 import { ApiProperty } from "@nestjs/swagger";
 import { User } from "src/users/users.model";
 import { DocumentsUser } from "./documents-user.model";
@@ -25,6 +25,8 @@ import { Inventary } from "src/inventary/inventary.model";
 import { DocumentsInventary } from "./documents-inventary.model";
 import { Buyer } from "src/buyer/buyer.model";
 import { DocumentsBuyer } from "./documents-buyer.model";
+import { Shipments } from "src/shipments/shipments.model";
+import { DocumentsShipments } from "./documents-shipments.mode";
 
 interface DocumentsCreationAttrs {
     name: string; 
@@ -104,10 +106,13 @@ export class Documents extends Model<Documents, DocumentsCreationAttrs> {
     @ForeignKey(() => User)
     @Column({type: DataType.INTEGER})
     responsible_user_id: number;
-
+ 
     @BelongsTo(() => User)
     responible_user: User;
 
     @BelongsToMany(() => Deliveries, () => DocumentsDeliveries)
     deliveries: Deliveries[]
+
+    @BelongsToMany(() => Shipments, () => DocumentsShipments)
+    shipments: Shipments[]
 } 

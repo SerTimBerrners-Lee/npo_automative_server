@@ -109,7 +109,7 @@ import { Links } from "./library/links.model";
 import { DocumentsLinks } from "./documents/documents-links.model";
 import { LinksUser } from "./library/links-user.model";
 import { DeliveriesInstrument } from "./provider/deliveries-instrument.model";
-
+import { DocumentsShipments } from "./documents/documents-shipments.mode";
 @Module({
     controllers: [],
     providers: [],
@@ -149,6 +149,7 @@ import { DeliveriesInstrument } from "./provider/deliveries-instrument.model";
                 DocumentsWaybill,
                 DocumentsInventary,
                 DocumentsLinks, 
+                DocumentsShipments,
                 PodPodMaterial,
                 PodMaterial,
                 Edizm,
@@ -210,7 +211,7 @@ import { DeliveriesInstrument } from "./provider/deliveries-instrument.model";
                 PTInventary,
                 ProvidersInventary,
                 Links,
-                LinksUser
+                LinksUser,
             ],
             autoLoadModels: true,
           }),

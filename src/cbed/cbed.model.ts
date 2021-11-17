@@ -99,6 +99,10 @@ export class Cbed extends Model<Cbed, CbedCreationAttrs> {
     @BelongsTo(() => User)
     user: User;
 
+    @ForeignKey(() => Assemble)
+    @Column({type: DataType.INTEGER})
+    assemble_id: number;
+
     @BelongsToMany(() => Product, () => ProductCbed)
     products: Product[];
 
