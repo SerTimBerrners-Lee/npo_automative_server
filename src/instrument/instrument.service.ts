@@ -1,6 +1,7 @@
 import { ConsoleLogger, HttpException, HttpStatus, Injectable } from '@nestjs/common';
 import { InjectModel } from '@nestjs/sequelize';
 import { of } from 'rxjs';
+import { Op } from 'sequelize';
 import { Documents } from 'src/documents/documents.model';
 import { DocumentsService } from 'src/documents/documents.service';
 import { Providers } from 'src/provider/provider.model';
@@ -265,5 +266,17 @@ export class InstrumentService {
             instrument.$add('documents', file.id)
 
         return file
+    }
+
+    async getDeficitInstruments() {
+        const materials = await this.nameInastrumentReprository.findAll({include: {all: true},
+            where: {
+                shipments_kolvo: {
+                    [Op.ne]: 0
+                }
+            }
+        });
+        
+        return materials
     }
 }

@@ -115,5 +115,11 @@ export class InstrumentController {
     attachFileToInstrument(@Param('instr_id') instr_id: number, @Param('file_id') file_id: number) {
         return this.instrumentService.attachFileToInstrument(instr_id, file_id)
     }
+
+    @ApiOperation({summary: 'Получаем Дефицит инструмента'})
+    @Get('/instrumentdeficit/')
+    getDeficitInstruments() {
+        return this.instrumentService.getDeficitInstruments()
+    }
 }
  

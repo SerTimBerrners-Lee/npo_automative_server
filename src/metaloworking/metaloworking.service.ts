@@ -52,10 +52,15 @@ export class MetaloworkingService {
 	}
 
 	async shipmentsMaterialsForDetal(detal: Detal, kolvo_all: any) {
-		console.log(detal)
 		if(detal.mat_zag) {
 			const mat_zag = await this.settingsService.getOnePPT(detal.mat_zag)
 			if(mat_zag) {
+				try{
+					const pars_ez = JSON.parse(mat_zag.ez_kolvo)
+					pars_ez.c1_kolvo.shipments_kolvo = Number(pars_ez.c1_kolvo.shipments_kolvo) + (1* kolvo_all)
+					mat_zag.ez_kolvo = JSON.stringify(pars_ez)
+				} catch(e) {console.error(e)}
+
 				mat_zag.shipments_kolvo = mat_zag.shipments_kolvo + (1 * kolvo_all)
 				await mat_zag.save()
 			}
@@ -63,6 +68,13 @@ export class MetaloworkingService {
 		if(detal.mat_zag_zam) {
 			const mat_zag_zam = await this.settingsService.getOnePPT(detal.mat_zag_zam)
 			if(mat_zag_zam) {
+				try{
+					const pars_ez = JSON.parse(mat_zag_zam.ez_kolvo)
+					pars_ez.c1_kolvo.shipments_kolvo = Number(pars_ez.c1_kolvo.shipments_kolvo) + (1* kolvo_all)
+					mat_zag_zam.ez_kolvo = JSON.stringify(pars_ez)
+				} catch(e) {console.error(e)}
+
+
 				mat_zag_zam.shipments_kolvo = mat_zag_zam.shipments_kolvo + (1 * kolvo_all)
 				await mat_zag_zam.save()
 			}
@@ -75,6 +87,19 @@ export class MetaloworkingService {
 					for(let material of pars_mat) {
 						let mat_check = await this.settingsService.getOnePPT(material.mat.id)
 						if(mat_check) {
+							try {
+								const pars_ez = JSON.parse(mat_check.ez_kolvo)
+								if(material.ez) {
+									if(material.ez == 1) pars_ez.c1_kolvo.shipments_kolvo = Number(pars_ez.c1_kolvo.shipments_kolvo) + (Number(material.kol) * kolvo_all)
+									if(material.ez == 2) pars_ez.c2_kolvo.shipments_kolvo = Number(pars_ez.c2_kolvo.shipments_kolvo) + (Number(material.kol) * kolvo_all)
+									if(material.ez == 3) pars_ez.c3_kolvo.shipments_kolvo = Number(pars_ez.c3_kolvo.shipments_kolvo) + (Number(material.kol) * kolvo_all)
+									if(material.ez == 4) pars_ez.c4_kolvo.shipments_kolvo = Number(pars_ez.c4_kolvo.shipments_kolvo) + (Number(material.kol) * kolvo_all)
+									if(material.ez == 5) pars_ez.c5_kolvo.shipments_kolvo = Number(pars_ez.c5_kolvo.shipments_kolvo) + (Number(material.kol) * kolvo_all)
+								}
+
+								mat_check.ez_kolvo = JSON.stringify(pars_ez)
+							} catch(e) { console.error(e) }
+
 							mat_check.shipments_kolvo = mat_check.shipments_kolvo + (material.kol * kolvo_all)
 							await mat_check.save()
 						}

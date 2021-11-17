@@ -108,6 +108,7 @@ import { Inventary } from "./inventary/inventary.model";
 import { Links } from "./library/links.model";
 import { DocumentsLinks } from "./documents/documents-links.model";
 import { LinksUser } from "./library/links-user.model";
+import { DeliveriesInstrument } from "./provider/deliveries-instrument.model";
 
 @Module({
     controllers: [],
@@ -179,6 +180,8 @@ import { LinksUser } from "./library/links-user.model";
                 Issue,
                 IssueUser,
                 Deliveries,
+                DeliveriesMaterial,
+                DeliveriesInstrument,
                 Cbed,
                 Product,
                 Buyer,
@@ -196,7 +199,6 @@ import { LinksUser } from "./library/links-user.model";
                 ProductDetal,
                 Assemble,
                 Metaloworking,
-                DeliveriesMaterial,
                 BuyerCbed,
                 Waybill,
                 NormHors,

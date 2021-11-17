@@ -31,6 +31,14 @@ export class Equipment extends Model<Equipment, EquipmentCreationAttrs> {
     @Column({type: DataType.BOOLEAN, defaultValue: false})
     ban: boolean; 
 
+    @ApiProperty({example: 12, description: 'Количество материала на складе'})
+    @Column({type: DataType.INTEGER, defaultValue: 0})
+    equipment_kolvo: number; 
+
+    @ApiProperty({example: 12, description: 'Количество материала необходимо'})
+    @Column({type: DataType.INTEGER, defaultValue: 0})
+    shipments_kolvo: number; 
+
     @ApiProperty({example: 12, description: 'Срок поставки'})
     @Column({type: DataType.STRING, allowNull: true})
     deliveryTime: string; 
