@@ -56,6 +56,4 @@ export class Material extends Model<Material, MaterialCreationAttrs> {
 
     @HasMany(() => PodPodMaterial)
     podPodMaterials: PodPodMaterial[]
-
-
 }    

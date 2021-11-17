@@ -110,6 +110,9 @@ import { DocumentsLinks } from "./documents/documents-links.model";
 import { LinksUser } from "./library/links-user.model";
 import { DeliveriesInstrument } from "./provider/deliveries-instrument.model";
 import { DocumentsShipments } from "./documents/documents-shipments.mode";
+import { MovingModule } from './moving/moving.module';
+import { Moving } from "./moving/moving.model";
+import { DocumentsMoving } from "./documents/documents-moving.model";
 @Module({
     controllers: [],
     providers: [],
@@ -150,6 +153,7 @@ import { DocumentsShipments } from "./documents/documents-shipments.mode";
                 DocumentsInventary,
                 DocumentsLinks, 
                 DocumentsShipments,
+                DocumentsMoving,
                 PodPodMaterial,
                 PodMaterial,
                 Edizm,
@@ -212,6 +216,7 @@ import { DocumentsShipments } from "./documents/documents-shipments.mode";
                 ProvidersInventary,
                 Links,
                 LinksUser,
+                Moving
             ],
             autoLoadModels: true,
           }),
@@ -239,6 +244,7 @@ import { DocumentsShipments } from "./documents/documents-shipments.mode";
         MetaloworkingModule,
         LibraryModule,
         InventaryModule,
+        MovingModule,
     ]
 })
 
