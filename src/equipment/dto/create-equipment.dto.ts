@@ -11,4 +11,5 @@ export class CreateEquipmentDto {
     readonly providers: string;
     readonly instrumentIdList: any;
     readonly rootParentId: number;
+    readonly attention: boolean;
 }

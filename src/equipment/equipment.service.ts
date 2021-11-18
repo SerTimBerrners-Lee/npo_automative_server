@@ -121,6 +121,8 @@ export class EquipmentService {
             if(user) 
                 equipment.responsibleId = user.id
         }  
+
+        equipment.attention = dto.attention
         
         await equipment.save()
 
@@ -214,6 +216,8 @@ export class EquipmentService {
             if(user) 
                 equipment.responsibleId = user.id
         }
+
+        equipment.attention = dto.attention
 
         await equipment.save()
 

@@ -122,6 +122,7 @@ export class InstrumentService {
             nameInstrument.mountUsed = dto.mountUsed
         else 
             nameInstrument.mountUsed = ''
+        nameInstrument.attention = dto.attention
 
         if(dto.providers) {
             let providers = JSON.parse(dto.providers)
@@ -196,6 +197,7 @@ export class InstrumentService {
             nameInstrument.mountUsed = dto.mountUsed
         else 
             nameInstrument.mountUsed = ''
+        nameInstrument.attention = dto.attention
 
         await nameInstrument.save()
 

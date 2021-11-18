@@ -50,10 +50,14 @@ export class Detal extends Model<Detal, DetalCreationAttrs> {
     @ApiProperty({example: 12, description: 'Срок поставки'})
     @Column({type: DataType.STRING, allowNull: true})
     articl: string; 
-
+ 
     @ApiProperty({example: 12, description: 'Срок поставки'})
     @Column({type: DataType.STRING, allowNull: true})
     description: string; 
+
+    @ApiProperty({example: false, description: 'Выделяет на фоне остальных'})
+    @Column({type: DataType.BOOLEAN, defaultValue: false})
+    attention: boolean;
 
     @ApiProperty({example: 12, description: 'Параметры - норма времени на изготовление'})
     @Column({type: DataType.TEXT, allowNull: true})

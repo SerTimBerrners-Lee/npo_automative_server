@@ -11,4 +11,5 @@ export class CreateProviderDto {
     readonly materialList:      any;
     readonly toolListId:        any;
     readonly equipmentListId:   any;
+    readonly attention:         boolean;
 }

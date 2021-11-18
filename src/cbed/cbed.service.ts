@@ -59,6 +59,7 @@ export class CbedService {
             cbed.parametrs = dto.parametrs
         if(dto.haracteriatic)
             cbed.haracteriatic = dto.haracteriatic
+        cbed.attention = dto.attention
 
         if(Number(dto.responsible)) {
             const user = await this.userRepository.findByPk(dto.responsible)

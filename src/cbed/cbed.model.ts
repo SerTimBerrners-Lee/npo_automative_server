@@ -39,7 +39,7 @@ export class Cbed extends Model<Cbed, CbedCreationAttrs> {
     @ApiProperty({example: 12, description: 'Количество Сборочных единиц на складе'})
     @Column({type: DataType.INTEGER, defaultValue: 0})
     cbed_kolvo: number; 
-
+ 
     @ApiProperty({example: 12, description: 'Количество СБ необходимо'})
     @Column({type: DataType.INTEGER, defaultValue: 0})
     shipments_kolvo: number;
@@ -79,6 +79,10 @@ export class Cbed extends Model<Cbed, CbedCreationAttrs> {
     @ApiProperty({example: 12, description: 'Срок поставки'})
     @Column({type: DataType.TEXT, allowNull: true})
     listDetal: any;
+
+    @ApiProperty({example: false, description: 'Выделяет на фоне остальных'})
+    @Column({type: DataType.BOOLEAN, defaultValue: false})
+    attention: boolean;
 
     @BelongsToMany(() => Documents, () => DocumentsCbed)
     documents: Documents[];

@@ -110,6 +110,7 @@ export class InventaryService {
       else inventary.mount_used  = 0
       if(dto.description != null) inventary.description = dto.description
       else inventary.description  = ''
+      inventary.attention = dto.attention
 
       if(dto.parent_t_id != null) {
         const type_inventary = await this.pInventaryReprository.findByPk(dto.parent_t_id)

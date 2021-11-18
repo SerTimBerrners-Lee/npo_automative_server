@@ -22,7 +22,7 @@ export class Inventary extends Model<Inventary, AttrCreateInventary> {
 
     @ApiProperty({example: 'Круг 20 D', description: 'Полная запись под материала измерений'})
     @Column({type: DataType.STRING, allowNull: false})
-    name: string;   
+    name: string;    
 
     @ApiProperty({example: true, description: 'Добавляем в архив'})
     @Column({type: DataType.BOOLEAN, defaultValue: false})
@@ -43,6 +43,10 @@ export class Inventary extends Model<Inventary, AttrCreateInventary> {
     @ApiProperty({example: 12, description: 'Срок поставки'})
     @Column({type: DataType.STRING, allowNull: true})
     description: string; 
+
+    @ApiProperty({example: false, description: 'Выделяет на фоне остальных'})
+    @Column({type: DataType.BOOLEAN, defaultValue: false})
+    attention: boolean;
 
     @BelongsToMany(() => Providers, () => ProvidersInventary)
     providers: Providers[];

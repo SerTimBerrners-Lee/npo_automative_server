@@ -16,7 +16,7 @@ export class Buyer extends Model<Buyer, BuyerCreationAttrs> {
 
     @ApiProperty({example: '1', description: 'Уникальный идентификатор'})
     @Column({type: DataType.INTEGER, unique: true, autoIncrement: true, primaryKey: true})
-    id: number;
+    id: number; 
 
     @Column({type: DataType.STRING, allowNull: false})
     name: string;    
@@ -38,6 +38,10 @@ export class Buyer extends Model<Buyer, BuyerCreationAttrs> {
 
     @Column({type: DataType.STRING, allowNull: true})
     description: string;
+
+    @ApiProperty({example: false, description: 'Выделяет на фоне остальных'})
+    @Column({type: DataType.BOOLEAN, defaultValue: false})
+    attention: boolean;
 
     @BelongsToMany(() => Documents, () => DocumentsBuyer)
     documents: Documents[];

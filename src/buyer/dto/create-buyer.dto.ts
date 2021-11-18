@@ -7,4 +7,5 @@ export class CreateBuyerDto {
     readonly contacts:      string;
     readonly description:   string;
     readonly docs:          any;
+    readonly attention:     boolean;
 }

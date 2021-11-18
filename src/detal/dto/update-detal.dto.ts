@@ -15,6 +15,7 @@ export class UpdateDetalDto {
     readonly techProcessID:     number;
     readonly id:                number;
     readonly file_base:         any;
+    readonly attention:         boolean;
 
     readonly responsibleActionId: number;
 }

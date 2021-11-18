@@ -7,6 +7,7 @@ export class CreateNameInstrumentDto {
     readonly description: string; 
     readonly parentId: number;
     readonly docs: any;
+    readonly attention: boolean;
 
     readonly providers: string;
     readonly rootParentId: number;

@@ -6,6 +6,7 @@ export class UpdateNameInstrumentDto {
     readonly minOstatok: string; 
     readonly description: string; 
     readonly docs: any;
+    readonly attention: boolean;
 
     readonly providers: any;
 }

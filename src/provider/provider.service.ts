@@ -61,6 +61,7 @@ export class ProviderService {
         else
             providers.description =''
         await providers.save()
+        providers.attention = dto.attention
         
         if(dto.docs) {
             let docs: any = Object.values(JSON.parse(dto.docs))

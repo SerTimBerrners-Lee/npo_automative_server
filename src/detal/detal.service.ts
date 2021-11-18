@@ -152,6 +152,7 @@ export class DetalService {
         if(dto.trash != 'null')
             detal.trash = dto.trash
             else detal.trash = 0
+        detal.attention = dto.attention
 
         await detal.save()
         if(detal.materials && detal.materials.length) {

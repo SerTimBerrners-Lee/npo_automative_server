@@ -22,7 +22,7 @@ export class Equipment extends Model<Equipment, EquipmentCreationAttrs> {
     @ApiProperty({example: '1', description: 'Уникальный идентификатор'})
     @Column({type: DataType.INTEGER, unique: true, autoIncrement: true, primaryKey: true})
     id: number;
-
+ 
     @ApiProperty({example: 'Круг 20 D', description: 'Полная запись под материала измерений'})
     @Column({type: DataType.STRING, allowNull: false})
     name: string;   
@@ -50,6 +50,10 @@ export class Equipment extends Model<Equipment, EquipmentCreationAttrs> {
     @ApiProperty({example: 12, description: 'Срок поставки'})
     @Column({type: DataType.STRING, allowNull: true})
     description: string; 
+
+    @ApiProperty({example: false, description: 'Выделяет на фоне остальных'})
+    @Column({type: DataType.BOOLEAN, defaultValue: false})
+    attention: boolean;
  
     @BelongsToMany(() => Providers, () => ProvidersEquipment)
     providers: Providers[];

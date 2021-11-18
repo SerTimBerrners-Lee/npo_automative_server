@@ -292,6 +292,7 @@ export class SettingsService {
         outsideDiametr = JSON.parse(dto.outsideDiametr)
         thickness = JSON.parse(dto.thickness)
         areaCrossSectional = JSON.parse(dto.areaCrossSectional)
+        podPodMaterial.attention = dto.attention
         
         if(length && length.edizm && length.znach) 
             await this.edizmReprository.findByPk(length.edizm).then(res => {

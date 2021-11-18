@@ -72,6 +72,7 @@ export class ProductService {
             }
         }
 
+        product.attention = dto.attention
         await product.save()
 
         product.materialList = ''

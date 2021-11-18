@@ -34,7 +34,8 @@ export class CreatePodPodMaterial {
     @ApiProperty({example: '{"edizm": 1, "znach": 123}', description: 'Запись значений'})
     readonly thickness: string;   
     @ApiProperty({example: '{"edizm": 1, "znach": 123}', description: 'Запись значений'})
-    readonly areaCrossSectional: string;   
+    readonly areaCrossSectional: string;  
+    readonly attention: boolean;
 
     readonly providers: any;
     readonly file_base: any;

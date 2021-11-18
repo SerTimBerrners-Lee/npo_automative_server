@@ -42,7 +42,7 @@ export class PodPodMaterial extends Model<PodPodMaterial, PodPodMaterialCreation
     @ApiProperty({example: 12, description: 'Количество материала необходимо'})
     @Column({type: DataType.INTEGER, defaultValue: 0})
     shipments_kolvo: number; 
-
+ 
     @ApiProperty({example: 12, description: 'Количество материала необходимо'})
     @Column({type: DataType.TEXT, defaultValue: '{"c1_kolvo":{"material_kolvo":0,"shipments_kolvo":0},"c2_kolvo":{"material_kolvo":0,"shipments_kolvo":0},"c3_kolvo":{"material_kolvo":0,"shipments_kolvo":0},"c4_kolvo":{"material_kolvo":0,"shipments_kolvo":0},"c5_kolvo":{"material_kolvo":0,"shipments_kolvo":0}}'})
     ez_kolvo: string; 
@@ -94,6 +94,10 @@ export class PodPodMaterial extends Model<PodPodMaterial, PodPodMaterialCreation
     @ApiProperty({example: '{edizmId: 10, znach: 2}', description: 'Запись значений'})
     @Column({type: DataType.STRING, allowNull: true})
     areaCrossSectional: any;   
+
+    @ApiProperty({example: false, description: 'Выделяет на фоне остальных'})
+    @Column({type: DataType.BOOLEAN, defaultValue: false})
+    attention: boolean;
     
     @BelongsToMany(() => Providers, () => ProvidersMaterial)
     providers: Providers[];

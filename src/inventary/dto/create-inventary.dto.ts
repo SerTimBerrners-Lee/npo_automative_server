@@ -12,4 +12,5 @@ export class CreateInventaryDto {
   readonly docs: any;
   readonly id: number;
   readonly documents_base: any;
+  readonly attention: boolean;
 }

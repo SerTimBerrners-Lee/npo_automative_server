@@ -46,7 +46,7 @@ export class NameInstrument extends Model<NameInstrument, NameInstrumentCreation
     @ApiProperty({example: 12, description: 'Срок поставки'})
     @Column({type: DataType.STRING, allowNull: true})
     mountUsed: string; 
-
+ 
     @ApiProperty({example: 12, description: 'Срок поставки'})
     @Column({type: DataType.STRING, allowNull: true})
     minOstatok: string; 
@@ -54,6 +54,10 @@ export class NameInstrument extends Model<NameInstrument, NameInstrumentCreation
     @ApiProperty({example: 12, description: 'Срок поставки'})
     @Column({type: DataType.STRING, allowNull: true})
     description: string; 
+
+    @ApiProperty({example: false, description: 'Выделяет на фоне остальных'})
+    @Column({type: DataType.BOOLEAN, defaultValue: false})
+    attention: boolean;
 
     @BelongsToMany(() => Providers, () => ProvidersInstrument)
     providers: Providers[];

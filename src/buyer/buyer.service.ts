@@ -44,6 +44,7 @@ export class BuyerService {
             buyer.description = dto.description 
         else
             buyer.description =''
+        buyer.attention = dto.attention
         await buyer.save()
         
         if(dto.docs) {

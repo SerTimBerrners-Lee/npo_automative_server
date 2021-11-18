@@ -17,7 +17,7 @@ interface ProvidersCreationAttrs {
 
 @Table({tableName: 'providers', createdAt: false, updatedAt: false})
 export class Providers extends Model<Providers, ProvidersCreationAttrs> {
-
+ 
     @ApiProperty({example: '1', description: 'Уникальный идентификатор'})
     @Column({type: DataType.INTEGER, unique: true, autoIncrement: true, primaryKey: true})
     id: number;
@@ -42,6 +42,10 @@ export class Providers extends Model<Providers, ProvidersCreationAttrs> {
 
     @Column({type: DataType.BOOLEAN, defaultValue: false})
     ban: boolean;
+
+    @ApiProperty({example: false, description: 'Выделяет на фоне остальных'})
+    @Column({type: DataType.BOOLEAN, defaultValue: false})
+    attention: boolean;
 
     @BelongsToMany(() => Documents, () => DocumentsProviders)
     documents: Documents[];
