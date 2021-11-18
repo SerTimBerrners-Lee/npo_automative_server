@@ -51,11 +51,4 @@ export class DateMethods {
 		return result
 
 	}
-
-
-	// var now = new Date();
-	// var mi = new Date(now.getFullYear(), now.getMonth(), now.getDate(), 10, 0, 0, 0) - now;
-	// if (mi < 0) 
-	// 		mi += 86400000; 
-	// setTimeout(() => console.log("10am!"), mi);
 }

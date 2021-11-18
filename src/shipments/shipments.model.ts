@@ -39,10 +39,6 @@ export class Shipments extends Model<Shipments, ShipmentsAttrCreate> {
     @Column({type: DataType.INTEGER})
     kol: number;
 
-		@ApiProperty({example: '1', description: ''})
-    @Column({type: DataType.INTEGER})
-    day_when_shipments: number;
-
 		@ApiProperty({example: false, description: 'bron'})
     @Column({type: DataType.BOOLEAN, defaultValue: false})
     bron: boolean;

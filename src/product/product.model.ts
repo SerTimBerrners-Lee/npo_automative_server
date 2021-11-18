@@ -76,8 +76,7 @@ export class Product extends Model<Product, ProductCreationAttrs> {
     @ApiProperty({example: 12, description: 'Срок поставки'})
     @Column({type: DataType.TEXT, allowNull: true})
     listCbed: any;
-
-    // Регестрируем привязки
+    
     @BelongsToMany(() => Documents, () => DocumentsProduct)
     documents: Documents[];
 

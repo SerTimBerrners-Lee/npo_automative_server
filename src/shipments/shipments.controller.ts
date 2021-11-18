@@ -1,4 +1,5 @@
-import { Body, Controller, Get, Param, Post, Put } from '@nestjs/common';
+import { Body, Controller, Delete, Get, Param, Post, Put, UploadedFiles, UseInterceptors } from '@nestjs/common';
+import { FileFieldsInterceptor } from '@nestjs/platform-express';
 import { ApiOperation, ApiTags } from '@nestjs/swagger';
 import { UpCreateShipmentsDto } from './dto/up-create-shipments.dto';
 import { ShipmentsService } from './shipments.service';
@@ -10,9 +11,31 @@ export class ShipmentsController {
 	constructor(private shipmentsSettings: ShipmentsService) {}
 
 	@ApiOperation({summary: 'Создание заказа'})
+	@UseInterceptors(FileFieldsInterceptor([
+			{name: 'document', maxCount: 40}
+	]))
   @Post()
-	createShipments(@Body() dto: UpCreateShipmentsDto) {
-		return this.shipmentsSettings.createShipments(dto);
+	createShipments(
+		@Body() dto: UpCreateShipmentsDto, 
+		@UploadedFiles() files: { document?: Express.Multer.File[]} ) {
+		return this.shipmentsSettings.createShipments(dto, files);
+	}
+
+	@ApiOperation({summary: 'Обновлние заказа'})
+	@UseInterceptors(FileFieldsInterceptor([
+			{name: 'document', maxCount: 40}
+	]))
+  @Put()
+	updateShipments(
+		@Body() dto: UpCreateShipmentsDto, 
+		@UploadedFiles() files: { document?: Express.Multer.File[]} ) {
+		return this.shipmentsSettings.updateShipments(dto, files);
+	}
+
+	@ApiOperation({summary: 'Удаление Заказа'})
+  @Delete(':id')
+	deleteShipmentsById(@Param('id') id: number) {
+		return this.shipmentsSettings.deleteShipmentsById(id);
 	}
 
 	@ApiOperation({summary: 'Получить все заказы'})

@@ -3,6 +3,7 @@ import { SequelizeModule } from '@nestjs/sequelize';
 import { BuyerModule } from 'src/buyer/buyer.module';
 import { CbedModule } from 'src/cbed/cbed.module';
 import { DetalModule } from 'src/detal/detal.module';
+import { DocumentsModule } from 'src/documents/documents.module';
 import { ProductModule } from 'src/product/product.module';
 import { SettingsModule } from 'src/settings/settings.module';
 import { ShipmentsController } from './shipments.controller';
@@ -18,7 +19,8 @@ import { ShipmentsService } from './shipments.service';
 		ProductModule,
 		CbedModule,
 		DetalModule,
-		SettingsModule
+		SettingsModule,
+		DocumentsModule
 	],
 
 	exports: [ShipmentsService]
