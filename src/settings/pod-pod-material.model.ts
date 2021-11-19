@@ -1,5 +1,5 @@
 import { ApiProperty } from "@nestjs/swagger";
-import { Model, Column, DataType, Table, BelongsTo, ForeignKey, BelongsToMany, HasMany } from "sequelize-typescript";
+import { Model, Column, DataType, Table, BelongsTo, ForeignKey, BelongsToMany, HasMany, BeforeFind, AfterFind, AfterValidate } from "sequelize-typescript";
 import { Actions } from "src/actions/actions.model";
 import { CbedMaterial } from "src/cbed/cbed-material.model";
 import { Cbed } from "src/cbed/cbed.model";
@@ -45,7 +45,7 @@ export class PodPodMaterial extends Model<PodPodMaterial, PodPodMaterialCreation
  
     @ApiProperty({example: 12, description: 'Количество материала необходимо'})
     @Column({type: DataType.TEXT, defaultValue: '{"c1_kolvo":{"material_kolvo":0,"shipments_kolvo":0},"c2_kolvo":{"material_kolvo":0,"shipments_kolvo":0},"c3_kolvo":{"material_kolvo":0,"shipments_kolvo":0},"c4_kolvo":{"material_kolvo":0,"shipments_kolvo":0},"c5_kolvo":{"material_kolvo":0,"shipments_kolvo":0}}'})
-    ez_kolvo: string; 
+    ez_kolvo: any; 
     
     @ApiProperty({example: 12, description: 'Стоимость'})
     @Column({type: DataType.INTEGER, defaultValue: 0})
@@ -136,5 +136,4 @@ export class PodPodMaterial extends Model<PodPodMaterial, PodPodMaterialCreation
 
     @BelongsToMany(() => Documents, () => DocumentsMaterial)
     documents: Documents[];
-
 }    

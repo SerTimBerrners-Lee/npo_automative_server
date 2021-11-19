@@ -113,6 +113,7 @@ import { DocumentsShipments } from "./documents/documents-shipments.mode";
 import { MovingModule } from './moving/moving.module';
 import { Moving } from "./moving/moving.model";
 import { DocumentsMoving } from "./documents/documents-moving.model";
+import { DeliveriesInventary } from "./provider/deliveries-inventary.model";
 @Module({
     controllers: [],
     providers: [],
@@ -216,7 +217,8 @@ import { DocumentsMoving } from "./documents/documents-moving.model";
                 ProvidersInventary,
                 Links,
                 LinksUser,
-                Moving
+                Moving,
+                DeliveriesInventary
             ],
             autoLoadModels: true,
           }),

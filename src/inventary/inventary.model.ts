@@ -3,6 +3,8 @@ import { Model, Column, DataType, Table, BelongsToMany, ForeignKey, BelongsTo, H
 import { Actions } from "src/actions/actions.model";
 import { DocumentsInventary } from "src/documents/documents-inventary.model";
 import { Documents } from "src/documents/documents.model";
+import { DeliveriesInventary } from "src/provider/deliveries-inventary.model";
+import { Deliveries } from "src/provider/deliveries.model";
 import { Providers } from "src/provider/provider.model";
 import { ProvidersInventary } from "src/provider/providers-inventary.model";
 import { PTInventary } from "./inventary-pt.model";
@@ -23,6 +25,14 @@ export class Inventary extends Model<Inventary, AttrCreateInventary> {
     @ApiProperty({example: 'Круг 20 D', description: 'Полная запись под материала измерений'})
     @Column({type: DataType.STRING, allowNull: false})
     name: string;    
+
+    @ApiProperty({example: 12, description: 'Количество инвентаря на складе'})
+    @Column({type: DataType.INTEGER, defaultValue: 0})
+    inventary_kolvo: number; 
+
+    @ApiProperty({example: 12, description: 'Количество инвентаря необходимо'})
+    @Column({type: DataType.INTEGER, defaultValue: 0})
+    shipments_kolvo: number; 
 
     @ApiProperty({example: true, description: 'Добавляем в архив'})
     @Column({type: DataType.BOOLEAN, defaultValue: false})
@@ -60,6 +70,9 @@ export class Inventary extends Model<Inventary, AttrCreateInventary> {
 
     @BelongsToMany(() => Documents, () => DocumentsInventary)
     documents: Documents[];
+
+    @BelongsToMany(() => Deliveries, () => DeliveriesInventary)
+    deliveries: Deliveries[];
 
     @ForeignKey(() => PTInventary)
     @Column({type: DataType.INTEGER})

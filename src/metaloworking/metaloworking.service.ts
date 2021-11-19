@@ -134,7 +134,6 @@ export class MetaloworkingService {
 			if(!obj.tech_process || !obj.tech_process.operations) continue;
 			for(let i in obj.tech_process.operations) {
 				for(let j in obj.tech_process.operations) {
-					console.log('Operations')
 					if(obj.tech_process.operations[i].id < obj.tech_process.operations[j].id) {
 						const ggg = obj.tech_process.operations[i]
 						obj.tech_process.operations[i] = obj.tech_process.operations[j]

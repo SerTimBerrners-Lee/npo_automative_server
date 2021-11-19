@@ -223,7 +223,6 @@ export class SettingsService {
     }
 
     async createAndUpdatePodPodMaterial(dto: CreatePodPodMaterial, files: any) {
-        console.log(dto)
         let podPodMaterial: any;
 
         if(Number(dto.id)) {
@@ -242,17 +241,17 @@ export class SettingsService {
         if(dto.description != 'null') podPodMaterial.description = dto.description
             else podPodMaterial.description = '' 
         
-        let [deliveryTime, kolvo, density]: any[] = []
+        let [deliveryTime, density]: any[] = []
 
         deliveryTime = JSON.parse(dto.deliveryTime)
-        kolvo = JSON.parse(dto.kolvo).kolvo
         density = JSON.parse(dto.density)
 
         podPodMaterial.kolvo = []
 
-        if(kolvo) {
+        if(dto.kolvo) {
             try {
-                podPodMaterial.kolvo = JSON.stringify(kolvo)
+                console.log(dto.kolvo)
+                podPodMaterial.kolvo = dto.kolvo
                 await podPodMaterial.save()
             } catch (e) {
                 console.log(e)
@@ -291,7 +290,7 @@ export class SettingsService {
         height = JSON.parse(dto.height)
         wallThickness = JSON.parse(dto.wallThickness)
         outsideDiametr = JSON.parse(dto.outsideDiametr)
-        thickness = JSON.parse(dto.thickness) 
+        thickness = JSON.parse(dto.thickness)
         areaCrossSectional = JSON.parse(dto.areaCrossSectional)
         podPodMaterial.attention = dto.attention
         
