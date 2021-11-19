@@ -223,6 +223,7 @@ export class SettingsService {
     }
 
     async createAndUpdatePodPodMaterial(dto: CreatePodPodMaterial, files: any) {
+        console.log(dto)
         let podPodMaterial: any;
 
         if(Number(dto.id)) {
@@ -290,7 +291,7 @@ export class SettingsService {
         height = JSON.parse(dto.height)
         wallThickness = JSON.parse(dto.wallThickness)
         outsideDiametr = JSON.parse(dto.outsideDiametr)
-        thickness = JSON.parse(dto.thickness)
+        thickness = JSON.parse(dto.thickness) 
         areaCrossSectional = JSON.parse(dto.areaCrossSectional)
         podPodMaterial.attention = dto.attention
         
