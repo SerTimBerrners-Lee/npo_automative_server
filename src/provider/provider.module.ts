@@ -1,10 +1,11 @@
-import { Module } from '@nestjs/common';
+import { forwardRef, Module } from '@nestjs/common';
 import { SequelizeModule } from '@nestjs/sequelize';
 import { DocumentsProviders } from 'src/documents/documents-providers.model';
 import { Documents } from 'src/documents/documents.model';
 import { DocumentsModule } from 'src/documents/documents.module';
 import { EquipmentModule } from 'src/equipment/equipment.module';
 import { InstrumentModule } from 'src/instrument/instrument.module';
+import { InventaryModule } from 'src/inventary/inventary.module';
 import { PodPodMaterial } from 'src/settings/pod-pod-material.model';
 import { SettingsModule } from 'src/settings/settings.module';
 import { Deliveries } from './deliveries.model';
@@ -33,7 +34,8 @@ import { Waybill } from './waybill.model';
         DocumentsModule,
         SettingsModule,
         EquipmentModule,
-        InstrumentModule
+        InstrumentModule,
+        forwardRef(() => InventaryModule)
     ],
     exports: [
         ProviderService

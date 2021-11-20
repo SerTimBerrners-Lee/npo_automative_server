@@ -39,23 +39,28 @@ export class ShipmentsService {
 		if(!shipment)
 			throw new HttpException('Не удалось создать заказ', HttpStatus.BAD_REQUEST)
 
-		const data = JSON.parse(dto.data)
-		if(!data)
-			throw new HttpException('Пустой запрос', HttpStatus.NO_CONTENT)
-		data.docs = dto.docs
-		return await this.upCreateShipments(data, shipment, files);
+		try {
+			const data = JSON.parse(dto.data)
+			if(!data)
+				throw new HttpException('Пустой запрос', HttpStatus.NO_CONTENT)
+
+			data.docs = dto.docs
+				return await this.upCreateShipments(data, shipment, files);
+		} catch(e) {console.error(e)}
 
 	}
 
 	async updateShipments(dto: UpCreateShipmentsDto, files: any) {
-		const data = JSON.parse(dto.data)
-		if(!data)
-			throw new HttpException('Пустой запрос', HttpStatus.NO_CONTENT)
-		const shipment = await this.shipmentsReprository.findByPk(data.id, {include: {all: true}});
-		if(!shipment)
-			throw new HttpException('Не удалось найти заказ', HttpStatus.BAD_REQUEST)
-		data.docs = dto.docs
-		return await this.upCreateShipments(data, shipment, files)
+		try {
+			const data = JSON.parse(dto.data)
+			if(!data)
+				throw new HttpException('Пустой запрос', HttpStatus.NO_CONTENT)
+			const shipment = await this.shipmentsReprository.findByPk(data.id, {include: {all: true}});
+			if(!shipment)
+				throw new HttpException('Не удалось найти заказ', HttpStatus.BAD_REQUEST)
+			data.docs = dto.docs
+			return await this.upCreateShipments(data, shipment, files)
+		} catch(e) {console.error(e)}
 	}
 
 	private async upCreateShipments(data: any, shipment: Shipments, files: any) {
@@ -231,16 +236,18 @@ export class ShipmentsService {
 	async getAllShipmentsAssemble() {
 		const shipments = await this.shipmentsReprository.findAll({include: {all: true}})
 		const assemble: any = []
-		for(let sh of shipments)
-			assemble.push(sh)
+		for(let sh of shipments) {
+			if(sh.cbeds && sh.cbeds.length) assemble.push(sh)
+		}
 		return assemble
 	}
 
 	async getAllShipmentsMetaloworking() {
 		const shipments = await this.shipmentsReprository.findAll({include: {all: true}})
 		const metaloworking: any = []
-		for(let sh of shipments) 
-			metaloworking.push(sh)
+		for(let sh of shipments) {
+			if(sh.detals && sh.detals.length) metaloworking.push(sh)
+		}
 		return metaloworking
 	}
 

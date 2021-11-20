@@ -1,10 +1,11 @@
-import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
+import { forwardRef, HttpException, HttpStatus, Inject, Injectable } from '@nestjs/common';
 import { InjectModel } from '@nestjs/sequelize';
 import { Documents } from 'src/documents/documents.model';
 import { DocumentsService } from 'src/documents/documents.service';
 import { EquipmentService } from 'src/equipment/equipment.service';
 import { DateMethods } from 'src/files/date.methods';
 import { InstrumentService } from 'src/instrument/instrument.service';
+import { InventaryService } from 'src/inventary/inventary.service';
 import { PodPodMaterial } from 'src/settings/pod-pod-material.model';
 import { SettingsService } from 'src/settings/settings.service';
 import { Deliveries } from './deliveries.model';
@@ -25,6 +26,8 @@ export class ProviderService {
             private documentService: DocumentsService,
             private equipmentService: EquipmentService,
             private instrumentService: InstrumentService,
+            @Inject(forwardRef(() => InventaryService))
+            private inventaryService: InventaryService
     ) {}
 
     async createProvider(dto: CreateProviderDto, files: any) {
@@ -148,7 +151,6 @@ export class ProviderService {
         let deliveries = await this.deliveriesReprository.create({name: numberEndDeliveries, date_create: dm})
         deliveries = await this.deliveriesReprository.findByPk(deliveries.id, {include: {all:true}})
 
-
         return await this.upCreateDeliveries(dto, files, deliveries)
         
     }
@@ -259,6 +261,7 @@ export class ProviderService {
         return new_dev_arr
     }
 
+    // Проверка заказа удаление из заказа
     private async checkDeliveroedComing(product: any, coming: Array<Deliveries>) {
         for(let com of coming) {
             try {
@@ -277,6 +280,7 @@ export class ProviderService {
     }
 
     async createWaybill(dto: CreateWaybillDto, files: any) {
+        console.log(dto, files)
         const dm = new DateMethods()
 		const endShipments = await this.waybillReprository.findOne(
 			{
@@ -297,13 +301,47 @@ export class ProviderService {
                 waybill.product = dto.product_list
                 for(let product of pars) {
                     this.checkDeliveroedComing(product, comings)
+                    let object: any
+                    if(product.type == 'mat')
+                        object = await this.settingsService.getOnePPT(product.id)
+                    if(product.type == 'tools')
+                        object = await this.instrumentService.getNameInstrument(product.id)
+                    if(product.type == 'eq')
+                        object = await this.equipmentService.getOneEquipment(product.id)
+                    if(product.type == 'inventary')
+                        object = await this.inventaryService.getInventaryById(product.id)
+                    console.log(product)
 
-                    let material = await this.settingsService.getOnePPT(product.id)
-                    if(material) {
-                        material.shipments_kolvo - product.kol <= 0 ? material.shipments_kolvo = 0 :
-                            material.shipments_kolvo  = material.shipments_kolvo - product.kol
-                        material.material_kolvo = material.material_kolvo + product.kol
-                        await material.save()
+                    if(object) {
+                        object.shipments_kolvo - product.kol <= 0 ? object.shipments_kolvo = 0 :
+                            object.shipments_kolvo  = object.shipments_kolvo - product.kol
+                        if(product.type == 'mat')
+                            object.material_kolvo = object.material_kolvo + product.kol
+                        if(product.type == 'tools')
+                            object.material_kolvo = object.instrument_kolvo + product.kol
+                        if(product.type == 'eq')
+                            object.material_kolvo = object.equipment_kolvo + product.kol
+                        if(product.type == 'inventary')
+                            object.material_kolvo = object.inventary_kolvo + product.kol
+                        object.price = product.sum ? product.sum : 0
+
+                        if(product.type == 'mat') {
+                            try {
+                                const pars_ez: any = JSON.parse(object.ez_kolvo)
+                                if(pars_ez) {
+                                    const edit_ez:any = Object.values(pars_ez)[Number(product.ez) ? Number(product.ez) - 1 : 0]
+
+                                    edit_ez.material_kolvo = edit_ez.material_kolvo  +  product.kol
+                                    edit_ez.shipments_kolvo - product.kol <= 0 ? object.shipments_kolvo = 0 :
+                                    object.shipments_kolvo  = object.shipments_kolvo - product.kol
+
+                                    Object.values(pars_ez)[Number(product.ez) ? Number(product.ez) - 1 : 0] = edit_ez
+                                    console.log('edit_ez', edit_ez)
+                                    object.ez_kolvo = JSON.stringify(pars_ez)
+                                }
+                            } catch(e) {console.error(e)}
+                        }
+                        await object.save()
                     }
                 }
             } catch (e) {

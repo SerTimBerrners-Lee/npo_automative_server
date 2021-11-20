@@ -1,4 +1,4 @@
-import { Module } from '@nestjs/common';
+import { forwardRef, Module } from '@nestjs/common';
 import { SequelizeModule } from '@nestjs/sequelize';
 import { DocumentsModule } from 'src/documents/documents.module';
 import { ProviderModule } from 'src/provider/provider.module';
@@ -17,7 +17,7 @@ import { InventaryService } from './inventary.service';
       PTInventary,
       Inventary
     ]),
-    ProviderModule,
+    forwardRef(() => ProviderModule),
     DocumentsModule
   ],
   exports: [

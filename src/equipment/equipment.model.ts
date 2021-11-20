@@ -35,6 +35,10 @@ export class Equipment extends Model<Equipment, EquipmentCreationAttrs> {
     @Column({type: DataType.INTEGER, defaultValue: 0})
     equipment_kolvo: number; 
 
+    @ApiProperty({example: 12, description: 'Стоимость'})
+    @Column({type: DataType.INTEGER, defaultValue: 0})
+    price: number; 
+
     @ApiProperty({example: 12, description: 'Количество материала необходимо'})
     @Column({type: DataType.INTEGER, defaultValue: 0})
     shipments_kolvo: number; 

@@ -30,6 +30,10 @@ export class Inventary extends Model<Inventary, AttrCreateInventary> {
     @Column({type: DataType.INTEGER, defaultValue: 0})
     inventary_kolvo: number; 
 
+    @ApiProperty({example: 12, description: 'Стоимость'})
+    @Column({type: DataType.INTEGER, defaultValue: 0})
+    price: number; 
+
     @ApiProperty({example: 12, description: 'Количество инвентаря необходимо'})
     @Column({type: DataType.INTEGER, defaultValue: 0})
     shipments_kolvo: number; 

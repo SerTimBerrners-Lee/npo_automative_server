@@ -35,6 +35,10 @@ export class NameInstrument extends Model<NameInstrument, NameInstrumentCreation
     @Column({type: DataType.INTEGER, defaultValue: 0})
     instrument_kolvo: number; 
 
+    @ApiProperty({example: 12, description: 'Стоимость'})
+    @Column({type: DataType.INTEGER, defaultValue: 0})
+    price: number; 
+
     @ApiProperty({example: 12, description: 'Количество материала необходимо'})
     @Column({type: DataType.INTEGER, defaultValue: 0})
     shipments_kolvo: number; 
