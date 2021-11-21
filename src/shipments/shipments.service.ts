@@ -131,7 +131,7 @@ export class ShipmentsService {
 				shipment.buyerId = null
 			await shipment.save()
 		}
-		if(data.product) {
+		if(data.product && !data.is_not_product) {
 			const product = await this.productService.getById(data.product.id)
 			if(product) {
 				product.shipments_kolvo = data.kol
