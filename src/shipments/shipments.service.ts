@@ -1,10 +1,12 @@
 import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
 import { InjectModel } from '@nestjs/sequelize';
+import { AssembleService } from 'src/assemble/assemble.service';
 import { BuyerService } from 'src/buyer/buyer.service';
 import { CbedService } from 'src/cbed/cbed.service';
 import { DetalService } from 'src/detal/detal.service';
 import { DocumentsService } from 'src/documents/documents.service';
 import { DateMethods } from 'src/files/date.methods';
+import { MetaloworkingService } from 'src/metaloworking/metaloworking.service';
 import { ProductService } from 'src/product/product.service';
 import { SettingsService } from 'src/settings/settings.service';
 import { UpCreateShipmentsDto } from './dto/up-create-shipments.dto';
@@ -18,7 +20,9 @@ export class ShipmentsService {
 		private cbedService: CbedService,
 		private detalService: DetalService,
 		private setingsService: SettingsService,
-		private documentsService: DocumentsService) {}
+		private documentsService: DocumentsService, 
+		private assembleService: AssembleService,
+		private metaloworkingService: MetaloworkingService) {}
 
 	async createShipments(dto: UpCreateShipmentsDto, files: any) {
 		const dm = new DateMethods()
@@ -98,7 +102,6 @@ export class ShipmentsService {
 					}
 					await this.incrementShipmentsKolvo(izd, shipment, 'increment')
 				}
-				// Перед тем как присвоить - проверяем удалены ли какие -то элементы 
 				if(shipment.list_cbed_detal) {
 					const parsCurList = JSON.parse(shipment.list_cbed_detal)
 					for(let izd of parsCurList) {
@@ -184,16 +187,24 @@ export class ShipmentsService {
 		return result
 	}
 
+	/**
+	 * Меняем количество заказаных СБ и Д
+	 * @param izd 
+	 * @param shipment 
+	 * @param action 
+	 */
 	private async incrementShipmentsKolvo(izd: any, shipment: Shipments, action: string) {
-		console.log('izd', izd)
 		if(izd.type == 'cbed') {
 			let izdels = await this.cbedService.findById(izd.obj.id) 
 			if(izdels) {
 				if(action == 'increment') {
 					izdels.shipments_kolvo = izdels.shipments_kolvo + Number(izd.kol)
+					await this.assembleService.shipmentsMaterialsForIzd(izdels, Number(izd.kol))
 					shipment.$add('cbeds', izdels.id)
 				} else {
 					izdels.shipments_kolvo = izdels.shipments_kolvo - Number(izd.kol)
+					let count = Number(izd.kol) > 0 ? - Number(izd.kol) : Number(izd.kol)
+					await this.assembleService.shipmentsMaterialsForIzd(izdels, count)
 					shipment.$remove('cbeds', izdels.id)
 				}
 				await izdels.save()
@@ -203,9 +214,12 @@ export class ShipmentsService {
 				if(izdels) {
 					if(action == 'increment') {
 						izdels.shipments_kolvo = izdels.shipments_kolvo + Number(izd.kol)
+						await this.metaloworkingService.shipmentsMaterialsForDetal(izdels, Number(izd.kol))
 						shipment.$add('detals', izdels.id)
 					} else {
 						izdels.shipments_kolvo = izdels.shipments_kolvo - Number(izd.kol)
+						let count = Number(izd.kol) > 0 ? - Number(izd.kol) : Number(izd.kol)
+						await this.metaloworkingService.shipmentsMaterialsForDetal(izdels, count)
 						shipment.$remove('detals', izdels.id)
 					}
 					await izdels.save()

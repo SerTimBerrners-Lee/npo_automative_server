@@ -53,11 +53,4 @@ export class Assemble extends Model<Assemble, AssembleAttrCreate> {
 
   @BelongsTo(() => Cbed)
   cbed: Cbed;
-
-  @ForeignKey(() => TechProcess)
-  @Column({type: DataType.INTEGER}) 
-  tp_id: number;
-
-  @BelongsTo(() => TechProcess)
-  tech_process: TechProcess;
 }  

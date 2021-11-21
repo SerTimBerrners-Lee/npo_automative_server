@@ -22,7 +22,7 @@ export class Metaloworking extends Model<Metaloworking, MetaloworkingAttrCreate>
     @ApiProperty({example: '1', description: ''})
     @Column({type: DataType.STRING})
     number_order: string;
-
+ 
     @ApiProperty({example: '1', description: ''})
     @Column({type: DataType.STRING})
     date_shipments: string;
@@ -48,12 +48,5 @@ export class Metaloworking extends Model<Metaloworking, MetaloworkingAttrCreate>
     detal_id: number;
 
     @BelongsTo(() => Detal)
-    detal: Cbed; 
-
-    @ForeignKey(() => TechProcess)
-    @Column({type: DataType.INTEGER})
-    tp_id: number;
-
-    @BelongsTo(() => TechProcess)
-    tech_process: TechProcess;
+    detal: Detal; 
 }  

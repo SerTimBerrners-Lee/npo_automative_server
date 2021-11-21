@@ -6,4 +6,6 @@ export class CreateMarkDto {
 	readonly description:          	string;
 	readonly user_id:  							number;
 	readonly oper_id: 		         	number;
+	readonly assemble_id: 					number;
+	readonly metaloworking_id:			number;
 }

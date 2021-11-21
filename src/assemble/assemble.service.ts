@@ -1,4 +1,4 @@
-import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
+import { forwardRef, HttpException, HttpStatus, Inject, Injectable } from '@nestjs/common';
 import { InjectModel } from '@nestjs/sequelize';
 import { Cbed } from 'src/cbed/cbed.model';
 import { CbedService } from 'src/cbed/cbed.service';
@@ -16,6 +16,7 @@ import { CreateAssembleDto } from './dto/create-assemble.dto';
 @Injectable()
 export class AssembleService {
 	constructor(@InjectModel(Assemble) private assembleReprository: typeof Assemble,
+		@Inject(forwardRef(() => ShipmentsService))
 		private shipmentService: ShipmentsService,
 		private cbedService: CbedService,
 		private settingsService: SettingsService, 
@@ -41,15 +42,13 @@ export class AssembleService {
 		if(dto.cbed_id) { 
 			const cbed = await this.cbedService.findById(dto.cbed_id)
 			if(cbed) {
-				await this.shipmentsMaterialsForIzd(cbed, dto.my_kolvo)
 				assemble.cbed_id = cbed.id
-				if(cbed.techProcesses && cbed.techProcesses.id)
-					assemble.tp_id = cbed.techProcesses.id
 				assemble.kolvo_shipments = dto.my_kolvo
 				cbed.assemble_kolvo = cbed.assemble_kolvo + dto.my_kolvo
 				await cbed.save()
 				if(dto.my_kolvo > dto.shipments_kolvo) {
 					let differenc = Number(dto.my_kolvo) - Number(dto.shipments_kolvo)
+					await this.shipmentsMaterialsForIzd(cbed, differenc)
 					if(cbed.listDetal)
 						await this.parseDetalJson(cbed.listDetal, differenc)
 					if(cbed.listCbed)
@@ -62,14 +61,14 @@ export class AssembleService {
 		return assemble
 	}
 
-	private async shipmentsMaterialsForIzd(izd: Cbed, kolvo_all: any = 1) {
+	async shipmentsMaterialsForIzd(izd: Cbed, kolvo_all: any = 1) {
 		if(izd.materialList) 
 			await this.parseMaterialJson(izd.materialList, kolvo_all)
 		if(izd.listPokDet) 
 			await this.parseMaterialJson(izd.listPokDet, kolvo_all)
 	}
 
-	private async parseDetalJson(list_json_detal: string, kolvo_all: any = 1) {
+	async parseDetalJson(list_json_detal: string, kolvo_all: any = 1) {
 		try {
 			const pars_det = JSON.parse(list_json_detal)
 			if(pars_det.length) {
@@ -88,7 +87,7 @@ export class AssembleService {
 		}
 	}
 
-	private async parseCbedJson(list_json_cbed: string, kolvo_all: any = 1) {
+	async parseCbedJson(list_json_cbed: string, kolvo_all: any = 1) {
 		try {
 			let pars_cbed = JSON.parse(list_json_cbed)
 			for(let cbed of pars_cbed) {
@@ -110,7 +109,7 @@ export class AssembleService {
 		}
 	}
 
-	private async parseMaterialJson(list_json_mat: string, kolvo_all: any = 1) {
+	async parseMaterialJson(list_json_mat: string, kolvo_all: any = 1) {
 		try {
 			const pars_mat = JSON.parse(list_json_mat)
 			if(pars_mat.length) {
@@ -119,6 +118,8 @@ export class AssembleService {
 					if(mat_check) {
 						try {
 							const pars_ez = JSON.parse(mat_check.ez_kolvo)
+							// Если инеремент мы должны оставить так как есть сейчас 
+							// если отрицательный значит мы должны удалить 
 							if(material.ez) {
 								if(material.ez == 1) pars_ez.c1_kolvo.shipments_kolvo = Number(pars_ez.c1_kolvo.shipments_kolvo)  + (Number(material.kol) * kolvo_all)
 								if(material.ez == 2) pars_ez.c2_kolvo.shipments_kolvo = Number(pars_ez.c2_kolvo.shipments_kolvo)  + (Number(material.kol) * kolvo_all)
@@ -140,38 +141,58 @@ export class AssembleService {
 	}
 
 	async getAllAssemble() {
-		const assembly = await this.assembleReprository.findAll({include: [ {all: true}, {
-			model: Cbed, 
-			include: ['documents', {
-				model: Shipments, 
-				include: ['product']
-			}]
-		}, {
-			model: TechProcess,
-			include: [{
-				model: Operation, 
-				include: ['marks']
-			}]
-		}]})
-
+		const assembly = await this.assembleReprository.findAll({include: [ {all: true}, 
+			{
+				model: Cbed, 
+				include: ['documents', 
+					{
+					model: Shipments, 
+					include: ['product'],
+					}, 
+					{
+					model: TechProcess,
+					include: [{
+						model: Operation, 
+						include: ['marks']
+						}]
+					}]
+			}
+		]})
+		// Фильтрация по операциям
 		for(let obj of assembly) {
-			if(!obj.tech_process || !obj.tech_process.operations.length) continue
-			for(let i in obj.tech_process.operations) {
-				for(let j in obj.tech_process.operations) {
-					if(obj.tech_process.operations[i].id < obj.tech_process.operations[j].id) {
-						const ggg = obj.tech_process.operations[i]
-						obj.tech_process.operations[i] = obj.tech_process.operations[j]
-						obj.tech_process.operations[j] = ggg
+			if(!obj.cbed || !obj.cbed.techProcesses || !obj.cbed.techProcesses.operations.length) continue
+			for(let i in obj.cbed.techProcesses.operations) {
+				for(let j in obj.cbed.techProcesses.operations) {
+					if(obj.cbed.techProcesses.operations[i].id < obj.cbed.techProcesses.operations[j].id) {
+						const ggg = obj.cbed.techProcesses.operations[i]
+						obj.cbed.techProcesses.operations[i] = obj.cbed.techProcesses.operations[j]
+						obj.cbed.techProcesses.operations[j] = ggg
 					}
 				}
 			}
 		}
-
+		
 		return assembly
 	}
 
 	async getAssembleById(id:number) {
-		return await this.assembleReprository.findByPk(id, {include: {all: true}})
+		return await this.assembleReprository.findByPk(id, {include: [{all: true}, 
+			{
+				model: Cbed, 
+				include: ['documents', 
+					{
+					model: Shipments, 
+					include: ['product'],
+					}, 
+					{
+					model: TechProcess,
+					include: [{
+						model: Operation, 
+						include: ['marks']
+						}]
+					}]
+			}
+		]})
 	}
 
 	async getAssembleByOperation(op_id: number) {
@@ -179,7 +200,8 @@ export class AssembleService {
 		const arr = []
 		for(let ass of assembles) {
 			try {
-				for(let operation of ass.tech_process.operations) {
+				if(!ass.cbed || !ass.cbed.techProcesses) continue
+				for(let operation of ass.cbed.techProcesses.operations) {
 					if(operation.name == op_id) {
 						const operation_new = {operation, ass}
 						arr.push(operation_new)
