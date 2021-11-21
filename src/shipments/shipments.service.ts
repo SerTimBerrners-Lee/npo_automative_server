@@ -85,11 +85,14 @@ export class ShipmentsService {
 						const parsCurList = JSON.parse(shipment.list_cbed_detal)
 						let check = true
 						for(let upl_izd of parsCurList) {
+							console.log('Когда нашли')
 							if(upl_izd.type == izd.type && upl_izd.obj.id == izd.obj.id) {
-								if(Number(izd.kol) > Number(upl_izd.kol)) izd.kol = Number(izd.kol) - Number(upl_izd.kol)
+								if(Number(izd.kol) > Number(upl_izd.kol)) {
+									izd.kol = Number(izd.kol) - Number(upl_izd.kol)
+									continue
+								}
 								if(Number(izd.kol) < Number(upl_izd.kol)) izd.kol = Number(izd.kol) - Number(upl_izd.kol)
 								else check = false
-								// Если элемент был а сейчас его нет удаляем элемент 
 							}
 						}
 						if(!check) continue
@@ -100,6 +103,7 @@ export class ShipmentsService {
 				// Перед тем как присвоить - проверяем удалены ли какие -то элементы 
 				if(shipment.list_cbed_detal) {
 					const parsCurList = JSON.parse(shipment.list_cbed_detal)
+					console.log(parsCurList)
 					for(let izd of parsCurList) {
 						let check = false
 						for(let dat_item of list_izd) {
@@ -184,6 +188,7 @@ export class ShipmentsService {
 	}
 
 	private async incrementShipmentsKolvo(izd: any, shipment: Shipments, action: string) {
+		console.log('izd', izd)
 		if(izd.type == 'cbed') {
 			let izdels = await this.cbedService.findById(izd.obj.id) 
 			if(izdels) {
@@ -199,11 +204,12 @@ export class ShipmentsService {
 		} else if(izd.type == 'detal') {
 				let izdels = await this.detalService.findByIdDetal(izd.obj.id)
 				if(izdels) {
+					console.log(izdels, izd, action)
 					if(action == 'increment') {
-						izdels.kolvo_shipments = izdels.kolvo_shipments + Number(izd.kol)
+						izdels.shipments_kolvo = izdels.shipments_kolvo + Number(izd.kol)
 						shipment.$add('detals', izdels.id)
 					} else {
-						izdels.kolvo_shipments = izdels.kolvo_shipments - Number(izd.kol)
+						izdels.shipments_kolvo = izdels.shipments_kolvo - Number(izd.kol)
 						shipment.$remove('detals', izdels.id)
 					}
 					await izdels.save()

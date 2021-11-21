@@ -25,7 +25,7 @@ export class MetaloworkingService {
 		const metaloworking = await this.metaloworkingReprositroy
 			.create({
 				date_order: dto.date_order,
-				description: dto.description
+				description: dto.description 
 			})
 		if(!metaloworking)
 			throw new HttpException('Не удалось отправить в производство', HttpStatus.BAD_GATEWAY)

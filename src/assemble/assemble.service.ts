@@ -77,7 +77,7 @@ export class AssembleService {
 					let det_check = await this.detalService.findByIdDetal(detal.det.id)
 					if(det_check) {
 						let deficit = detal.kol * kolvo_all
-						det_check.kolvo_shipments = det_check.kolvo_shipments + deficit
+						det_check.shipments_kolvo = det_check.shipments_kolvo + deficit
 						await det_check.save()
 						await this.metaloworkingService.shipmentsMaterialsForDetal(det_check, deficit)
 					}
