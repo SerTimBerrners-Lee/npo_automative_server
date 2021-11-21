@@ -40,7 +40,7 @@ export class MetaloworkingService {
 			if(detal) {
 				await this.shipmentsMaterialsForDetal(detal, dto.my_kolvo)
 				metaloworking.detal_id = detal.id
-				if(detal.techProcesses.id)
+				if(detal.techProcesses && detal.techProcesses.id)
 					metaloworking.tp_id = detal.techProcesses.id
 				metaloworking.kolvo_shipments = dto.my_kolvo
 				detal.metalloworking_kolvo = detal.metalloworking_kolvo + dto.my_kolvo

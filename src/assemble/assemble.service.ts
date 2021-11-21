@@ -43,7 +43,7 @@ export class AssembleService {
 			if(cbed) {
 				await this.shipmentsMaterialsForIzd(cbed, dto.my_kolvo)
 				assemble.cbed_id = cbed.id
-				if(cbed.techProcesses.id)
+				if(cbed.techProcesses && cbed.techProcesses.id)
 					assemble.tp_id = cbed.techProcesses.id
 				assemble.kolvo_shipments = dto.my_kolvo
 				cbed.assemble_kolvo = cbed.assemble_kolvo + dto.my_kolvo
