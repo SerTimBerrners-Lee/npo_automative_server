@@ -155,6 +155,7 @@ export class AssembleService {
 		}]})
 
 		for(let obj of assembly) {
+			if(!obj.tech_process || !obj.tech_process.operations.length) continue
 			for(let i in obj.tech_process.operations) {
 				for(let j in obj.tech_process.operations) {
 					if(obj.tech_process.operations[i].id < obj.tech_process.operations[j].id) {
