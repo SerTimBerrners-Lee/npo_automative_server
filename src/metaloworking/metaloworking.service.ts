@@ -1,4 +1,4 @@
-import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
+import { forwardRef, HttpException, HttpStatus, Inject, Injectable } from '@nestjs/common';
 import { InjectModel } from '@nestjs/sequelize';
 import { Detal } from 'src/detal/detal.model';
 import { DetalService } from 'src/detal/detal.service';
@@ -16,6 +16,7 @@ import { Metaloworking } from './metaloworking.model';
 export class MetaloworkingService {
 	constructor(
 		@InjectModel(Metaloworking) private metaloworkingReprositroy: typeof Metaloworking,  
+		@Inject(forwardRef(() => ShipmentsService))
 		private shipmentService: ShipmentsService,
 		private detalService: DetalService,
 		private settingsService: SettingsService,
@@ -25,7 +26,7 @@ export class MetaloworkingService {
 		const metaloworking = await this.metaloworkingReprositroy
 			.create({
 				date_order: dto.date_order,
-				description: dto.description
+				description: dto.description 
 			})
 		if(!metaloworking)
 			throw new HttpException('Не удалось отправить в производство', HttpStatus.BAD_GATEWAY)
@@ -38,12 +39,13 @@ export class MetaloworkingService {
 		if(dto.detal_id) {
 			const detal = await this.detalService.findByIdDetal(dto.detal_id)
 			if(detal) {
-				await this.shipmentsMaterialsForDetal(detal, dto.my_kolvo)
 				metaloworking.detal_id = detal.id
-				if(detal.techProcesses.id)
-					metaloworking.tp_id = detal.techProcesses.id
 				metaloworking.kolvo_shipments = dto.my_kolvo
 				detal.metalloworking_kolvo = detal.metalloworking_kolvo + dto.my_kolvo
+				if(dto.my_kolvo > detal.shipments_kolvo) {
+					let differens = Number(dto.my_kolvo) - Number(detal.shipments_kolvo)
+					await this.shipmentsMaterialsForDetal(detal, differens)
+				}
 				await detal.save()
 			} 
 		}
@@ -121,23 +123,24 @@ export class MetaloworkingService {
 				model: PodPodMaterial,
 				as: 'mat_za_obj',
 				include: ['material'],
-			}] 
 			}, {
 				model: TechProcess,
-				include: [{
-					model: Operation, 
-					include: ['marks']
-			}]
-		}]})
+					include: [{
+						model: Operation, 
+						include: ['marks']
+					}]
+			}] 
+			}
+		]})
 
 		for(let obj of metal) {
-			if(!obj.tech_process || !obj.tech_process.operations) continue;
-			for(let i in obj.tech_process.operations) {
-				for(let j in obj.tech_process.operations) {
-					if(obj.tech_process.operations[i].id < obj.tech_process.operations[j].id) {
-						const ggg = obj.tech_process.operations[i]
-						obj.tech_process.operations[i] = obj.tech_process.operations[j]
-						obj.tech_process.operations[j] = ggg
+			if(!obj.detal || !obj.detal.techProcesses || !obj.detal.techProcesses.operations.length) continue;
+			for(let i in obj.detal.techProcesses.operations) {
+				for(let j in obj.detal.techProcesses.operations) {
+					if(obj.detal.techProcesses.operations[i].id < obj.detal.techProcesses.operations[j].id) {
+						const ggg = obj.detal.techProcesses.operations[i]
+						obj.detal.techProcesses.operations[i] = obj.detal.techProcesses.operations[j]
+						obj.detal.techProcesses.operations[j] = ggg
 					}
 				}
 			}
@@ -146,7 +149,21 @@ export class MetaloworkingService {
 	}
 
 	async getOneMetaloworkingById(id: number) {
-		return await this.metaloworkingReprositroy.findByPk(id, {include: {all: true}})
+		return await this.metaloworkingReprositroy.findByPk(id, {include: [{all: true}, 
+			{
+				model: Detal, 
+				include: ['documents', 'mat_za_obj', {
+					model: Shipments, 
+					include: ['product']
+				}, {
+					model: TechProcess,
+						include: [{
+							model: Operation, 
+							include: ['marks']
+						}]
+				}] 
+			}
+		]})
 	}
 
 	async getMetalloworkingByTypeOperation(op_id: number) {
@@ -154,7 +171,8 @@ export class MetaloworkingService {
 		const arr = []
 		for(let metal of metaloworkings) {
 			try {
-				for(let operation of metal.tech_process.operations) {
+				if(!metal.detal || !metal.detal.techProcesses) continue
+				for(let operation of metal.detal.techProcesses.operations) {
 					if(operation.name == op_id) {
 						const operation_new = {operation, metal}
 						arr.push(operation_new)

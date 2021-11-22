@@ -1,4 +1,4 @@
-import { Module } from '@nestjs/common';
+import { forwardRef, Module } from '@nestjs/common';
 import { SequelizeModule } from '@nestjs/sequelize';
 import { CbedModule } from 'src/cbed/cbed.module';
 import { DetalModule } from 'src/detal/detal.module';
@@ -17,7 +17,7 @@ import { AssembleService } from './assemble.service';
 		SequelizeModule.forFeature([
 			Assemble
 		]),
-		ShipmentsModule,
+		forwardRef(() => ShipmentsModule),
 		CbedModule,
 		SettingsModule,
 		DetalModule,

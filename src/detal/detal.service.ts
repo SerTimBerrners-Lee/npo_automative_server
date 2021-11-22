@@ -566,10 +566,11 @@ export class DetalService {
 
     async getAllDeficitDeficit() {
 		const detals = await this.detalReprository.findAll({include: {all: true}, where: {
-            kolvo_shipments: {
+            shipments_kolvo: {
                 [Op.gt]: 0
             }
         }})
+        console.log(detals)
 
         return detals
 	}

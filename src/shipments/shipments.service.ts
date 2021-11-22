@@ -1,10 +1,12 @@
 import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
 import { InjectModel } from '@nestjs/sequelize';
+import { AssembleService } from 'src/assemble/assemble.service';
 import { BuyerService } from 'src/buyer/buyer.service';
 import { CbedService } from 'src/cbed/cbed.service';
 import { DetalService } from 'src/detal/detal.service';
 import { DocumentsService } from 'src/documents/documents.service';
 import { DateMethods } from 'src/files/date.methods';
+import { MetaloworkingService } from 'src/metaloworking/metaloworking.service';
 import { ProductService } from 'src/product/product.service';
 import { SettingsService } from 'src/settings/settings.service';
 import { UpCreateShipmentsDto } from './dto/up-create-shipments.dto';
@@ -18,7 +20,9 @@ export class ShipmentsService {
 		private cbedService: CbedService,
 		private detalService: DetalService,
 		private setingsService: SettingsService,
-		private documentsService: DocumentsService) {}
+		private documentsService: DocumentsService, 
+		private assembleService: AssembleService,
+		private metaloworkingService: MetaloworkingService) {}
 
 	async createShipments(dto: UpCreateShipmentsDto, files: any) {
 		const dm = new DateMethods()
@@ -39,23 +43,28 @@ export class ShipmentsService {
 		if(!shipment)
 			throw new HttpException('Не удалось создать заказ', HttpStatus.BAD_REQUEST)
 
-		const data = JSON.parse(dto.data)
-		if(!data)
-			throw new HttpException('Пустой запрос', HttpStatus.NO_CONTENT)
-		data.docs = dto.docs
-		return await this.upCreateShipments(data, shipment, files);
+		try {
+			const data = JSON.parse(dto.data)
+			if(!data)
+				throw new HttpException('Пустой запрос', HttpStatus.NO_CONTENT)
+
+			data.docs = dto.docs
+				return await this.upCreateShipments(data, shipment, files);
+		} catch(e) {console.error(e)}
 
 	}
 
 	async updateShipments(dto: UpCreateShipmentsDto, files: any) {
-		const data = JSON.parse(dto.data)
-		if(!data)
-			throw new HttpException('Пустой запрос', HttpStatus.NO_CONTENT)
-		const shipment = await this.shipmentsReprository.findByPk(data.id, {include: {all: true}});
-		if(!shipment)
-			throw new HttpException('Не удалось найти заказ', HttpStatus.BAD_REQUEST)
-		data.docs = dto.docs
-		return await this.upCreateShipments(data, shipment, files)
+		try {
+			const data = JSON.parse(dto.data)
+			if(!data)
+				throw new HttpException('Пустой запрос', HttpStatus.NO_CONTENT)
+			const shipment = await this.shipmentsReprository.findByPk(data.id, {include: {all: true}});
+			if(!shipment)
+				throw new HttpException('Не удалось найти заказ', HttpStatus.BAD_REQUEST)
+			data.docs = dto.docs
+			return await this.upCreateShipments(data, shipment, files)
+		} catch(e) {console.error(e)}
 	}
 
 	private async upCreateShipments(data: any, shipment: Shipments, files: any) {
@@ -81,17 +90,18 @@ export class ShipmentsService {
 						let check = true
 						for(let upl_izd of parsCurList) {
 							if(upl_izd.type == izd.type && upl_izd.obj.id == izd.obj.id) {
-								if(Number(izd.kol) > Number(upl_izd.kol)) izd.kol = Number(izd.kol) - Number(upl_izd.kol)
+								if(Number(izd.kol) > Number(upl_izd.kol)) {
+									izd.kol = Number(izd.kol) - Number(upl_izd.kol)
+									continue
+								}
 								if(Number(izd.kol) < Number(upl_izd.kol)) izd.kol = Number(izd.kol) - Number(upl_izd.kol)
 								else check = false
-								// Если элемент был а сейчас его нет удаляем элемент 
 							}
 						}
 						if(!check) continue 
 					}
 					await this.incrementShipmentsKolvo(izd, shipment, 'increment')
 				}
-				// Перед тем как присвоить - проверяем удалены ли какие -то элементы 
 				if(shipment.list_cbed_detal) {
 					const parsCurList = JSON.parse(shipment.list_cbed_detal)
 					for(let izd of parsCurList) {
@@ -121,7 +131,7 @@ export class ShipmentsService {
 				shipment.buyerId = null
 			await shipment.save()
 		}
-		if(data.product) {
+		if(data.product && !data.is_not_product) {
 			const product = await this.productService.getById(data.product.id)
 			if(product) {
 				product.shipments_kolvo = data.kol
@@ -177,15 +187,24 @@ export class ShipmentsService {
 		return result
 	}
 
+	/**
+	 * Меняем количество заказаных СБ и Д
+	 * @param izd 
+	 * @param shipment 
+	 * @param action 
+	 */
 	private async incrementShipmentsKolvo(izd: any, shipment: Shipments, action: string) {
 		if(izd.type == 'cbed') {
 			let izdels = await this.cbedService.findById(izd.obj.id) 
 			if(izdels) {
 				if(action == 'increment') {
 					izdels.shipments_kolvo = izdels.shipments_kolvo + Number(izd.kol)
+					await this.assembleService.shipmentsMaterialsForIzd(izdels, Number(izd.kol))
 					shipment.$add('cbeds', izdels.id)
 				} else {
 					izdels.shipments_kolvo = izdels.shipments_kolvo - Number(izd.kol)
+					let count = Number(izd.kol) > 0 ? - Number(izd.kol) : Number(izd.kol)
+					await this.assembleService.shipmentsMaterialsForIzd(izdels, count)
 					shipment.$remove('cbeds', izdels.id)
 				}
 				await izdels.save()
@@ -194,10 +213,13 @@ export class ShipmentsService {
 				let izdels = await this.detalService.findByIdDetal(izd.obj.id)
 				if(izdels) {
 					if(action == 'increment') {
-						izdels.kolvo_shipments = izdels.kolvo_shipments + Number(izd.kol)
+						izdels.shipments_kolvo = izdels.shipments_kolvo + Number(izd.kol)
+						await this.metaloworkingService.shipmentsMaterialsForDetal(izdels, Number(izd.kol))
 						shipment.$add('detals', izdels.id)
 					} else {
-						izdels.kolvo_shipments = izdels.kolvo_shipments - Number(izd.kol)
+						izdels.shipments_kolvo = izdels.shipments_kolvo - Number(izd.kol)
+						let count = Number(izd.kol) > 0 ? - Number(izd.kol) : Number(izd.kol)
+						await this.metaloworkingService.shipmentsMaterialsForDetal(izdels, count)
 						shipment.$remove('detals', izdels.id)
 					}
 					await izdels.save()
@@ -230,16 +252,18 @@ export class ShipmentsService {
 	async getAllShipmentsAssemble() {
 		const shipments = await this.shipmentsReprository.findAll({include: {all: true}})
 		const assemble: any = []
-		for(let sh of shipments)
-			assemble.push(sh)
+		for(let sh of shipments) {
+			if(sh.cbeds && sh.cbeds.length) assemble.push(sh)
+		}
 		return assemble
 	}
 
 	async getAllShipmentsMetaloworking() {
 		const shipments = await this.shipmentsReprository.findAll({include: {all: true}})
 		const metaloworking: any = []
-		for(let sh of shipments) 
-			metaloworking.push(sh)
+		for(let sh of shipments) {
+			if(sh.detals && sh.detals.length) metaloworking.push(sh)
+		}
 		return metaloworking
 	}
 

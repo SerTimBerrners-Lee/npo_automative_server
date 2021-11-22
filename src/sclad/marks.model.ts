@@ -37,11 +37,19 @@ export class Marks extends Model<Marks, MarksCreationAttrs> {
 
     @BelongsTo(() => User)
     user: User;
+
+    @ForeignKey(() => Assemble)
+    @Column({type: DataType.INTEGER})
+    assemble_id: number;
+
+    @ForeignKey(() => Metaloworking)
+    @Column({type: DataType.INTEGER})
+    metaloworking_id: number;
     
 		@ForeignKey(() => Operation)
     @Column({type: DataType.INTEGER})
     oper_id: number;
 
     @BelongsTo(() => Operation)
-    operation: Operation;
+    operation: Operation; 
 }     

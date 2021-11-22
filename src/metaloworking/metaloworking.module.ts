@@ -1,4 +1,4 @@
-import { Module } from '@nestjs/common';
+import { forwardRef, Module } from '@nestjs/common';
 import { SequelizeModule } from '@nestjs/sequelize';
 import { DetalModule } from 'src/detal/detal.module';
 import { ProductModule } from 'src/product/product.module';
@@ -15,7 +15,7 @@ import { MetaloworkingService } from './metaloworking.service';
 		SequelizeModule.forFeature([
 			Metaloworking
 		]),
-		ShipmentsModule,
+		forwardRef(() => ShipmentsModule),
 		DetalModule,
 		SettingsModule,
 		ProductModule
