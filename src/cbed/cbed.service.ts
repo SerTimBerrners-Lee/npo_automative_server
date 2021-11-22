@@ -157,7 +157,7 @@ export class CbedService {
                         await cbed.$add('documents', check_files)
                 }
             }   catch(e) {
-                console.log(e)
+                console.error(e)
             }
         }
 

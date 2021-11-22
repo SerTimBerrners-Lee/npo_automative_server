@@ -141,7 +141,6 @@ export class MetaloworkingService {
 					}
 				}
 			}
-			console.log('Operaitons2')
 		}
 		return metal
 	}

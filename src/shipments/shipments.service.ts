@@ -87,8 +87,7 @@ export class ShipmentsService {
 								// Если элемент был а сейчас его нет удаляем элемент 
 							}
 						}
-						if(!check) continue
-						console.log(izd, check)
+						if(!check) continue 
 					}
 					await this.incrementShipmentsKolvo(izd, shipment, 'increment')
 				}

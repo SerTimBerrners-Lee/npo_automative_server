@@ -226,7 +226,7 @@ export class DetalService {
                         await detal.$add('documents', check_files)
                 }
             }   catch(e) {
-                console.log(e)
+                console.error(e)
             }
         }
 
@@ -451,8 +451,7 @@ export class DetalService {
 
         if(dto.description)
             tp.description = dto.description
-        
-        console.log(dto)
+
         tp.operations = []
         if(dto.operationList) {
             let OL = JSON.parse(dto.operationList)
