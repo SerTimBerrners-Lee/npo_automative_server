@@ -19,7 +19,6 @@ export class ShipmentsService {
 		private productService: ProductService,
 		private cbedService: CbedService,
 		private detalService: DetalService,
-		private setingsService: SettingsService,
 		private documentsService: DocumentsService, 
 		private assembleService: AssembleService,
 		private metaloworkingService: MetaloworkingService) {}
@@ -36,20 +35,35 @@ export class ShipmentsService {
 				limit: 1
 			})
 		let endYears = dm.date().split('.')[dm.date().split('.').length - 1].slice(2);
-		const numberEndShipments = endShipments && endShipments.id ?  
+		let numberEndShipments = endShipments && endShipments.id ?  
 			`№ ${endYears}-${endShipments.id + 1} от ${dm.date()}` : `№ ${endYears}-1 от ${dm.date()}`
-
-		const shipment = await this.shipmentsReprository.create({number_order: numberEndShipments});
-		if(!shipment)
-			throw new HttpException('Не удалось создать заказ', HttpStatus.BAD_REQUEST)
 
 		try {
 			const data = JSON.parse(dto.data)
-			if(!data)
-				throw new HttpException('Пустой запрос', HttpStatus.NO_CONTENT)
-
+			if(!data) throw new HttpException('Пустой запрос', HttpStatus.NO_CONTENT)
 			data.docs = dto.docs
-				return await this.upCreateShipments(data, shipment, files);
+
+			let shipment: any
+			if(data.parent_id) {
+				const parentShipments = await this.shipmentsReprository.findByPk(data.parent_id, {include: {all: true}})
+				if(parentShipments) {
+						let pars_number = parentShipments.number_order.split('от')
+						numberEndShipments = `${pars_number[0]}/${parentShipments.childrens.length + 1} от ${pars_number[1]}`
+
+						shipment = await this.shipmentsReprository.create({number_order: numberEndShipments});
+						if(!shipment)
+							throw new HttpException('Не удалось создать заказ', HttpStatus.BAD_REQUEST)
+
+						shipment.parent_id = data.parent_id
+						await shipment.save()
+						return await this.upCreateShipments(data, shipment, files);
+				}
+			}
+			shipment = await this.shipmentsReprository.create({number_order: numberEndShipments});
+			if(!shipment)
+				throw new HttpException('Не удалось создать заказ', HttpStatus.BAD_REQUEST)
+
+			return await this.upCreateShipments(data, shipment, files);
 		} catch(e) {console.error(e)}
 
 	}

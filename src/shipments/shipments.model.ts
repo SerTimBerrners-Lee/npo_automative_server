@@ -1,5 +1,5 @@
 import { ApiProperty } from "@nestjs/swagger";
-import { Model, Column, DataType, Table, ForeignKey, BelongsTo, BelongsToMany} from "sequelize-typescript";
+import { Model, Column, DataType, Table, ForeignKey, BelongsTo, BelongsToMany, HasMany} from "sequelize-typescript";
 import { Buyer } from "src/buyer/buyer.model";
 import { Cbed } from "src/cbed/cbed.model";
 import { Detal } from "src/detal/detal.model";
@@ -76,6 +76,13 @@ export class Shipments extends Model<Shipments, ShipmentsAttrCreate> {
     @ApiProperty({example: '1', description: ''})
     @Column({type: DataType.STRING, defaultValue: statusShipment.order})
     status: string;
+
+    @ForeignKey(() => Shipments)
+    @Column({type: DataType.INTEGER})
+    parent_id: number;
+
+    @HasMany(() => Shipments)
+    childrens: Shipments[];
   
     @BelongsToMany(() => Cbed, () => ShipmentsCbed)
     cbeds: Cbed[];
