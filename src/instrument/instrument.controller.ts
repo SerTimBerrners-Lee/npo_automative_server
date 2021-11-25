@@ -35,7 +35,6 @@ export class InstrumentController {
     @ApiOperation({summary: 'Обновление Типа '})
     @Post('/update')
     updateTInstrument(@Body() dto: UpdateTInstrumentDto) {
-        console.log(dto)
         return this.instrumentService.updateTInstrument(dto)
     } 
 

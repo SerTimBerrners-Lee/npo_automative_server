@@ -16,7 +16,6 @@ export class MovingController {
   createNewMoving(
     @Body() dto: CreateMovingDto, 
     @UploadedFiles() files: { document?: Express.Multer.File[]} ) {
-      console.log(dto)
     return this.movingServices.createNewMoving(dto, files)
   }
 

@@ -570,8 +570,6 @@ export class DetalService {
                 [Op.gt]: 0
             }
         }})
-        console.log(detals)
-
         return detals
 	}
 

@@ -18,8 +18,7 @@ import { UsersService } from './users.service';
     SequelizeModule.forFeature([User, Role, DocumentsUser, Avatars]),
     RolesModule,
     DocumentsModule,
-    FilesModule,
-    // Предотврашаем кольцевую зависимость 
+    FilesModule, 
     forwardRef(() => AuthModule )
   ],
   exports: [

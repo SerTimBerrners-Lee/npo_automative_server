@@ -50,10 +50,14 @@ export class Shipments extends Model<Shipments, ShipmentsAttrCreate> {
 		@ApiProperty({example: '1', description: ''})
     @Column({type: DataType.BOOLEAN, defaultValue: true})
     to_sklad: boolean;
-
+    
 		@ApiProperty({example: '1', description: ''})
     @Column({type: DataType.TEXT})
     list_cbed_detal: string;
+
+    @ApiProperty({example: '1', description: ''})
+    @Column({type: DataType.TEXT})
+    list_hidden_cbed_detal: string;
 
 		@ApiProperty({example: '1', description: ''})
     @Column({type: DataType.STRING})

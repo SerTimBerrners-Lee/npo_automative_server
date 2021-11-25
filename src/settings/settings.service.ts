@@ -249,13 +249,10 @@ export class SettingsService {
         podPodMaterial.kolvo = []
 
         if(dto.kolvo) {
-            try {
-                console.log(dto.kolvo)
+            try { 
                 podPodMaterial.kolvo = dto.kolvo
                 await podPodMaterial.save()
-            } catch (e) {
-                console.log(e)
-            }
+            } catch (e) { console.error(e) }
         }
             
         if(deliveryTime && deliveryTime.edizm && deliveryTime.znach) 
@@ -263,9 +260,7 @@ export class SettingsService {
                 if(res) {
                     try {
                         podPodMaterial.deliveryTime = JSON.stringify({edizm: res, znach: deliveryTime.znach})
-                    } catch(e) {
-                        console.log(e)
-                    }
+                    } catch(e) {  console.error(e)  }
                 }   
             })
         else 
@@ -276,9 +271,7 @@ export class SettingsService {
                 if(res) {
                     try {
                         podPodMaterial.density = JSON.stringify({edizm: res, znach: density.znach})
-                    } catch(e) {
-                        console.log(e)
-                    }
+                    } catch(e) { console.error(e) }
                 }
             })
         else 
@@ -386,9 +379,7 @@ export class SettingsService {
                     if(check_files)
                         await podPodMaterial.$add('documents', check_files)
                 }
-            }   catch(e) {
-                console.log(e)
-            }
+            }   catch(e) { console.error(e) }
         }
 
         if(dto.docs) {

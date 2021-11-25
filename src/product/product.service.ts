@@ -171,9 +171,7 @@ export class ProductService {
                     if(check_files)
                         await product.$add('documents', check_files)
                 }
-            }   catch(e) {
-                console.log(e)
-            }
+            }   catch(e) {console.error(e)}
         }
 
         if(dto.docs) {

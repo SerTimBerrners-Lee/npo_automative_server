@@ -54,10 +54,7 @@ export class FilesService {
     async newBackup() {
         try {
             if(fs.existsSync(DIR_SCRIPT)) {
-                const { err, exicute } = await exec(`sh ${DIR_SCRIPT}`)
-                console.log("exicute", exicute)
-                console.log('err:', err)
-                console.log(DIR_SCRIPT)
+                await exec(`sh ${DIR_SCRIPT}`)
                 return true
             }
             return false

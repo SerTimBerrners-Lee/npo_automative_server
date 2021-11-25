@@ -344,9 +344,7 @@ export class ProviderService {
                         await object.save()
                     }
                 }
-            } catch (e) {
-                console.log(e)
-            }
+            } catch (e) { console.error(e) }
             await waybill.save()
         }
 

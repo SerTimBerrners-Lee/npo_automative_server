@@ -10,7 +10,7 @@ export class MovingService {
   ) {}
 
   async createNewMoving(dto: CreateMovingDto, files: any) {
-    console.log(dto, files)
+
   }
 
   async getAllMoving() {

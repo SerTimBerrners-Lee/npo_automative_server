@@ -8,7 +8,6 @@ import { DocumentsService } from 'src/documents/documents.service';
 import { DateMethods } from 'src/files/date.methods';
 import { MetaloworkingService } from 'src/metaloworking/metaloworking.service';
 import { ProductService } from 'src/product/product.service';
-import { SettingsService } from 'src/settings/settings.service';
 import { UpCreateShipmentsDto } from './dto/up-create-shipments.dto';
 import { Shipments } from './shipments.model';
 
@@ -91,16 +90,15 @@ export class ShipmentsService {
 		if(data.description != 'null')
 			shipment.description = data.description
 			else shipment.description = ''
-		
-		console.log(data)
-		console.log(files)
 
 		if(data.list_cbed_detal && data.list_cbed_detal != 'null' || data.list_cbed_detal != '[]') {
 			try {
 				let list_izd = JSON.parse(data.list_cbed_detal)
+				if(data.list_hidden_cbed_detal) list_izd = list_izd.concat(JSON.parse(data.list_hidden_cbed_detal))
 				for(let izd of list_izd) {
 					if(data.id && shipment.list_cbed_detal) {
-						const parsCurList = JSON.parse(shipment.list_cbed_detal)
+						let parsCurList = JSON.parse(shipment.list_cbed_detal)
+						if(shipment.list_hidden_cbed_detal) parsCurList = parsCurList.concat(JSON.parse(shipment.list_hidden_cbed_detal))
 						let check = true
 						for(let upl_izd of parsCurList) {
 							if(upl_izd.type == izd.type && upl_izd.obj.id == izd.obj.id) {
@@ -117,7 +115,8 @@ export class ShipmentsService {
 					await this.incrementShipmentsKolvo(izd, shipment, 'increment')
 				}
 				if(shipment.list_cbed_detal) {
-					const parsCurList = JSON.parse(shipment.list_cbed_detal)
+					let parsCurList = JSON.parse(shipment.list_cbed_detal)
+					if(shipment.list_hidden_cbed_detal) parsCurList = parsCurList.concat(JSON.parse(shipment.list_hidden_cbed_detal))
 					for(let izd of parsCurList) {
 						let check = false
 						for(let dat_item of list_izd) {
@@ -128,10 +127,12 @@ export class ShipmentsService {
 					}
 				}
 				shipment.list_cbed_detal = data.list_cbed_detal
-			} catch(e) {
-				console.error(e)
-			}
-		} else shipment.list_cbed_detal = ''
+				shipment.list_hidden_cbed_detal = data.list_hidden_cbed_detal
+			} catch(e) {console.error(e)}
+		} else {
+			shipment.list_cbed_detal = ''
+			shipment.list_hidden_cbed_detal = ''
+		}
 
 		if(data.buyer && Number(data.buyer) && !data.to_sklad) {
 			const buyer = await this.buyerService.getByuerById(data.buyer)
@@ -165,7 +166,8 @@ export class ShipmentsService {
 					docs[i].type,
 					docs[i].version,
 					docs[i].description,
-					docs[i].name
+					docs[i].name,
+					docs[i].newVersion
 				)
 				if(res && res.id) {
 					const docId = await this.documentsService.getFileById(res.id)
@@ -186,7 +188,8 @@ export class ShipmentsService {
 
 		if(shipments.list_cbed_detal) {
 			try {
-				const pars = JSON.parse(shipments.list_cbed_detal)
+				let pars = JSON.parse(shipments.list_cbed_detal)
+				if(shipments.list_hidden_cbed_detal) pars = pars.concat(JSON.parse(shipments.list_hidden_cbed_detal))
 				if(pars) {
 					for(let izd of pars) {
 						this.incrementShipmentsKolvo(izd, shipments, 'decriment')

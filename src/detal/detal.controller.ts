@@ -68,7 +68,6 @@ export class DetalController {
     @Delete('/:id')
     removeDeleteById(@Request() req: any, @Param('id') id: number, ) {
         const authHeader = req.headers.authorization;
-        console.log(req.headers)
         if(!authHeader)
             throw new  HttpException('Пользователь не зарегестрирован', HttpStatus.BAD_REQUEST)
         return this.detalService.removeDeleteById(id, authHeader)

@@ -77,8 +77,7 @@ export class SettingsController {
 
     @ApiOperation({summary: 'Создаем под тип материала'})
     @Post('/podtype')
-    createPodMaterial(@Body() dto: CreatePodMaterialDto) {
-        console.log(dto)
+    createPodMaterial(@Body() dto: CreatePodMaterialDto) { 
         return this.settingsService.createPodMaterial(dto)
     }
 
