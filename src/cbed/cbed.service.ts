@@ -83,21 +83,20 @@ export class CbedService {
         if(cbed.materials && cbed.materials.length) {
             for( let mat of cbed.materials) {
                 await cbed.$remove('materials', mat.id)
-                await cbed.save()
             }
         }
 
         if(dto.materialList) {
             const mList = JSON.parse(dto.materialList)
-            cbed.materialList = dto.materialList
             if(mList.length) {
                 for(let m = 0; m < mList.length; m++) {
                     let material = await this.podPodMaterialReprository.findByPk(mList[m].mat.id)
                     if(material) {
+                        mList[m].mat.name = material.name
                         await cbed.$add('materials', material.id)
-                        await cbed.save()
                     }
                 }
+                cbed.materialList = JSON.stringify(mList)
             }
         } 
 
@@ -105,15 +104,15 @@ export class CbedService {
 
         if(dto.listPokDet) {
             const mList = JSON.parse(dto.listPokDet)
-            cbed.listPokDet = dto.listPokDet
             if(mList.length) {
                 for(let m = 0; m < mList.length; m++) {
                     let material = await this.podPodMaterialReprository.findByPk(mList[m].mat.id)
                     if(material) {
+                        mList[m].mat.name = material.name
                         await cbed.$add('materials', material.id)
-                        await cbed.save()
                     }
                 }
+                cbed.listPokDet = JSON.stringify(mList)
             }
         }
 
@@ -121,25 +120,35 @@ export class CbedService {
         if(cbed.detals && cbed.detals.length) {
             for( let det of cbed.detals) {
                 await cbed.$remove('detals', det.id) 
-                await cbed.save()
             }
         }
         
         if(dto.listDetal) {
             const mList = JSON.parse(dto.listDetal)
-            cbed.listDetal = dto.listDetal
             if(mList.length) {
                 for(let m = 0; m < mList.length; m++) {
                     let detal = await this.detalReprository.findByPk(mList[m].det.id)
                     if(detal) {
+                        mList[m].det.name = detal.name
                         await cbed.$add('detals', detal.id)
-                        await cbed.save()
                     }
                 }
+                cbed.listDetal = JSON.stringify(mList)
             }
         }
-        if(dto.listCbed) 
-            cbed.listCbed = dto.listCbed
+        if(dto.listCbed) {
+            try {
+                let mList = JSON.parse(dto.listCbed)
+                if(mList) {
+                    for(let m of mList) {
+                        const check_cbed = await this.cbedReprository.findByPk(mList[m].cb.id)
+                        if(check_cbed) 
+                            mList[m].cb.name = check_cbed.name
+                    }
+                    cbed.listCbed = JSON.stringify(mList)
+                }
+            }catch(e) {console.error(e)}
+        }
         else cbed.listCbed = ''
 
         if(cbed.documents) {

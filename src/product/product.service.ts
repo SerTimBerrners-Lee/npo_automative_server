@@ -85,15 +85,15 @@ export class ProductService {
 
         if(dto.materialList) {
             const mList = JSON.parse(dto.materialList)
-            product.materialList = dto.materialList
             if(mList.length) {
                 for(let m = 0; m < mList.length; m++) {
                     let material = await this.podPodMaterialReprository.findByPk(mList[m].mat.id)
                     if(material) {
+                        mList[m].mat.name = material.name
                         await product.$add('materials', material.id)
-                        await product.save()
                     }
                 }
+                product.materialList = JSON.stringify(mList)
             }
         }
 
@@ -101,15 +101,15 @@ export class ProductService {
 
         if(dto.listPokDet) {
             const mList = JSON.parse(dto.listPokDet)
-            product.listPokDet = dto.listPokDet
             if(mList.length) {
                 for(let m = 0; m < mList.length; m++) {
                     let material = await this.podPodMaterialReprository.findByPk(mList[m].mat.id)
                     if(material) {
+                        mList[m].mat.name = material.name
                         await product.$add('materials', material.id)
-                        await product.save()
                     }
                 }
+                product.listPokDet = JSON.stringify(mList)
             }
         }
 
@@ -117,21 +117,20 @@ export class ProductService {
         if(product.detals && product.detals.length) {
             for( let det of product.detals) {
                 await product.$remove('detals', det.id) 
-                await product.save()
             }
         }
 
         if(dto.listDetal) {
             const mList = JSON.parse(dto.listDetal)
-            product.listDetal = dto.listDetal
             if(mList.length) {
                 for(let m = 0; m < mList.length; m++) {
                     let detal = await this.detalReprository.findByPk(mList[m].det.id)
                     if(detal) {
+                        mList[m].det.name = detal.name
                         await product.$add('detals', detal.id)
-                        await product.save()
                     }
                 }
+                product.listDetal = JSON.stringify(mList)
             }
         }
 
@@ -139,21 +138,20 @@ export class ProductService {
         if(product.cbeds && product.cbeds.length) {
             for( let cb of product.cbeds) {
                 await product.$remove('cbeds', cb.id) 
-                await product.save()
             }
         }
 
         if(dto.listCbed) {
             const mList = JSON.parse(dto.listCbed)
-            product.listCbed = dto.listCbed
             if(mList.length) {
                 for(let m = 0; m < mList.length; m++) {
                     let cbed = await this.cbedReprository.findByPk(mList[m].cb.id)
                     if(cbed) {
+                        mList[m].cb.name = cbed.name
                         await product.$add('cbeds', cbed.id)
-                        await product.save()
                     }
                 }
+                product.listCbed = JSON.stringify(mList)
             }
         }
 
@@ -222,6 +220,10 @@ export class ProductService {
 
     async getProductByIdLight(id: number) {
         return await this.productReprository.findByPk(id)
+    }
+
+    async getProductById(id: number) {
+        return await this.productReprository.findByPk(id, {include: {all: true}})
     }
 
     async removeDocumentProduct(dto: RemoveDocumentDto) {

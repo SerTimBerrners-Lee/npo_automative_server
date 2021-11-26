@@ -50,6 +50,12 @@ export class ProductController {
         return this.productService.getProductByIdLight(id)
     }
 
+    @ApiOperation({summary: 'Получаем Полностью Изделие by ID'})
+    @Get('/one/:id')
+    getProductById(@Param('id') id: number) {
+        return this.productService.getProductById(id)
+    }
+
     @ApiOperation({summary: 'Прикрепить файл'})
     @Get('/files/:product_id/:file_id')
     attachFileToProduct(@Param('product_id') product_id: number, @Param('file_id') file_id: number) {

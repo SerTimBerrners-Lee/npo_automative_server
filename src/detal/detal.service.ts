@@ -189,14 +189,15 @@ export class DetalService {
 
         if(dto.materialList) {
             const mList = JSON.parse(dto.materialList)
-            detal.materialList = dto.materialList
             if(mList.length) {
                 for(let m = 0; m < mList.length; m++) {
                     let material = await this.podPodMaterialReprository.findByPk(mList[m].mat.id)
                     if(material) {
+                        mList[m].mat.name = material.name
                         await detal.$add('materials', material.id)
                     }
                 }
+                detal.materialList = JSON.stringify(mList)
             }
         } else 
             detal.materialList = ''   
