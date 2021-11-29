@@ -140,7 +140,7 @@ export class ProductService {
                 await product.$remove('cbeds', cb.id) 
             }
         }
-
+        
         if(dto.listCbed) {
             const mList = JSON.parse(dto.listCbed)
             if(mList.length) {
@@ -193,7 +193,7 @@ export class ProductService {
             }
         }
 
-
+        await product.save()
         return product
     }
 
