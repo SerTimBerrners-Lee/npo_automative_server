@@ -140,7 +140,7 @@ export class CbedService {
             try {
                 let mList = JSON.parse(dto.listCbed)
                 if(mList) {
-                    for(let m of mList) {
+                    for(let m in mList) {
                         const check_cbed = await this.cbedReprository.findByPk(mList[m].cb.id)
                         if(check_cbed) 
                             mList[m].cb.name = check_cbed.name
@@ -148,8 +148,7 @@ export class CbedService {
                     cbed.listCbed = JSON.stringify(mList)
                 }
             }catch(e) {console.error(e)}
-        }
-        else cbed.listCbed = ''
+        } else cbed.listCbed = ''
 
         if(cbed.documents) {
             for(let doc of cbed.documents) {
