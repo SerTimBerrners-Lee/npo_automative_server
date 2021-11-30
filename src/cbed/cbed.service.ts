@@ -193,9 +193,17 @@ export class CbedService {
         return cbed
     }
 
-    async getAllCbed() {
-        const cbed = await this.cbedReprository.findAll({include: {all: true}})
-        return cbed
+    async getAllCbed(light: string) {
+        if(light == 'true') {
+            const cbed = await this.cbedReprository.findAll({attributes: [
+                'id', 'name', 'ban', 'articl', 'attention'
+            ]})
+            return cbed
+        }
+        else {
+            const cbed = await this.cbedReprository.findAll({include: {all: true}})
+            return cbed
+        }
     }
 
     async findById(id: number) {
@@ -229,10 +237,8 @@ export class CbedService {
         const cbed = await this.cbedReprository.findByPk(dto.id_object, {include: {all: true}})
         const document = await this.documentsService.getFileById(dto.id_document)
 
-        if(cbed && document) {
+        if(cbed && document)
             cbed.$remove('documents', document.id)
-            await cbed.save()
-        }
         return cbed
     }
 

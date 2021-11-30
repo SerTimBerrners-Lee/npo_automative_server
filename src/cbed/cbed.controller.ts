@@ -33,9 +33,9 @@ export class CbedController {
     }
 
     @ApiOperation({summary: 'Получаем все сборочные единицы'})
-    @Get('/')
-    getAllCbed() {
-        return this.cbedService.getAllCbed()
+    @Get('/:light')
+    getAllCbed(@Param('light') light: string) {
+        return this.cbedService.getAllCbed(light)
     }
 
     @ApiOperation({summary: 'Получаем все артиклы СБ'})
@@ -69,7 +69,7 @@ export class CbedController {
     }
 
     @ApiOperation({summary: 'Получить одну сборочную единицу по ID'})
-    @Get('/:id')
+    @Get('/one/:id')
     getOneCbedById(@Param('id') id: number) {
         return this.cbedService.getOneCbedById(id)
     }

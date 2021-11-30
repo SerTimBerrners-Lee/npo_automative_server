@@ -187,7 +187,6 @@ export class ProductService {
                 if(res && res.id) {
                     const docId = await this.documentsReprository.findByPk(res.id)
                     if(docId) await product.$add('documents', docId.id)
-                    
                 }
                 i++
             }
@@ -201,8 +200,10 @@ export class ProductService {
         if(light == 'false')
             return await this.productReprository.findAll({include: {all: true}})
 
-        return await this.productReprository.findAll()
-    }
+        return await this.productReprository.findAll({attributes: [
+            'id', 'name', 'ban', 'fabricNumber', 'articl', 'attention'
+        ]})
+    } 
 
     async getById(id: number) {
         return await this.productReprository.findByPk(id)
