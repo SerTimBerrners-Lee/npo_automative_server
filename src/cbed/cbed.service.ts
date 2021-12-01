@@ -207,7 +207,13 @@ export class CbedService {
     }
 
     async findById(id: number) {
-        return await this.cbedReprository.findByPk(id, {include: {all: true}})
+        return await this.cbedReprository.findByPk(id, {include: [
+            {all: true},
+            {
+            model: TechProcess,
+            include: ['operations']
+            }
+        ]})
     }
 
     async getCbedByField(field: string, id: number) {

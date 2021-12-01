@@ -9,4 +9,4 @@ start:
 all:
 	sudo make git
 	sudo make build
-	sudo make start
+	pm2 restart npo-server

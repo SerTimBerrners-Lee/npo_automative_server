@@ -102,7 +102,13 @@ export class DetalService {
     }
 
     async getDeleteById(id:number) {
-        const detal = await this.detalReprository.findByPk(id, {include: {all: true}})
+        const detal = await this.detalReprository.findByPk(id, {include: [
+            {all: true},
+            {
+                model: TechProcess,
+                include: ['operations']
+            }
+        ]})
         if(!detal) 
             throw new HttpException('Не удалось обновить деталь', HttpStatus.BAD_REQUEST)
             

@@ -224,7 +224,13 @@ export class ProductService {
     }
 
     async getProductById(id: number) {
-        return await this.productReprository.findByPk(id, {include: {all: true}})
+        return await this.productReprository.findByPk(id, {include: [
+            {all: true},
+            {
+                model: TechProcess,
+                include: ['operations']
+            }
+        ]})
     }
 
     async removeDocumentProduct(dto: RemoveDocumentDto) {

@@ -154,7 +154,12 @@ export class UsersService {
 
     async getUser(light: string) {
         if(light == 'true')
-            return await this.userRepository.findAll()
+            return await this.userRepository.findAll({
+                include: ['role'],
+                order: [
+                    ['tabel', 'ASC']
+                ]
+            })
         else
             return await this.userRepository.findAll({
                 include: {all: true},
