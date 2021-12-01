@@ -85,8 +85,7 @@ export class Detal extends Model<Detal, DetalCreationAttrs> {
 
     @BelongsToMany(() => Documents, () => DocumentsDetal)
     documents: Documents[];
-
-    // Регистрируем модель для материалов
+    
     @BelongsToMany(() => PodPodMaterial, () => DetalMaterials)
     materials: PodPodMaterial[];
 

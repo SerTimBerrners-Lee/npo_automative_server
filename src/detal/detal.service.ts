@@ -37,8 +37,11 @@ export class DetalService {
         private documentsService: DocumentsService
     ) {} 
 
-    async getAllDetals() {
-        return await this.detalReprository.findAll({include: {all: true}})
+    async getAllDetals(light: string) {
+        if(light == 'false') return await this.detalReprository.findAll({include: {all: true}})
+        return await this.detalReprository.findAll({ attributes: [
+            'id', 'name', 'ban', 'articl', 'attention'
+        ]})
     }
 
     async createNewDetal(dto: CreateDetalDto, files: any, authID: any) {

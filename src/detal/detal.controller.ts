@@ -80,15 +80,15 @@ export class DetalController {
     }
 
     @ApiOperation({summary: 'Get detal by id '})
-    @Get('/:id')
+    @Get('/one/:id')
     getDeleteById(@Param('id') id: number) {
         return this.detalService.getDeleteById(id)
     }
  
     @ApiOperation({summary: 'Get All Detals '})
-    @Get('/')
-    getAllDetals() {
-        return this.detalService.getAllDetals()
+    @Get('/:light')
+    getAllDetals(@Param('light') light: string) {
+        return this.detalService.getAllDetals(light)
     }
 
     @ApiOperation({summary: 'Создаем операцию'})
