@@ -10,6 +10,12 @@ import { CreateCbedDto } from './dto/create-cbed.dto';
 export class CbedController {
     constructor(private cbedService: CbedService) {}
 
+    @ApiOperation({summary: 'Получаем Массив ID СБ у которых есть операции'})
+    @Get('/operation/')
+    getCbedIncludeOperation() {
+        return this.cbedService.getCbedIncludeOperation()
+    }
+
     @ApiOperation({summary: 'Создаем Сборочную единицу'})
     @UseInterceptors(FileFieldsInterceptor([
         {name: 'document', maxCount: 40}
@@ -45,7 +51,7 @@ export class CbedController {
     }
 
     @ApiOperation({summary: 'Получаем все дифицитные сборочные единицы'})
-    @Get('/deficit')
+    @Get('/cbed/deficit')
     getAllDeficitCbed() {
         return this.cbedService.getAllDeficitCbed()
     }

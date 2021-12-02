@@ -3,11 +3,13 @@ import { InjectModel } from '@nestjs/sequelize';
 import { isArray } from 'lodash';
 import { Op } from 'sequelize';
 import { Actions } from 'src/actions/actions.model';
+import { Cbed } from 'src/cbed/cbed.model';
 import { Documents } from 'src/documents/documents.model';
 import { DocumentsService } from 'src/documents/documents.service';
 import { Equipment } from 'src/equipment/equipment.model';
 import { RemoveDocumentDto } from 'src/files/dto/remove-document.dto';
 import { NameInstrument } from 'src/instrument/name-instrument.model';
+import { Product } from 'src/product/product.model';
 import { PodPodMaterial } from 'src/settings/pod-pod-material.model';
 import { User } from 'src/users/users.model';
 import { Detal } from './detal.model';
@@ -105,7 +107,7 @@ export class DetalService {
         const detal = await this.detalReprository.findByPk(id, {include: [
             {all: true},
             {
-                model: TechProcess,
+                model: TechProcess, 
                 include: ['operations']
             }
         ]})
@@ -501,25 +503,16 @@ export class DetalService {
     }
 
     async getTechProcessById(id: number) {
-        const tp = await this.techProcessReprository.findByPk(id, {include: {all: true}})
+        const tp = await this.techProcessReprository.findByPk(id, {include: [
+            {all: true},
+            {model: Detal, include: ['documents']},
+            {model: Cbed, include: ['documents']},
+            {model: Product, include: ['documents']}
+        ]})
 
         if(!tp)
             throw new HttpException('Не удалось создать операцию', HttpStatus.BAD_REQUEST)
-
-        // 1. Возвращаем все операции по возрастанию 
-        // 2. Операция не должна быть в бане
-        
         if(tp.operations.length) {
-            // let oper_min = null
-            // for(let i in tp.operations) {
-            //     for(let j in tp.operations) {
-            //         if(tp.operations[j].name > tp.operations[i].name) {
-            //             oper_min = tp.operations[i]
-            //             tp.operations[i] = tp.operations[j]
-            //             tp.operations[j] = oper_min
-            //         }
-            //     }
-            // }
             for(let inx = 0; inx < tp.operations.length; inx++) {
                 if(tp.operations[inx].ban)
                     tp.operations.splice(inx, 1)
@@ -582,5 +575,19 @@ export class DetalService {
         }})
         return detals
 	}
+
+    async getDetalIncludeOperation() {
+        const detal = await this.detalReprository.findAll({include: [{
+            model: TechProcess, 
+            include: [{all: true}]
+        }]})
+        
+        let new_arr = []
+        for(let det of detal) {
+            if(!det.techProcesses || det.techProcesses.operations.length == 0) new_arr.push(det.id)
+        }
+
+        return new_arr
+    }
 
 }

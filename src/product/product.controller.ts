@@ -9,6 +9,12 @@ import { ProductService } from './product.service';
 export class ProductController {
     constructor(private productService: ProductService) {}
 
+    @ApiOperation({summary: 'Получаем Массив ID Изделий у которых есть операции'})
+    @Get('/operation/')
+    getProductIncludeOperation() {
+        return this.productService.getProductIncludeOperation()
+    }
+    
     @ApiOperation({summary: 'Создаем Изделие'})
     @UseInterceptors(FileFieldsInterceptor([
         {name: 'document', maxCount: 40}
@@ -34,7 +40,6 @@ export class ProductController {
     @ApiOperation({summary: 'Получаем все артиклы продукции'})
     @Get('/articl')
     getAllProductArticl() {
-        console.log('productArticl')
         return this.productService.getAllProductArticl()
     }
 

@@ -257,4 +257,18 @@ export class ProductService {
 
         return file
     }
+
+    async getProductIncludeOperation() {
+        const product = await this.productReprository.findAll({include: [{
+            model: TechProcess, 
+            include: [{all: true}]
+        }]})
+        
+        let new_arr = []
+        for(let prod of product) {
+            if(!prod.techProcesses || prod.techProcesses.operations.length == 0) new_arr.push(prod.id)
+        }
+
+        return new_arr
+    }
 }

@@ -16,6 +16,12 @@ import { UpdateTypeOperation } from './dto/update-type-operation.dto';
 export class DetalController {
     constructor(private detalService: DetalService) {}
 
+    @ApiOperation({summary: 'Получаем Массив ID Деталей у которых есть операции'})
+    @Get('/operation/include')
+    getDetalIncludeOperation() {
+        return this.detalService.getDetalIncludeOperation()
+    }
+
     @ApiOperation({summary: 'Получаем все дифицитные детали'})
     @Get('/deficit')
     getAllDeficitCbed() {
@@ -146,7 +152,7 @@ export class DetalController {
     }
 
     @ApiOperation({summary: 'Получить технологический процесс по id'})
-    @Get('/techprocess/:id')
+    @Get('/techprocess/:id') 
     getTechProcessById(@Param('id') id: number){
         return this.detalService.getTechProcessById(id)
     }

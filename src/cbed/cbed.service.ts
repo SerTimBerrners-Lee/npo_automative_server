@@ -233,10 +233,16 @@ export class CbedService {
             await cbed.save()
             return cbed
         }
-    }
+    }       
 
     async getOneCbedById(id: number) {
-        return await this.cbedReprository.findByPk(id, {include: {all: true}})
+        return await this.cbedReprository.findByPk(id,  {include: [
+            {all: true},
+            {
+            model: TechProcess,
+            include: ['operations']
+            }
+        ]})
     }
 
     async removeDocumentCbed(dto: RemoveDocumentDto) {
@@ -254,7 +260,6 @@ export class CbedService {
                 [Op.gt]: 0
             }
         }})
-
         return cbeds
 	}
 
@@ -266,6 +271,20 @@ export class CbedService {
             cbed.$add('documents', file.id)
 
         return file
+    }
+
+    async getCbedIncludeOperation() {
+        const cbed = await this.cbedReprository.findAll({include: [{
+            model: TechProcess, 
+            include: [{all: true}]
+        }]})
+        
+        let new_arr = []
+        for(let cb of cbed) {
+            if(!cb.techProcesses || cb.techProcesses.operations.length == 0) new_arr.push(cb.id)
+        }
+
+        return new_arr
     }
 }
  
