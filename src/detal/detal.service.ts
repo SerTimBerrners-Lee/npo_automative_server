@@ -154,6 +154,8 @@ export class DetalService {
             detal.parametrs = dto.parametrs
         if(dto.haracteriatic)
             detal.haracteriatic = dto.haracteriatic
+        if(dto.variables_znach)
+            detal.variables_znach = dto.variables_znach
         if(dto.DxL != 'null')
             detal.DxL = dto.DxL
             else detal.DxL = 0
