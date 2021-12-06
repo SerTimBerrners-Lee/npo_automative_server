@@ -1,13 +1,13 @@
-import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
-import { InjectModel } from '@nestjs/sequelize';
-import { Documents } from './documents.model';
-import CreateDocumentsDto from './dto/create-documents.dto';
 import * as fs from 'fs';
 import * as path from 'path';
 import * as uuid from 'uuid';
-import { ChangeTypeDto } from './dto/change-type.dto';
 import { Detal } from 'src/detal/detal.model';
+import { Documents } from './documents.model';
+import { InjectModel } from '@nestjs/sequelize';
+import { ChangeTypeDto } from './dto/change-type.dto';
+import CreateDocumentsDto from './dto/create-documents.dto';
 import { UpdateDocumentDto } from './dto/update-document.dto';
+import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
 @Injectable()
 export class DocumentsService {
     constructor(@InjectModel(Documents)
@@ -19,40 +19,56 @@ export class DocumentsService {
         return this.documentReprository.create(dto);
     }
 
-    async createArrDocuments(arrFolder: [], files: any) {
+    async createArrDocuments(dto: any, files: any) {
+        if(!dto.docs || !files || !files.document || !files.document.length) return false
+
         const NewArrsFile: Array<Documents> = []
         try {
             for(let inx in files.document) {
-                const arr = JSON.parse(Object.values(arrFolder)[0])
+                const docs = Object.values(JSON.parse(dto.docs))
                 const result = await this.saveDocument(
                     files.document[inx],
-                    arr[inx].nameInstans,
-                    arr[inx].type,
-                    arr[inx].version,
-                    arr[inx].description,
-                    arr[inx].name,
-                    arr[inx].newVersion
+                    docs[inx].nameInstans,
+                    docs[inx].type,
+                    docs[inx].version,
+                    docs[inx].description,
+                    docs[inx].name,
+                    docs[inx].newVersion
                 )
                 if(!result) continue;
                 if(result) NewArrsFile.push(result)
             }
             return NewArrsFile
         } catch(e) {
-            throw new HttpException('', HttpStatus.BAD_GATEWAY)
+            throw new HttpException('Не удалось создать файлы', HttpStatus.BAD_GATEWAY)
         }
     }
 
-    async saveDocument(file, nameInstans = '', type = '', version = 1, description = '', name = '', newVersion = false) {
+    async attachDocumentForObject(obj: any, dto: any, files: any) {
+        const arrDocuments = await this.createArrDocuments(dto, files)
+        if(arrDocuments && arrDocuments.length) {
+            const obj_documents = await obj.$get('documents')
+            for(let doc of arrDocuments) {
+                let check = true
+                if(obj_documents && obj_documents.length) {
+                    for(let have_doc of obj_documents) {
+                        if(doc && have_doc.id == doc.id) check = false
+                    }
+                }
+                if(doc && doc.id && check) await obj.$add('documents', doc.id)
+            }
+        }
+    }
+
+    async saveDocument(file: any, nameInstans = '', type = '', version = 1, description = '', name = '', newVersion = false) {
         const imageTypes = ['bmp', 'gif', 'jpg', 'png', 'pds', 'tif', 'odg', 'jpeg', 'eps', 'pict', 'pcx', 'ico', 'svg', 'webp', 'avif']
         let folderToSave = 'doc';
         try {
             let origName: string;
             const fileType = file.originalname.split('.')[file.originalname.split('.').length - 1]
             name ? origName = name + '.' + fileType : origName = file.originalname
-            for (let typ of imageTypes) {
-                if (typ == fileType)
-                    folderToSave = 'image'
-            }
+            for (let typ of imageTypes) 
+                if (typ == fileType) folderToSave = 'image'
             
             const pathName = (origName + '__+__') + uuid.v4() +'.'+ fileType
             const filePath = path.resolve(__dirname, '..', `static/${folderToSave}`)

@@ -172,25 +172,8 @@ export class ProductService {
             }   catch(e) {console.error(e)}
         }
 
-        if(dto.docs) {
-            let docs: any = Object.values(JSON.parse(dto.docs))
-            let i = 0
-            for(let document of files.document) {
-                let res = await this.documentsService.saveDocument(
-                    document, 
-                    'p', 
-                    docs[i].type,
-                    docs[i].version,
-                    docs[i].description,
-                    docs[i].name
-                )
-                if(res && res.id) {
-                    const docId = await this.documentsReprository.findByPk(res.id)
-                    if(docId) await product.$add('documents', docId.id)
-                }
-                i++
-            }
-        }
+        if(dto.docs, files.document) 
+            await this.documentsService.attachDocumentForObject(product, dto, files)
 
         await product.save()
         return product

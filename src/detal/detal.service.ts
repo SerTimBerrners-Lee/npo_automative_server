@@ -148,7 +148,7 @@ export class DetalService {
             detal.articl = dto.articl
             else detal.articl = 0
         if(dto.description != 'null')
-            detal.description = dto.description
+            detal.description = dto.description 
             else detal.description = ''
         if(dto.parametrs)
             detal.parametrs = dto.parametrs
@@ -244,28 +244,8 @@ export class DetalService {
             }
         }
 
-        if(dto.docs) {
-            let docs: any = Object.values(JSON.parse(dto.docs))
-            let i = 0
-            for(let document of files.document) {
-                let res = await this.documentsService.saveDocument(
-                    document, 
-                    'p', 
-                    docs[i].type, 
-                    docs[i].version,
-                    docs[i].description,
-                    docs[i].name
-                )
-                if(res && res.id) {
-                    const docId = await this.documentsReprository.findByPk(res.id)
-                    if(docId) {
-                        await detal.$add('documents', docId.id)
-                        await detal.save()
-                    }
-                }
-                i++
-            }
-        }
+        if(dto.docs, files.document) 
+            await this.documentsService.attachDocumentForObject(detal, dto, files)
  
         await detal.save()
         return detal

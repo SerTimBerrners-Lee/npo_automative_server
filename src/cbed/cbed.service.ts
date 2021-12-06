@@ -17,7 +17,6 @@ import { CreateCbedDto } from './dto/create-cbed.dto';
 export class CbedService {
     constructor(@InjectModel(Cbed) private cbedReprository: typeof Cbed,
         @InjectModel(User) private userRepository: typeof User,
-        @InjectModel(Documents) private documentsReprository: typeof Documents,
         @InjectModel(TechProcess) private techProcessReprository: typeof TechProcess,
         @InjectModel(PodPodMaterial) private podPodMaterialReprository: typeof PodPodMaterial,
         @InjectModel(Detal) private detalReprository: typeof Detal,
@@ -169,25 +168,8 @@ export class CbedService {
             }
         }
 
-        if(dto.docs) {
-            let docs: any = Object.values(JSON.parse(dto.docs))
-            let i = 0
-            for(let document of files.document) {
-                let res = await this.documentsService.saveDocument(
-                    document, 
-                    'p', 
-                    docs[i].type,
-                    docs[i].version,
-                    docs[i].description,
-                    docs[i].name
-                )
-                if(res && res.id) {
-                    const docId = await this.documentsReprository.findByPk(res.id)
-                    if(docId) await cbed.$add('documents', docId.id)
-                }
-                i++
-            }
-        }
+        if(dto.docs, files.document) 
+            await this.documentsService.attachDocumentForObject(cbed, dto, files)
 
         await cbed.save()
         return cbed
