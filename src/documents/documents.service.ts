@@ -44,6 +44,12 @@ export class DocumentsService {
         }
     }
 
+    /**
+     * Обрабатываем документ добавляем если его нет 
+     * @param obj 
+     * @param dto 
+     * @param files 
+     */
     async attachDocumentForObject(obj: any, dto: any, files: any) {
         const arrDocuments = await this.createArrDocuments(dto, files)
         if(arrDocuments && arrDocuments.length) {
