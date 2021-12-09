@@ -2,10 +2,8 @@
 import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
 import { InjectModel } from '@nestjs/sequelize';
 import { Op } from 'sequelize';
-import { all } from 'sequelize/types/lib/operators';
 import { Detal } from 'src/detal/detal.model';
 import { TechProcess } from 'src/detal/tech-process.model';
-import { Documents } from 'src/documents/documents.model';
 import { DocumentsService } from 'src/documents/documents.service';
 import { RemoveDocumentDto } from 'src/files/dto/remove-document.dto';
 import { PodPodMaterial } from 'src/settings/pod-pod-material.model';
@@ -135,14 +133,43 @@ export class CbedService {
                 cbed.listDetal = JSON.stringify(mList)
             }
         }
+
+        if(cbed.listCbed) {
+            try {
+                const pars_list = JSON.parse(cbed.listCbed)
+                for(let pl of pars_list) {
+                    const check_cb = await this.cbedReprository.findByPk(pl.cb.id)
+                    if(check_cb) {
+                        const pars_parent = JSON.parse(check_cb.cbed)
+                        let new_arr = []
+                        for(let ppl of pars_parent) {
+                            if(ppl.id == cbed.id) continue
+                            new_arr.push(ppl)
+                        }
+                        check_cb.cbed = JSON.stringify(new_arr)
+                    }
+                }
+            } catch(e) {console.error(e)}
+        }
+
         if(dto.listCbed) {
             try {
                 let mList = JSON.parse(dto.listCbed)
                 if(mList) {
                     for(let m in mList) {
                         const check_cbed = await this.cbedReprository.findByPk(mList[m].cb.id)
-                        if(check_cbed) 
+                        if(check_cbed) {
                             mList[m].cb.name = check_cbed.name
+                            let parent_list = JSON.parse(check_cbed.cbed)
+                            let check = true
+                            for(let pl of parent_list) {
+                                if(pl.id == cbed.id) check = false
+                            }
+                            if(check) parent_list.push({id: cbed.id, name: cbed.name, articl: cbed.articl})
+                            else check = true
+                            check_cbed.cbed = JSON.stringify(parent_list)
+                            await check_cbed.save()
+                        }
                     }
                     cbed.listCbed = JSON.stringify(mList)
                 }
@@ -192,8 +219,8 @@ export class CbedService {
         return await this.cbedReprository.findByPk(id, {include: [
             {all: true},
             {
-            model: TechProcess,
-            include: ['operations']
+                model: TechProcess,
+                include: ['operations']
             }
         ]})
     }

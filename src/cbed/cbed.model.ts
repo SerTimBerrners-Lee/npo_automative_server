@@ -57,6 +57,10 @@ export class Cbed extends Model<Cbed, CbedCreationAttrs> {
     description: string; 
 
     @ApiProperty({example: 12, description: 'Срок поставки'})
+    @Column({type: DataType.TEXT, defaultValue: '[]'})
+    cbed: any; 
+
+    @ApiProperty({example: 12, description: 'Срок поставки'})
     @Column({type: DataType.TEXT, allowNull: true})
     parametrs: any; 
 
