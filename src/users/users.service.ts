@@ -16,7 +16,6 @@ export class UsersService {
         private documentService: DocumentsService) {}
 
     async createUser(dto: CreateUserDto, files?: any) {
-
         const tabel     =   await this.userRepository.findOne({where: { tabel: dto.tabel }})
         if(tabel) 
             throw new HttpException("Табельный номер не может повторяться", HttpStatus.BAD_REQUEST)

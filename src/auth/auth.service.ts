@@ -13,6 +13,7 @@ export class AuthService {
         private jwtService: JwtService) {}
 
     async login(dto: AuthUserDto) {
+        console.log(dto)
 
        if(!dto.login || !dto.password)
             throw new UnauthorizedException({message: 'Пароль или логин небыли введены' })
@@ -25,7 +26,7 @@ export class AuthService {
 
         if(!passwordEquals)
             throw new UnauthorizedException({message: 'Некорректный пароль' })
-        
+        console.log('user', user)
         return user
     }
 
