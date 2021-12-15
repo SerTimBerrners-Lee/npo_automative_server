@@ -5,7 +5,7 @@ git:
 build:
 	nest build
 start:
-	pm2 start dist/main.js --name npo-server --node-args="--max-old-space-size=4096" -i max
+	pm2 start dist/main.js --name npo-server --node-args="--max-old-space-size=4096" -i 4
 all:
 	sudo make git
 	sudo make build
