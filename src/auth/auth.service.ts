@@ -26,8 +26,8 @@ export class AuthService {
 
         if(!passwordEquals)
             throw new UnauthorizedException({message: 'Некорректный пароль' })
-        console.log('user', user)
-        return user
+        console.log(user)
+        return {message: 'Все ок' }
     }
 
     async registration( userDto: CreateUserDto) {
