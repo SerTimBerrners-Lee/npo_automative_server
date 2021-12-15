@@ -170,7 +170,7 @@ export class UsersService {
     }
 
     async getUserByPk(id: number) {
-        const user = await this.userRepository.findByPk(id, {include: 'role'})
+        const user = await this.userRepository.findByPk(id, {include: ['role', 'documents']})
 
         return user
     }
