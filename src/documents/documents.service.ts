@@ -182,7 +182,7 @@ export class DocumentsService {
     }
 
     async getFileById(id:number) {
-        return await this.documentReprository.findByPk(id, {include: {all: true}})
+        return await this.documentReprository.findByPk(id)
     }
  
     async banFile(id: number) {

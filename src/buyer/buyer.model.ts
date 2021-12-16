@@ -11,7 +11,7 @@ interface BuyerCreationAttrs {
     name: string;
 }
 
-@Table({tableName: 'buyer', createdAt: false, updatedAt: false})
+@Table({tableName: 'buyer'})
 export class Buyer extends Model<Buyer, BuyerCreationAttrs> {
 
     @ApiProperty({example: '1', description: 'Уникальный идентификатор'})

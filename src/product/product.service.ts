@@ -184,7 +184,7 @@ export class ProductService {
             return await this.productReprository.findAll({include: {all: true}})
 
         return await this.productReprository.findAll({attributes: [
-            'id', 'name', 'ban', 'fabricNumber', 'articl', 'attention'
+            'id', 'name', 'ban', 'fabricNumber', 'articl', 'attention', 'createdAt', 'responsibleId'
         ]})
     } 
 

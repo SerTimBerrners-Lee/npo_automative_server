@@ -15,7 +15,7 @@ interface ProvidersCreationAttrs {
     name: string;
 }
 
-@Table({tableName: 'providers', createdAt: false, updatedAt: false})
+@Table({tableName: 'providers'})
 export class Providers extends Model<Providers, ProvidersCreationAttrs> {
  
     @ApiProperty({example: '1', description: 'Уникальный идентификатор'})

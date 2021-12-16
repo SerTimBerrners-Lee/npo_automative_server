@@ -42,7 +42,7 @@ export class DetalService {
     async getAllDetals(light: string) {
         if(light == 'false') return await this.detalReprository.findAll({include: {all: true}})
         return await this.detalReprository.findAll({ attributes: [
-            'id', 'name', 'ban', 'articl', 'attention'
+            'id', 'name', 'ban', 'articl', 'attention', 'createdAt', 'responsibleId'
         ]})
     }
 
@@ -518,13 +518,31 @@ export class DetalService {
         const TO = await this.typeOperationReprository.findByPk(dto.id)
         if(!TO)
             throw new HttpException('Не удалось сохранить тип операции', HttpStatus.BAD_REQUEST)
+
+        if(dto.square) {
+            const square_select = await this.typeOperationReprository.findOne({where: {square: true}})
+            if(square_select && TO.id !== square_select.id) {
+                square_select.square = false
+                await square_select.save()
+            }
+        }
+
+        if(dto.list) {
+            const square_select = await this.typeOperationReprository.findOne({where: {list: true}})
+            if(square_select && TO.id !== square_select.id) {
+                square_select.list = false
+                await square_select.save()
+            }
+        }
+
         await TO.update(dto)
-        
         return TO
     }
 
     async getAllTypeOperation() {
-        return await this.typeOperationReprository.findAll({include: {all: true}})
+        return await this.typeOperationReprository.findAll({order: [
+            ['id', 'ASC'] 
+        ]})
     }
 
     async deleteTypeOperationById(id: any) {

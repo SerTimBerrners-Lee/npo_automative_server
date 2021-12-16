@@ -205,7 +205,7 @@ export class CbedService {
     async getAllCbed(light: string) {
         if(light == 'true') {
             const cbed = await this.cbedReprository.findAll({attributes: [
-                'id', 'name', 'ban', 'articl', 'attention'
+                'id', 'name', 'ban', 'articl', 'attention', 'createdAt', 'responsibleId'
             ]})
             return cbed
         }

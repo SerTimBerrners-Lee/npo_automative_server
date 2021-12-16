@@ -91,6 +91,19 @@ export class ShipmentsService {
 			shipment.description = data.description
 			else shipment.description = ''
 
+
+		if(data.documentsData) {
+			try {
+				const pars_id_documents = JSON.parse(data.documentsData)
+				for(let doc of pars_id_documents) {
+					const docs = await this.documentsService.getFileById(doc)
+					if(docs) {
+						await shipment.$add('documents', docs.id)
+					}
+				}
+			} catch(e) {console.error(e)}
+		}
+
 		if(data.list_cbed_detal && data.list_cbed_detal != 'null' || data.list_cbed_detal != '[]') {
 			try {
 				let list_izd = JSON.parse(data.list_cbed_detal)

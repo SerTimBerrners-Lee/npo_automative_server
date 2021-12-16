@@ -32,6 +32,18 @@ export class TypeOperation extends Model<TypeOperation, TypeOperationCreationAtt
     @Column({type: DataType.BOOLEAN, defaultValue: false})
     mainTime: boolean; 
 
+    @ApiProperty({example: '1', description: 'ЧПУ'})
+    @Column({type: DataType.BOOLEAN, defaultValue: false})
+    cpu: boolean; 
+
+    @ApiProperty({example: '1', description: 'Резка круга / профиля'})
+    @Column({type: DataType.BOOLEAN, defaultValue: false})
+    square: boolean; 
+
+    @ApiProperty({example: '1', description: 'Листовая резка'})
+    @Column({type: DataType.BOOLEAN, defaultValue: false})
+    list: boolean; 
+
     @HasMany(() => Operation)
     operations: Operation[];
 }     
