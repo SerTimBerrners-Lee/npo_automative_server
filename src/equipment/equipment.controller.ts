@@ -101,9 +101,9 @@ export class EquipmentController {
     } 
 
     @ApiOperation({summary: 'Получение всех подтипов'})
-    @Get('/eq')
-    getAllEquipment() {
-        return this.equipmentService.getAllEquipment()
+    @Get('/eq/all/:light')
+    getAllEquipment(@Param('light') light: string) {
+        return this.equipmentService.getAllEquipment(light)
     }
 
     @ApiOperation({summary: 'Прикрепить файл'})

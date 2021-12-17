@@ -295,8 +295,10 @@ export class EquipmentService {
         }
     }
 
-    async getAllEquipment() {
-        return await this.equipmentReprository.findAll()
+    async getAllEquipment(light: string) {
+        if(light == 'true')
+            return await this.equipmentReprository.findAll()
+        return await this.equipmentReprository.findAll({include: {all: true}})
     }
 
     async attachFileToEquipment(eq_id: number, file_id: number) {
