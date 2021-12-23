@@ -113,6 +113,21 @@ export class MetaloworkingService {
 		}
 	}
 
+	async deleteMetolloworking(id: number) {
+		const metalloworking = await this.metaloworkingReprositroy.findByPk(id)
+		if(!metalloworking) throw new HttpException('Не удалось удалить металообработки', HttpStatus.BAD_REQUEST)
+		
+		if(!metalloworking.detal) return await this.metaloworkingReprositroy.destroy({where: {id}})
+
+		const detal = await this.detalService.findByIdDetal(metalloworking.detal.id)
+		if(!detal) return await this.metaloworkingReprositroy.destroy({where: {id}})
+		detal.metalloworking_kolvo = detal.metalloworking_kolvo - metalloworking.kolvo_shipments < 0 
+			? 0 : detal.metalloworking_kolvo - metalloworking.kolvo_shipments
+		await detal.save()
+		
+		return await this.metaloworkingReprositroy.destroy({where: {id}})
+	}
+
 	async getMetolloworking() {
 		const metal = await this.metaloworkingReprositroy.findAll({include: [ {all: true}, {
 			model: Detal, 

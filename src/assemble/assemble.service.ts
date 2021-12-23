@@ -175,6 +175,20 @@ export class AssembleService {
 		return assembly
 	}
 
+	async deleteAssembly(id: number) {
+		const ass = await this.assembleReprository.findByPk(id, {include: {all: true}})
+		if(!ass) throw new HttpException('Не удалось удалить Сборку', HttpStatus.BAD_REQUEST)
+
+		if(!ass.cbed) return await this.assembleReprository.destroy({where: {id}})
+
+		const cbed = await this.cbedService.getOneCbedById(ass.cbed.id)
+		if(!cbed) return await this.assembleReprository.destroy({where: {id}})
+		cbed.assemble_kolvo = cbed.assemble_kolvo - ass.kolvo_shipments < 0 ? 0 : cbed.assemble_kolvo - ass.kolvo_shipments
+		await cbed.save()
+		
+		return await this.assembleReprository.destroy({where: {id}})
+	}
+
 	async getAssembleById(id:number) {
 		return await this.assembleReprository.findByPk(id, {include: [{all: true}, 
 			{

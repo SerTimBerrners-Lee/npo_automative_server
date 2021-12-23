@@ -1,4 +1,4 @@
-import { Body, Controller, Get, Param, Post } from '@nestjs/common';
+import { Body, Controller, Delete, Get, Param, Post } from '@nestjs/common';
 import { ApiOperation, ApiTags } from '@nestjs/swagger';
 import { AssembleService } from './assemble.service';
 import { CreateAssembleDto } from './dto/create-assemble.dto';
@@ -24,6 +24,12 @@ export class AssembleController {
 	@Get('/:id')
 	getAssembleById(@Param('id') id: number) {
 			return this.assembleService.getAssembleById(id)
+	}
+
+	@ApiOperation({summary: 'Удалить Металлообработку'})
+	@Delete('/:id')
+	deleteAssembly(@Param('id') id: number) {
+			return this.assembleService.deleteAssembly(id)
 	}
 
 	@ApiOperation({summary: 'Получаем все сборки по типам операций'})
