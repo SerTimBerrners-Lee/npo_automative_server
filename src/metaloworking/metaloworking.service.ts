@@ -133,7 +133,7 @@ export class MetaloworkingService {
 			model: Detal, 
 			include: ['documents', 'mat_za_obj', {
 				model: Shipments, 
-				include: ['product']
+				include: ['product', 'buyer']
 			}, {
 				model: PodPodMaterial,
 				as: 'mat_za_obj',

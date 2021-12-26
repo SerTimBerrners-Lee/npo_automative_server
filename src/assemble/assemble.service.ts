@@ -196,7 +196,7 @@ export class AssembleService {
 				include: ['documents', 
 					{
 					model: Shipments, 
-					include: ['product'],
+					include: ['product', 'buyer'],
 					}, 
 					{
 					model: TechProcess,
