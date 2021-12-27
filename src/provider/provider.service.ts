@@ -280,7 +280,6 @@ export class ProviderService {
     }
 
     async createWaybill(dto: CreateWaybillDto, files: any) {
-        console.log(dto, files)
         const dm = new DateMethods()
 		const endShipments = await this.waybillReprository.findOne(
 			{
@@ -291,6 +290,9 @@ export class ProviderService {
 			})
 		const numberEndShipments = endShipments && endShipments.id ?  
 			`№ ${endShipments.id + 1} от ${dm.date()}` : `№ 1 от ${dm.date()}`
+
+        if(!dto.product_list || !dto.provider_id) 
+            throw new HttpException('Пустое тело запроса', HttpStatus.BAD_REQUEST) 
 
         const waybill = await this.waybillReprository.create({name: numberEndShipments})
 
@@ -346,6 +348,7 @@ export class ProviderService {
                 }
             } catch (e) { console.error(e) }
             await waybill.save()
+            return waybill
         }
 
         if(dto.provider_id) {
