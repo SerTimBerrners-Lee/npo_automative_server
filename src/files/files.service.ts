@@ -14,7 +14,7 @@ interface AttrFilesReturn {
 }
 
 const DIR_SCRIPT = '/etc/scripts/pgsql_dump.sh'
-const DIR_BACKUP = '/mnt/backup'
+const DIR_BACKUP = '~/Desktop/db'
 @Injectable()
 export class FilesService {
 

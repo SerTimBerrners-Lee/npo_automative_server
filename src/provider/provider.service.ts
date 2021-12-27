@@ -294,7 +294,7 @@ export class ProviderService {
 		const numberEndShipments = endShipments && endShipments.id ?  
 			`№ ${endShipments.id + 1} от ${dm.date()}` : `№ 1 от ${dm.date()}`
 
-        if(!dto.product_list || !dto.provider_id) 
+        if(!dto.product_list) 
             throw new HttpException('Пустое тело запроса', HttpStatus.BAD_REQUEST) 
 
         const waybill = await this.waybillReprository.create({name: numberEndShipments})
@@ -315,8 +315,6 @@ export class ProviderService {
                         object = await this.equipmentService.getOneEquipment(product.id)
                     if(product.type == 'inventary')
                         object = await this.inventaryService.getInventaryById(product.id)
-                    console.log(product)
-
                     if(object) {
                         object.shipments_kolvo - product.kol <= 0 ? object.shipments_kolvo = 0 :
                             object.shipments_kolvo  = object.shipments_kolvo - product.kol
