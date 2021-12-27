@@ -148,6 +148,9 @@ export class ProviderService {
             end_deliveries.id + 1 : 1
         const dm = new DateMethods().date()
 
+        if(!dto.number_check || !dto.provider_id || !dto.material_lists) 
+            throw new HttpException('Пустое тело запроса', HttpStatus.BAD_REQUEST) 
+
         let deliveries = await this.deliveriesReprository.create({name: numberEndDeliveries, date_create: dm})
         deliveries = await this.deliveriesReprository.findByPk(deliveries.id, {include: {all:true}})
 
