@@ -14,7 +14,7 @@ interface AttrFilesReturn {
 }
 
 const DIR_SCRIPT = '/etc/scripts/pgsql_dump.sh'
-const DIR_BACKUP = '~/Desktop/db'
+const DIR_BACKUP = '/home/npo/Desktop/db'
 @Injectable()
 export class FilesService {
 
@@ -47,7 +47,7 @@ export class FilesService {
 
             return JSON.stringify(date)
         } catch(e) {
-            throw new HttpException('Произошла ошибка при записи файла', HttpStatus.INTERNAL_SERVER_ERROR)
+            throw new HttpException('Произошла ошибка при записи Получении файлов', HttpStatus.INTERNAL_SERVER_ERROR)
         }
     }
 
