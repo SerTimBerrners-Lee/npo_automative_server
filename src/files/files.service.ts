@@ -13,7 +13,7 @@ interface AttrFilesReturn {
     readonly size: string;
 }
 
-const DIR_SCRIPT = '/etc/scripts/pgsql_dump.sh'
+const DIR_SCRIPT = '/home/npo/Desktop/script/pg_dump.sh'
 const DIR_BACKUP = '/home/npo/Desktop/db'
 @Injectable()
 export class FilesService {
