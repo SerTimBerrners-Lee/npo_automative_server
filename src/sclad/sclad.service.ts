@@ -61,7 +61,7 @@ export class ScladService {
             if(objects.detal && objects.detal.techProcesses) tp = objects.detal.techProcesses
             
         if(!tp || !tp.operations || !tp.operations.length) 
-            throw new HttpException('Произошла ошибка при добавлении отметки3.', HttpStatus.BAD_REQUEST)
+            throw new HttpException('Произошла ошибка при добавлении отметки.', HttpStatus.BAD_REQUEST)
             
         let create_marks = 0
         for(let oper of tp.operations) {
