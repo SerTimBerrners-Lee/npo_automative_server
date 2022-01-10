@@ -91,7 +91,7 @@ export class Detal extends Model<Detal, DetalCreationAttrs> {
     documents: Documents[];
     
     @BelongsToMany(() => PodPodMaterial, () => DetalMaterials)
-    materials: PodPodMaterial[];
+    materials: PodPodMaterial[]; 
 
     @ForeignKey(() => PodPodMaterial)
     @Column({type: DataType.INTEGER, allowNull: true})
