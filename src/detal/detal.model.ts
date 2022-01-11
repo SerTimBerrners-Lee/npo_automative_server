@@ -75,6 +75,34 @@ export class Detal extends Model<Detal, DetalCreationAttrs> {
     @Column({type: DataType.STRING, allowNull: true})
     DxL: any;
 
+    @ApiProperty({example: 12, description: 'Параметры заготовки'})
+    @Column({type: DataType.STRING, allowNull: true, defaultValue: undefined})
+    diametr: any;
+
+    @ApiProperty({example: 12, description: 'Параметры заготовки'})
+    @Column({type: DataType.STRING, allowNull: true, defaultValue: undefined})
+    lengt: any;
+
+    @ApiProperty({example: 12, description: 'Параметры заготовки'})
+    @Column({type: DataType.STRING, allowNull: true, defaultValue: undefined})
+    height: any;
+
+    @ApiProperty({example: 12, description: 'Параметры заготовки'})
+    @Column({type: DataType.STRING, allowNull: true, defaultValue: undefined})
+    thickness: any;
+
+    @ApiProperty({example: 12, description: 'Параметры заготовки'})
+    @Column({type: DataType.STRING, allowNull: true, defaultValue: undefined})
+    wallThickness: any;
+
+    @ApiProperty({example: 12, description: 'Параметры заготовки'})
+    @Column({type: DataType.STRING, allowNull: true, defaultValue: undefined})
+    width: any;
+
+    @ApiProperty({example: 12, description: 'Параметры заготовки'})
+    @Column({type: DataType.STRING, allowNull: true, defaultValue: undefined})
+    areaCS: any;
+
     @ApiProperty({example: 12, description: 'Масса заготовки'})
     @Column({type: DataType.STRING, allowNull: true})
     massZag: any;

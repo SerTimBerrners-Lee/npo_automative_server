@@ -6,6 +6,13 @@ export class UpdateDetalDto {
     readonly parametrs:         string;
     readonly haracteriatic:     string;
     readonly DxL:               string;
+    readonly diametr:           number;
+    readonly lengt:             number;
+    readonly height:            number;
+    readonly thickness:         number;
+    readonly wallThickness:     number;
+    readonly width:             number;
+    readonly areaCS:            number;
     readonly massZag:           string;
     readonly trash:             string;
     readonly mat_zag:           number;
