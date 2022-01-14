@@ -36,81 +36,52 @@ export class MetaloworkingService {
 		if(!dto.date_order) metaloworking.date_order = new Date().toLocaleString('ru-RU').split(',')[0]
 		else metaloworking.number_order = dto.number_order
 
-		if(dto.detal_id) {
-			const detal = await this.detalService.findByIdDetal(dto.detal_id)
-			if(detal) {
-				metaloworking.detal_id = detal.id
-				metaloworking.kolvo_shipments = dto.my_kolvo
-				detal.metalloworking_kolvo = detal.metalloworking_kolvo + dto.my_kolvo
-				if(dto.my_kolvo > detal.shipments_kolvo) {
-					let differens = Number(dto.my_kolvo) - Number(detal.shipments_kolvo)
-					await this.shipmentsMaterialsForDetal(detal, differens)
-				}
-				await detal.save()
-			} 
-		}
+		await metaloworking.save()
+
+		if(!dto.detal_id) return metaloworking
+		const detal = await this.detalService.findByIdDetal(dto.detal_id)
+		if(!detal) return metaloworking
+
+		metaloworking.detal_id = detal.id
+		metaloworking.kolvo_shipments = dto.my_kolvo
+		detal.metalloworking_kolvo = detal.metalloworking_kolvo + dto.my_kolvo
+
+		if(dto.my_kolvo > detal.shipments_kolvo) 
+			await this.shipmentsMaterialsForDetal(detal, (Number(dto.my_kolvo) - Number(detal.shipments_kolvo)))
+		else if(detal.metalloworking_kolvo > dto.shipments_kolvo)
+			await this.shipmentsMaterialsForDetal(detal, Number(dto.my_kolvo))
+		await detal.save()
+
 		await metaloworking.save()
 		return metaloworking
 	}
 
+	// Формируем дефицит для заготовки зам заготовки и всех прикрепленных материаов
 	async shipmentsMaterialsForDetal(detal: Detal, kolvo_all: any) {
-		if(detal.mat_zag) {
-			const mat_zag = await this.settingsService.getOnePPT(detal.mat_zag)
-			if(mat_zag) {
-				try{
-					const pars_ez = JSON.parse(mat_zag.ez_kolvo)
-					pars_ez.c1_kolvo.shipments_kolvo = Number(pars_ez.c1_kolvo.shipments_kolvo) + (1* kolvo_all)
-					mat_zag.ez_kolvo = JSON.stringify(pars_ez)
-				} catch(e) {console.error(e)}
+		if(detal.mat_zag)  // Заготовку или заменитель заготовки тоже кидаем в дефицит 
+			this.formationDeficitZagMaterial(detal.mat_zag, kolvo_all)
+		if(detal.mat_zag_zam) 
+			this.formationDeficitZagMaterial(detal.mat_zag_zam, kolvo_all)
+		if(detal.materialList) 
+			await this.settingsService.formationDeficitMaterial(detal.materialList, kolvo_all)
+	}
 
-				mat_zag.shipments_kolvo = mat_zag.shipments_kolvo + (1 * kolvo_all)
-				await mat_zag.save()
-			}
-		}
-		if(detal.mat_zag_zam) {
-			const mat_zag_zam = await this.settingsService.getOnePPT(detal.mat_zag_zam)
-			if(mat_zag_zam) {
-				try{
-					const pars_ez = JSON.parse(mat_zag_zam.ez_kolvo)
-					pars_ez.c1_kolvo.shipments_kolvo = Number(pars_ez.c1_kolvo.shipments_kolvo) + (1* kolvo_all)
-					mat_zag_zam.ez_kolvo = JSON.stringify(pars_ez)
-				} catch(e) {console.error(e)}
+	private async formationDeficitZagMaterial(material_zag: any, kolvo_all: number) {
+		const mat_zag = await this.settingsService.getOnePPT(material_zag)
+		if(!mat_zag) return false
 
+		try{
+			const pars_ez = JSON.parse(mat_zag.ez_kolvo)
+			const kolvo = JSON.parse(mat_zag.kolvo) // Проверяем если "штука" в ЕИ не выставлена у заготовки - выставляем
+			if(!kolvo.c1) kolvo.c1 = true
 
-				mat_zag_zam.shipments_kolvo = mat_zag_zam.shipments_kolvo + (1 * kolvo_all)
-				await mat_zag_zam.save()
-			}
-		}
+			pars_ez.c1_kolvo.shipments_kolvo = Number(pars_ez.c1_kolvo.shipments_kolvo) + (1* kolvo_all)
+			mat_zag.ez_kolvo = JSON.stringify(pars_ez)
+			mat_zag.kolvo = JSON.stringify(kolvo)
+			mat_zag.shipments_kolvo = mat_zag.shipments_kolvo + (1 * kolvo_all)
+		} catch(e) {console.error(e)}
 
-		if(detal.materialList) {
-			try {
-				const pars_mat = JSON.parse(detal.materialList)
-				if(pars_mat.length) {
-					for(let material of pars_mat) {
-						let mat_check = await this.settingsService.getOnePPT(material.mat.id)
-						if(mat_check) {
-							try {
-								const pars_ez = JSON.parse(mat_check.ez_kolvo)
-								if(material.ez) {
-									if(material.ez == 1) pars_ez.c1_kolvo.shipments_kolvo = Number(pars_ez.c1_kolvo.shipments_kolvo) + (Number(material.kol) * kolvo_all)
-									if(material.ez == 2) pars_ez.c2_kolvo.shipments_kolvo = Number(pars_ez.c2_kolvo.shipments_kolvo) + (Number(material.kol) * kolvo_all)
-									if(material.ez == 3) pars_ez.c3_kolvo.shipments_kolvo = Number(pars_ez.c3_kolvo.shipments_kolvo) + (Number(material.kol) * kolvo_all)
-									if(material.ez == 4) pars_ez.c4_kolvo.shipments_kolvo = Number(pars_ez.c4_kolvo.shipments_kolvo) + (Number(material.kol) * kolvo_all)
-									if(material.ez == 5) pars_ez.c5_kolvo.shipments_kolvo = Number(pars_ez.c5_kolvo.shipments_kolvo) + (Number(material.kol) * kolvo_all)
-								}
-
-								mat_check.ez_kolvo = JSON.stringify(pars_ez)
-							} catch(e) { console.error(e) }
-
-							mat_check.shipments_kolvo = mat_check.shipments_kolvo + (material.kol * kolvo_all)
-							await mat_check.save()
-						}
-					}
-				}
-			} catch(e) {
-				console.error(e)
-			}
-		}
+		await mat_zag.save()
 	}
 
 	async deleteMetolloworking(id: number) {

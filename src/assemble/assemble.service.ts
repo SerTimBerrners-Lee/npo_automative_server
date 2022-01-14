@@ -24,7 +24,7 @@ export class AssembleService {
 		private metaloworkingService: MetaloworkingService, 
 		private productService: ProductService) {} 
 
-
+	// Добавляем сборку
 	async createAssemble(dto: CreateAssembleDto) {
 		const assemble = await this.assembleReprository
 			.create({
@@ -39,35 +39,48 @@ export class AssembleService {
 		if(!dto.date_order) assemble.date_order = new Date().toLocaleString('ru-RU').split(',')[0]
 		else assemble.number_order = dto.number_order
 
-		if(dto.cbed_id) { 
-			const cbed = await this.cbedService.findById(dto.cbed_id)
-			if(cbed) {
-				assemble.cbed_id = cbed.id
-				assemble.kolvo_shipments = dto.my_kolvo
-				cbed.assemble_kolvo = cbed.assemble_kolvo + dto.my_kolvo
-				await cbed.save()
-				if(dto.my_kolvo > dto.shipments_kolvo) {
-					let differenc = Number(dto.my_kolvo) - Number(dto.shipments_kolvo)
-					await this.shipmentsMaterialsForIzd(cbed, differenc)
-					if(cbed.listDetal)
-						await this.parseDetalJson(cbed.listDetal, differenc)
-					if(cbed.listCbed)
-						await this.parseCbedJson(cbed.listCbed, differenc)
-				}
-			}
-		}
-		
+		await assemble.save()
+
+		if(!dto.cbed_id) return assemble
+
+		const cbed = await this.cbedService.findById(dto.cbed_id)
+		if(!cbed) return assemble
+
+		assemble.cbed_id = cbed.id
+		assemble.kolvo_shipments = dto.my_kolvo
+		cbed.assemble_kolvo = cbed.assemble_kolvo + dto.my_kolvo
+		await cbed.save()
+
+		// shipments_kolvo -- сколько заказано в задачах на тгрузку (Дефицит)
+		// my_kolvo -- которое мы указали для производства
+		// assemble_kolvo -- всего заказано на производстве в СБОРКЕ
+			
+		if(dto.my_kolvo > dto.shipments_kolvo ) 
+			await this.countFunction(cbed, Number(dto.my_kolvo) - Number(dto.shipments_kolvo))
+		else if(cbed.assemble_kolvo > dto.shipments_kolvo)  
+			await this.countFunction(cbed, Number(dto.my_kolvo))
+
 		await assemble.save()
 		return assemble
 	}
 
-	async shipmentsMaterialsForIzd(izd: Cbed, kolvo_all: any = 1) {
-		if(izd.materialList) 
-			await this.parseMaterialJson(izd.materialList, kolvo_all)
-		if(izd.listPokDet) 
-			await this.parseMaterialJson(izd.listPokDet, kolvo_all)
+	private async countFunction(cbed: Cbed, differenc: number) {
+		await this.shipmentsMaterialsForIzd(cbed, differenc)
+		if(cbed.listDetal)
+			await this.parseDetalJson(cbed.listDetal, differenc)
+		if(cbed.listCbed)
+			await this.parseCbedJson(cbed.listCbed, differenc)
 	}
 
+	// Промежуточная функция Проверка на покупные и просто материалы
+	async shipmentsMaterialsForIzd(izd: Cbed, kolvo_all: any = 1) {
+		if(izd.materialList) 
+			await this.settingsService.formationDeficitMaterial(izd.materialList, kolvo_all)
+		if(izd.listPokDet) 
+			await this.settingsService.formationDeficitMaterial(izd.listPokDet, kolvo_all)
+	}
+
+	// Парсим Детали
 	async parseDetalJson(list_json_detal: string, kolvo_all: any = 1) {
 		try {
 			const pars_det = JSON.parse(list_json_detal)
@@ -87,6 +100,7 @@ export class AssembleService {
 		}
 	}
 
+	// Парсим также Сборки
 	async parseCbedJson(list_json_cbed: string, kolvo_all: any = 1) {
 		try {
 			let pars_cbed = JSON.parse(list_json_cbed)
@@ -104,37 +118,6 @@ export class AssembleService {
 						await this.parseCbedJson(cbed_check.listCbed, deficit)
 				}
 			}
-		} catch(e) {
-			console.error(e)
-		}
-	}
-
-	async parseMaterialJson(list_json_mat: string, kolvo_all: any = 1) {
-		try {
-			const pars_mat = JSON.parse(list_json_mat)
-			if(pars_mat.length) {
-				for(let material of pars_mat) {
-					let mat_check = await this.settingsService.getOnePPT(material.mat.id)
-					if(mat_check) {
-						try {
-							const pars_ez = JSON.parse(mat_check.ez_kolvo)
-							// Если инеремент мы должны оставить так как есть сейчас 
-							// если отрицательный значит мы должны удалить 
-							if(material.ez) {
-								if(material.ez == 1) pars_ez.c1_kolvo.shipments_kolvo = Number(pars_ez.c1_kolvo.shipments_kolvo)  + (Number(material.kol) * kolvo_all)
-								if(material.ez == 2) pars_ez.c2_kolvo.shipments_kolvo = Number(pars_ez.c2_kolvo.shipments_kolvo)  + (Number(material.kol) * kolvo_all)
-								if(material.ez == 3) pars_ez.c3_kolvo.shipments_kolvo = Number(pars_ez.c3_kolvo.shipments_kolvo)  + (Number(material.kol) * kolvo_all)
-								if(material.ez == 4) pars_ez.c4_kolvo.shipments_kolvo = Number(pars_ez.c4_kolvo.shipments_kolvo)  + (Number(material.kol) * kolvo_all)
-								if(material.ez == 5) pars_ez.c5_kolvo.shipments_kolvo = Number(pars_ez.c5_kolvo.shipments_kolvo)  + (Number(material.kol) * kolvo_all)
-							}
-							mat_check.ez_kolvo = JSON.stringify(pars_ez)
-						} catch(e) {console.error(e)}
-						
-						mat_check.shipments_kolvo = mat_check.shipments_kolvo + (Number(material.kol) * kolvo_all)
-						await mat_check.save()
-					}
-				}
-			} 
 		} catch(e) {
 			console.error(e)
 		}
@@ -175,6 +158,8 @@ export class AssembleService {
 		return assembly
 	}
 
+	// Удаляем сборку
+	// ТО-DO: удалять также материалы при удалении сборки
 	async deleteAssembly(id: number) {
 		const ass = await this.assembleReprository.findByPk(id, {include: {all: true}})
 		if(!ass) throw new HttpException('Не удалось удалить Сборку', HttpStatus.BAD_REQUEST)
@@ -189,6 +174,7 @@ export class AssembleService {
 		return await this.assembleReprository.destroy({where: {id}})
 	}
 
+	// Получаем сборку по ID 
 	async getAssembleById(id:number) {
 		return await this.assembleReprository.findByPk(id, {include: [{all: true}, 
 			{
@@ -209,6 +195,7 @@ export class AssembleService {
 		]})
 	}
 
+	// Получаем сборки по операциям
 	async getAssembleByOperation(op_id: number) {
 		const assembles = await this.getAllAssemble()
 		const arr = []
