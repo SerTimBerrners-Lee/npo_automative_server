@@ -1,4 +1,4 @@
-import { Body, Controller, Delete, Get, Param, Post } from '@nestjs/common';
+import { Body, Controller, Delete, Get, Param, Post, Put } from '@nestjs/common';
 import { ApiOperation, ApiTags } from '@nestjs/swagger';
 import { CreateMetaloworkingDto } from './dto/create-metaloworking.dto';
 import { MetaloworkingService } from './metaloworking.service';
@@ -19,17 +19,23 @@ export class MetaloworkingController {
 	getOneMetaloworkingById(@Param('id') id: number) {
 			return this.metaloworkingService.getOneMetaloworkingById(id)
 	}
-
+    
 	@ApiOperation({summary: 'Получить всю металлообработку'})
-	@Get()
-	getMetolloworking() {
-			return this.metaloworkingService.getMetolloworking()
+	@Get('/all/:isBan')
+	getMetolloworking(@Param('isBan') isBan: boolean = false) {
+			return this.metaloworkingService.getMetolloworking(isBan)
 	}
 
 	@ApiOperation({summary: 'Удалить Металлообработку'})
 	@Delete('/:id')
 	deleteMetolloworking(@Param('id') id: number) {
 			return this.metaloworkingService.deleteMetolloworking(id)
+	}
+
+	@ApiOperation({summary: 'Вернуть Металлообработку из архива'})
+	@Put('/comback/:id')
+	combackeMetolloworking(@Param('id') id: number) {
+			return this.metaloworkingService.combackMetolloworking(id)
 	}
 
 	@ApiOperation({summary: 'Получить по ID из металообработки'})

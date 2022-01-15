@@ -21,8 +21,7 @@ export class AssembleService {
 		private cbedService: CbedService,
 		private settingsService: SettingsService, 
 		private detalService: DetalService, 
-		private metaloworkingService: MetaloworkingService, 
-		private productService: ProductService) {} 
+		private metaloworkingService: MetaloworkingService) {} 
 
 	// Добавляем сборку
 	async createAssemble(dto: CreateAssembleDto) {
@@ -123,7 +122,8 @@ export class AssembleService {
 		}
 	}
 
-	async getAllAssemble() {
+	// Получаем все Сборки 
+	async getAllAssemble(isBan: boolean = false) {
 		const assembly = await this.assembleReprository.findAll({include: [ {all: true}, 
 			{
 				model: Cbed, 
@@ -140,7 +140,7 @@ export class AssembleService {
 						}]
 					}]
 			}
-		]})
+		], where: {ban: isBan}})
 		// Фильтрация по операциям
 		for(let obj of assembly) {
 			if(!obj.cbed || !obj.cbed.techProcesses || !obj.cbed.techProcesses.operations.length) continue
@@ -159,19 +159,32 @@ export class AssembleService {
 	}
 
 	// Удаляем сборку
-	// ТО-DO: удалять также материалы при удалении сборки
 	async deleteAssembly(id: number) {
 		const ass = await this.assembleReprository.findByPk(id, {include: {all: true}})
 		if(!ass) throw new HttpException('Не удалось удалить Сборку', HttpStatus.BAD_REQUEST)
+		if(!ass.ban) {
+			ass.ban = true
+			await	ass.save()
+			return id
+		}	// Если значение не БАН - переводим в БАН и не отображаем
 
-		if(!ass.cbed) return await this.assembleReprository.destroy({where: {id}})
+		if(!ass.cbed) return await this.assembleReprository.destroy({where: {id}}) // Удаляем саму сборку если нет СБ
 
 		const cbed = await this.cbedService.getOneCbedById(ass.cbed.id)
-		if(!cbed) return await this.assembleReprository.destroy({where: {id}})
+		if(!cbed) return await this.assembleReprository.destroy({where: {id}}) // Если нет СБ удаляем сборку
 		cbed.assemble_kolvo = cbed.assemble_kolvo - ass.kolvo_shipments < 0 ? 0 : cbed.assemble_kolvo - ass.kolvo_shipments
 		await cbed.save()
 		
 		return await this.assembleReprository.destroy({where: {id}})
+	}
+
+	async combackeAssembly(id: number) {
+		const ass = await this.assembleReprository.findByPk(id, {include: {all: true}})
+		if(!ass) throw new HttpException('Не удалось вернуть Сборку из Архива', HttpStatus.BAD_REQUEST)
+
+		ass.ban = false
+		await ass.save()
+		return id
 	}
 
 	// Получаем сборку по ID 

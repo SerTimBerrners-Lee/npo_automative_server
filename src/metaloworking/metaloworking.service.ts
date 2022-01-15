@@ -19,8 +19,7 @@ export class MetaloworkingService {
 		@Inject(forwardRef(() => ShipmentsService))
 		private shipmentService: ShipmentsService,
 		private detalService: DetalService,
-		private settingsService: SettingsService,
-		private productService: ProductService) {}
+		private settingsService: SettingsService) {}
 
 	async createMetaloworking(dto: CreateMetaloworkingDto) {
 		const metaloworking = await this.metaloworkingReprositroy
@@ -84,9 +83,15 @@ export class MetaloworkingService {
 		await mat_zag.save()
 	}
 
+	// Delete Metalloworking
 	async deleteMetolloworking(id: number) {
 		const metalloworking = await this.metaloworkingReprositroy.findByPk(id)
 		if(!metalloworking) throw new HttpException('Не удалось удалить металообработки', HttpStatus.BAD_REQUEST)
+		if(!metalloworking.ban) {
+			metalloworking.ban = true
+			await	metalloworking.save()
+			return id
+		}
 		
 		if(!metalloworking.detal) return await this.metaloworkingReprositroy.destroy({where: {id}})
 
@@ -99,7 +104,16 @@ export class MetaloworkingService {
 		return await this.metaloworkingReprositroy.destroy({where: {id}})
 	}
 
-	async getMetolloworking() {
+	async combackMetolloworking(id: number) {
+		const metalloworking = await this.metaloworkingReprositroy.findByPk(id)
+		if(!metalloworking) throw new HttpException('Не удалось вернуть металообработки из архива', HttpStatus.BAD_REQUEST)
+
+		metalloworking.ban = false
+		await metalloworking.save()
+		return id
+	}
+
+	async getMetolloworking(isBan: boolean = false) {
 		const metal = await this.metaloworkingReprositroy.findAll({include: [ {all: true}, {
 			model: Detal, 
 			include: ['documents', 'mat_za_obj', {
@@ -117,7 +131,7 @@ export class MetaloworkingService {
 					}]
 			}] 
 			}
-		]})
+		], where: {ban: isBan}})
 
 		for(let obj of metal) {
 			if(!obj.detal || !obj.detal.techProcesses || !obj.detal.techProcesses.operations.length) continue;

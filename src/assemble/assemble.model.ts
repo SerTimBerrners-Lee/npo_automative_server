@@ -1,11 +1,7 @@
 import { ApiProperty } from "@nestjs/swagger";
-import { Model, Column, DataType, Table, ForeignKey, BelongsTo, HasMany} from "sequelize-typescript";
+import { Model, Column, DataType, Table, ForeignKey, BelongsTo} from "sequelize-typescript";
 import { Cbed } from "src/cbed/cbed.model";
-import { Operation } from "src/detal/operation.model";
-import { TechProcess } from "src/detal/tech-process.model";
 import { StatusAssemble } from "src/files/enums";
-import { Product } from "src/product/product.model";
-import { Marks } from "src/sclad/marks.model";
 
 interface AssembleAttrCreate {
   date_order: string;
@@ -18,6 +14,10 @@ export class Assemble extends Model<Assemble, AssembleAttrCreate> {
   @ApiProperty({example: '1', description: 'Уникальный идентификатор'})
   @Column({type: DataType.INTEGER, unique: true, autoIncrement: true, primaryKey: true})
   id: number;
+
+  @ApiProperty({example: '', description: ''})
+  @Column({type: DataType.BOOLEAN, defaultValue: false})
+  ban: boolean;
 
   @ApiProperty({example: '1', description: ''})
   @Column({type: DataType.STRING})

@@ -1,4 +1,4 @@
-import { Body, Controller, Delete, Get, Param, Post } from '@nestjs/common';
+import { Body, Controller, Delete, Get, Param, Post, Put } from '@nestjs/common';
 import { ApiOperation, ApiTags } from '@nestjs/swagger';
 import { AssembleService } from './assemble.service';
 import { CreateAssembleDto } from './dto/create-assemble.dto';
@@ -15,21 +15,28 @@ export class AssembleController {
 	}
 
 	@ApiOperation({summary: 'Получить все сборочные единицы'})
-	@Get('/')
-	getAllAssemble() {
-			return this.assembleService.getAllAssemble()
+	@Get('/all/:isBan')
+	getAllAssemble(@Param('isBan') isBan: boolean = false) {
+			return this.assembleService.getAllAssemble(isBan)
 	}
 
-	@ApiOperation({summary: 'Получить все сборочные единицы'})
+	@ApiOperation({summary: 'Получить Сборочную единицу'})
 	@Get('/:id')
 	getAssembleById(@Param('id') id: number) {
 			return this.assembleService.getAssembleById(id)
 	}
 
-	@ApiOperation({summary: 'Удалить Металлообработку'})
+	@ApiOperation({summary: 'Удалить Сборку'})
 	@Delete('/:id')
 	deleteAssembly(@Param('id') id: number) {
 			return this.assembleService.deleteAssembly(id)
+	}
+
+	@ApiOperation({summary: 'Вернуть Сборку из Архива'})
+	@Put('/comback/:id')
+	combackeAssembly(@Param('id') id: number) {
+		console.log(id, "ASSEMBLy")
+			return this.assembleService.combackeAssembly(id)
 	}
 
 	@ApiOperation({summary: 'Получаем все сборки по типам операций'})
