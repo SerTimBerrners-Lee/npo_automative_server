@@ -2,6 +2,7 @@ import { Body, Controller, Delete, Get, Param, Post, Put } from '@nestjs/common'
 import { ApiOperation, ApiTags } from '@nestjs/swagger';
 import { AssembleService } from './assemble.service';
 import { CreateAssembleDto } from './dto/create-assemble.dto';
+import { UpdateAssembleDto } from './dto/update-assemble.dto';
 
 @ApiTags('Сборка')
 @Controller('assemble')
@@ -12,6 +13,12 @@ export class AssembleController {
 	@Post('/')
 	createAssemble(@Body() dto: CreateAssembleDto) {
 		return this.assembleService.createAssemble(dto)
+	}
+
+	@ApiOperation({summary: 'Обнвляем Сборочную единицу'})
+	@Put('/')
+	updateAssemble(@Body() dto: UpdateAssembleDto) {
+		return this.assembleService.updateAssemble(dto)
 	}
 
 	@ApiOperation({summary: 'Получить все сборочные единицы'})

@@ -244,7 +244,9 @@ export class CbedService {
         }
     }       
 
-    async getOneCbedById(id: number) {
+    async getOneCbedById(id: number, light: boolean = false) {
+        if(light) return await this.cbedReprository.findByPk(id)
+        
         return await this.cbedReprository.findByPk(id,  {include: [
             {all: true},
             {

@@ -1,6 +1,7 @@
 import { Body, Controller, Delete, Get, Param, Post, Put } from '@nestjs/common';
 import { ApiOperation, ApiTags } from '@nestjs/swagger';
 import { CreateMetaloworkingDto } from './dto/create-metaloworking.dto';
+import { UpdateMetaloworkingDto } from './dto/update-metalloworking.dto';
 import { MetaloworkingService } from './metaloworking.service';
 
 @ApiTags('Металообработка')
@@ -12,6 +13,12 @@ export class MetaloworkingController {
 	@Post('/')
 	createMetaloworking(@Body() dto: CreateMetaloworkingDto) {
 			return this.metaloworkingService.createMetaloworking(dto)
+	}
+
+	@ApiOperation({summary: 'Обновляем Металообработку'})
+	@Put('/')
+	updateMetaloworking(@Body() dto: UpdateMetaloworkingDto) {
+			return this.metaloworkingService.updateMetaloworking(dto)
 	}
 
 	@ApiOperation({summary: 'Получить по ID из металообработки'})

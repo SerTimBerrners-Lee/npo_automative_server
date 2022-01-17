@@ -10,6 +10,7 @@ import { SettingsService } from 'src/settings/settings.service';
 import { Shipments } from 'src/shipments/shipments.model';
 import { ShipmentsService } from 'src/shipments/shipments.service';
 import { CreateMetaloworkingDto } from './dto/create-metaloworking.dto';
+import { UpdateMetaloworkingDto } from './dto/update-metalloworking.dto';
 import { Metaloworking } from './metaloworking.model';
 
 @Injectable()
@@ -30,7 +31,7 @@ export class MetaloworkingService {
 		if(!metaloworking)
 			throw new HttpException('Не удалось отправить в производство', HttpStatus.BAD_GATEWAY)
 
-		if(!dto.number_order) 
+		if(!dto.number_order?.trim()) 
 			metaloworking.number_order = String(metaloworking.id)
 		if(!dto.date_order) metaloworking.date_order = new Date().toLocaleString('ru-RU').split(',')[0]
 		else metaloworking.number_order = dto.number_order
@@ -41,22 +42,77 @@ export class MetaloworkingService {
 		const detal = await this.detalService.findByIdDetal(dto.detal_id)
 		if(!detal) return metaloworking
 
+		let differece = detal.metalloworking_kolvo
 		metaloworking.detal_id = detal.id
 		metaloworking.kolvo_shipments = dto.my_kolvo
 		detal.metalloworking_kolvo = detal.metalloworking_kolvo + dto.my_kolvo
-
-		if(dto.my_kolvo > detal.shipments_kolvo) 
-			await this.shipmentsMaterialsForDetal(detal, (Number(dto.my_kolvo) - Number(detal.shipments_kolvo)))
-		else if(detal.metalloworking_kolvo > dto.shipments_kolvo)
-			await this.shipmentsMaterialsForDetal(detal, Number(dto.my_kolvo))
-		await detal.save()
-
 		await metaloworking.save()
+
+		const result = await this.middlewareUpdate(metaloworking, detal, dto.my_kolvo, differece)
+
+		return result
+	}
+
+	private async middlewareUpdate(metaloworking: Metaloworking, detal: Detal, my_kolvo: number, differece: number) {
+		const all_kolvo_metal = await this.metaloworkingReprositroy.findAll({attributes: ['detal_id', 'kolvo_shipments', 'id'], where: {detal_id: detal.id}})
+		let count_metalloworking = 0 // Количество уже заказанных
+		for(let item of all_kolvo_metal) {
+			count_metalloworking  += item.kolvo_shipments 
+		}
+
+		if(count_metalloworking < detal.shipments_kolvo) { 
+			// Нудно учесть тот факт что удалении из дефицита заказанного после оно в дефицит не уйдет!!!
+			let num = 0
+			if(Number(my_kolvo) > detal.shipments_kolvo) num = Number(my_kolvo) - detal.shipments_kolvo
+			else if(count_metalloworking + Number(my_kolvo) > detal.shipments_kolvo)
+				num = (count_metalloworking + Number(my_kolvo)) - detal.shipments_kolvo
+
+			await this.shipmentsMaterialsForDetal(detal, num)
+			await detal.save()
+			await metaloworking.save()
+			
+			return metaloworking
+		} 
+		if(count_metalloworking <= detal.shipments_kolvo) return metaloworking	 
+
+		let count = Number(detal.metalloworking_kolvo) - differece == 0 ? -1 : Number(detal.metalloworking_kolvo) - differece
+
+		await this.shipmentsMaterialsForDetal(detal, count)
+		await detal.save()
+		await metaloworking.save()
+		
 		return metaloworking
+	}
+
+	async updateMetaloworking(dto: UpdateMetaloworkingDto) {
+		const metal = await this.metaloworkingReprositroy.findByPk(dto.metal_id)
+		const detal = await this.detalService.findByIdDetal(dto.detal_id)
+		if(!metal || !detal) 
+			throw new HttpException('Не удалось найти Деталь или металлообработку', HttpStatus.BAD_REQUEST)
+
+		let differece = dto.kolvo_shipments - metal.kolvo_shipments 
+		let last_count = detal.metalloworking_kolvo
+		if(differece < 0)  {
+			detal.metalloworking_kolvo -= differece
+			await this.shipmentsMaterialsForDetal(detal, -differece)
+		}
+		else if(differece > 0) {
+			detal.metalloworking_kolvo += differece
+			await this.middlewareUpdate(metal, detal, differece, last_count)
+		}
+
+		metal.description = dto.description
+		metal.kolvo_shipments = dto.kolvo_shipments
+
+		await metal.save()
+		await detal.save()
+		return metal
 	}
 
 	// Формируем дефицит для заготовки зам заготовки и всех прикрепленных материаов
 	async shipmentsMaterialsForDetal(detal: Detal, kolvo_all: any) {
+		if(kolvo_all === 0) return false
+
 		if(detal.mat_zag)  // Заготовку или заменитель заготовки тоже кидаем в дефицит 
 			this.formationDeficitZagMaterial(detal.mat_zag, kolvo_all)
 		if(detal.mat_zag_zam) 
@@ -92,11 +148,12 @@ export class MetaloworkingService {
 			await	metalloworking.save()
 			return id
 		}
-		
 		if(!metalloworking.detal) return await this.metaloworkingReprositroy.destroy({where: {id}})
 
 		const detal = await this.detalService.findByIdDetal(metalloworking.detal.id)
 		if(!detal) return await this.metaloworkingReprositroy.destroy({where: {id}})
+		await this.shipmentsMaterialsForDetal(detal, -metalloworking.kolvo_shipments)
+
 		detal.metalloworking_kolvo = detal.metalloworking_kolvo - metalloworking.kolvo_shipments < 0 
 			? 0 : detal.metalloworking_kolvo - metalloworking.kolvo_shipments
 		await detal.save()

@@ -12,6 +12,7 @@ import { Shipments } from 'src/shipments/shipments.model';
 import { ShipmentsService } from 'src/shipments/shipments.service';
 import { Assemble } from './assemble.model';
 import { CreateAssembleDto } from './dto/create-assemble.dto';
+import { UpdateAssembleDto } from './dto/update-assemble.dto';
 
 @Injectable()
 export class AssembleService {
@@ -33,7 +34,7 @@ export class AssembleService {
 		if(!assemble)
 			throw new HttpException('Не удалось отправить в производство', HttpStatus.BAD_GATEWAY)
 		
-		if(!dto.number_order) 
+		if(!dto.number_order?.trim()) 
 			assemble.number_order = String(assemble.id)
 		if(!dto.date_order) assemble.date_order = new Date().toLocaleString('ru-RU').split(',')[0]
 		else assemble.number_order = dto.number_order
@@ -41,26 +42,77 @@ export class AssembleService {
 		await assemble.save()
 
 		if(!dto.cbed_id) return assemble
-
-		const cbed = await this.cbedService.findById(dto.cbed_id)
+		const cbed = await this.cbedService.findById(dto.cbed_id)	
 		if(!cbed) return assemble
 
+		let differece = cbed.assemble_kolvo
 		assemble.cbed_id = cbed.id
 		assemble.kolvo_shipments = dto.my_kolvo
 		cbed.assemble_kolvo = cbed.assemble_kolvo + dto.my_kolvo
-		await cbed.save()
+		await assemble.save()
 
 		// shipments_kolvo -- сколько заказано в задачах на тгрузку (Дефицит)
 		// my_kolvo -- которое мы указали для производства
 		// assemble_kolvo -- всего заказано на производстве в СБОРКЕ
 			
-		if(dto.my_kolvo > dto.shipments_kolvo ) 
-			await this.countFunction(cbed, Number(dto.my_kolvo) - Number(dto.shipments_kolvo))
-		else if(cbed.assemble_kolvo > dto.shipments_kolvo)  
-			await this.countFunction(cbed, Number(dto.my_kolvo))
+		const result = await this.middlewareUpdate(assemble, cbed, dto.my_kolvo, differece)
+		return result
+	}
 
-		await assemble.save()
-		return assemble
+	private async middlewareUpdate(ass: Assemble, cbed: Cbed, my_kolvo: number, differece: number) {
+		const all_kolvo_metal = await this.assembleReprository.findAll({attributes: ['cbed_id', 'kolvo_shipments', 'id'], where: {cbed_id: cbed.id}})
+		let count_ass = 0 // Количество уже заказанных
+		for(let item of all_kolvo_metal) {
+			count_ass  += item.kolvo_shipments 
+		}
+
+		if(count_ass < cbed.shipments_kolvo) { 
+			// Нудно учесть тот факт что удалении из дефицита заказанного после оно в дефицит не уйдет!!!
+			let num = 0
+			if(Number(my_kolvo) > cbed.shipments_kolvo) num = Number(my_kolvo) - cbed.shipments_kolvo
+			else if(count_ass + Number(my_kolvo) > cbed.shipments_kolvo)
+				num = (count_ass + Number(my_kolvo)) - cbed.shipments_kolvo
+
+			await this.countFunction(cbed, num)
+			await cbed.save()
+			await ass.save()
+			
+			return ass
+		} 
+		if(count_ass <= cbed.shipments_kolvo) return ass	 
+
+		let count = Number(cbed.assemble_kolvo) - differece == 0 ? -1 : Number(cbed.assemble_kolvo) - differece
+
+		await this.countFunction(cbed, count)
+		await cbed.save()
+		await ass.save()
+		
+		return ass
+	}
+
+	async updateAssemble(dto: UpdateAssembleDto) {
+		const ass = await this.assembleReprository.findByPk(dto.ass_id)
+		const cbed = await this.cbedService.getOneCbedById(dto.cbed_id, true)
+		if(!ass || !cbed) 
+			throw new HttpException('Не удалось найти Сборку или Сборочную Единицу', HttpStatus.BAD_REQUEST)
+
+		let differece = dto.kolvo_shipments - ass.kolvo_shipments 
+		let last_count = cbed.assemble_kolvo
+		if(differece < 0)  {
+			cbed.assemble_kolvo -= differece
+			await this.countFunction(cbed, -differece)
+		}
+		else if(differece > 0) {
+			cbed.assemble_kolvo += differece
+			await this.middlewareUpdate(ass, cbed, differece, last_count)
+		}
+
+		ass.description = dto.description
+		ass.kolvo_shipments = dto.kolvo_shipments
+
+		await ass.save()
+		await cbed.save()
+		return ass
 	}
 
 	private async countFunction(cbed: Cbed, differenc: number) {
@@ -172,6 +224,8 @@ export class AssembleService {
 
 		const cbed = await this.cbedService.getOneCbedById(ass.cbed.id)
 		if(!cbed) return await this.assembleReprository.destroy({where: {id}}) // Если нет СБ удаляем сборку
+		await this.countFunction(cbed, -ass.kolvo_shipments)
+
 		cbed.assemble_kolvo = cbed.assemble_kolvo - ass.kolvo_shipments < 0 ? 0 : cbed.assemble_kolvo - ass.kolvo_shipments
 		await cbed.save()
 		
