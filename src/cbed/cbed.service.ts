@@ -304,6 +304,7 @@ export class CbedService {
                 try {
                     let product_min_remainder = JSON.parse(product.haracteriatic)[1]
                     product_min_remainder = Number(product_min_remainder.znach)
+                    console.log(product, product_min_remainder, 'product_min_remainder')
 
                     let object: any;
                         if(list_cd) 
@@ -320,9 +321,7 @@ export class CbedService {
     // return object in list  
     searchIzdToList(izd_id: number, type: string, list: any): object {
         for(let item of list) {
-            console.log(item)
-            if(izd_id == item.id && type == item.type) 
-                return item
+            if(izd_id == item.obj.id && type == item.type) return item
         }
         return undefined;	
     }

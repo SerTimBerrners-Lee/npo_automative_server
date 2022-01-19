@@ -654,8 +654,7 @@ export class DetalService {
     // return object in list  
     searchIzdToList(izd_id: number, type: string, list: any): object {
         for(let item of list) {
-            console.log(item)
-            if(izd_id == item.id && type == item.type) 
+            if(izd_id == item.obj.id && type == item.type) return item
                 return item
         }
         return undefined;	
