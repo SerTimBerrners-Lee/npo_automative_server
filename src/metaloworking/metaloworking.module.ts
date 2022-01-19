@@ -15,7 +15,6 @@ import { MetaloworkingService } from './metaloworking.service';
 		SequelizeModule.forFeature([
 			Metaloworking
 		]),
-		forwardRef(() => ShipmentsModule),
 		DetalModule,
 		SettingsModule,
 		ProductModule

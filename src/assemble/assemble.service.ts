@@ -17,8 +17,6 @@ import { UpdateAssembleDto } from './dto/update-assemble.dto';
 @Injectable()
 export class AssembleService {
 	constructor(@InjectModel(Assemble) private assembleReprository: typeof Assemble,
-		@Inject(forwardRef(() => ShipmentsService))
-		private shipmentService: ShipmentsService,
 		private cbedService: CbedService,
 		private settingsService: SettingsService, 
 		private detalService: DetalService, 

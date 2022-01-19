@@ -11,6 +11,7 @@ import { RemoveDocumentDto } from 'src/files/dto/remove-document.dto';
 import { NameInstrument } from 'src/instrument/name-instrument.model';
 import { Product } from 'src/product/product.model';
 import { PodPodMaterial } from 'src/settings/pod-pod-material.model';
+import { Shipments } from 'src/shipments/shipments.model';
 import { User } from 'src/users/users.model';
 import { Detal } from './detal.model';
 import { CreateDetalDto } from './dto/create-detal.dto';
@@ -36,6 +37,7 @@ export class DetalService {
         @InjectModel(User) private userRepository: typeof User,
         @InjectModel(Actions) private actionsReprository: typeof Actions,
         @InjectModel(TypeOperation) private typeOperationReprository: typeof TypeOperation,
+        @InjectModel(Product) private productReprository: typeof Product,
         private documentsService: DocumentsService
     ) {} 
 
@@ -612,11 +614,53 @@ export class DetalService {
                 [Op.gt]: 0
             }
         },
-
         })
+
+        for(let inx in detals) {
+            const remaining = await this.minRemainder(detals[inx].id, detals[inx].shipments, 'detal')
+            detals[inx].min_remaining = remaining
+        }
 
         return detals
 	}
+
+    // return min remainder
+    // Получаем продукт и его минимальное потребление
+    // Получаем изделие в заказе и * количестово на мин. потребление
+    async minRemainder(izd_id: number, shipments: Array<Shipments>, izd_type: string): Promise<number> {
+        let remainder = 0;
+        for(let item of shipments) {
+                if(!item.productId) continue;
+                const product = await this.productReprository.findByPk(item.productId)
+
+                let list_cd = item.list_cbed_detal;
+                let list_hidden_cd = item.list_hidden_cbed_detal;
+                try {
+                    let product_min_remainder = JSON.parse(product.haracteriatic)[1]
+                    product_min_remainder = Number(product_min_remainder.znach)
+
+                    let object: any;
+                        if(list_cd) 
+                            object = this.searchIzdToList(izd_id, izd_type, JSON.parse(list_cd))
+                        if(list_hidden_cd) 
+                            object = this.searchIzdToList(izd_id, izd_type, JSON.parse(list_hidden_cd))
+
+                        if(object) remainder += (object.kol * product_min_remainder)
+                } catch (e){ console.error(e)}
+        }
+        return remainder
+    }
+
+    // return object in list  
+    searchIzdToList(izd_id: number, type: string, list: any): object {
+        for(let item of list) {
+            console.log(item)
+            if(izd_id == item.id && type == item.type) 
+                return item
+        }
+        return undefined;	
+    }
+
 
     async getDetalIncludeOperation() {
         const detal = await this.detalReprository.findAll({include: [{

@@ -17,8 +17,6 @@ import { Metaloworking } from './metaloworking.model';
 export class MetaloworkingService {
 	constructor(
 		@InjectModel(Metaloworking) private metaloworkingReprositroy: typeof Metaloworking,  
-		@Inject(forwardRef(() => ShipmentsService))
-		private shipmentService: ShipmentsService,
 		private detalService: DetalService,
 		private settingsService: SettingsService) {}
 

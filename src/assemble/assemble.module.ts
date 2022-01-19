@@ -17,7 +17,6 @@ import { AssembleService } from './assemble.service';
 		SequelizeModule.forFeature([
 			Assemble
 		]),
-		forwardRef(() => ShipmentsModule),
 		CbedModule,
 		SettingsModule,
 		DetalModule,

@@ -4,6 +4,7 @@ import { Detal } from 'src/detal/detal.model';
 import { TechProcess } from 'src/detal/tech-process.model';
 import { Documents } from 'src/documents/documents.model';
 import { DocumentsModule } from 'src/documents/documents.module';
+import { Product } from 'src/product/product.model';
 import { PodPodMaterial } from 'src/settings/pod-pod-material.model';
 import { User } from 'src/users/users.model';
 import { CbedController } from './cbed.controller';
@@ -20,7 +21,8 @@ import { CbedService } from './cbed.service';
             Documents,
             TechProcess,
             PodPodMaterial,
-            Detal
+            Detal,
+            Product
         ]),
         DocumentsModule
     ],

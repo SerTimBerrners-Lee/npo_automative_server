@@ -36,6 +36,10 @@ export class Cbed extends Model<Cbed, CbedCreationAttrs> {
     @Column({type: DataType.BOOLEAN, defaultValue: false})
     ban: boolean; 
 
+    @ApiProperty({example: 12, description: 'Минимальное количество'})
+    @Column({type: DataType.INTEGER, defaultValue: 0})
+    min_remaining: number; 
+
     @ApiProperty({example: 12, description: 'Количество Сборочных единиц на складе'})
     @Column({type: DataType.INTEGER, defaultValue: 0})
     cbed_kolvo: number; 
