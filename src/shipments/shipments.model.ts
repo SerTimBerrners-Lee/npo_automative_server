@@ -23,19 +23,19 @@ export class Shipments extends Model<Shipments, ShipmentsAttrCreate> {
     @Column({type: DataType.INTEGER, unique: true, autoIncrement: true, primaryKey: true})
     id: number;
 
-		@ApiProperty({example: '1', description: ''})
+		@ApiProperty({example: '1', description: 'Дата заказа'})
     @Column({type: DataType.STRING})
     date_order: string;
 
-		@ApiProperty({example: '1', description: ''})
+		@ApiProperty({example: '1', description: 'Дата отгрузки покупателю'})
     @Column({type: DataType.STRING})
     date_shipments: string;
 
-		@ApiProperty({example: '1', description: ''})
+		@ApiProperty({example: '1', description: 'Номер заказа'})
     @Column({type: DataType.STRING})
     number_order: string;
 
-		@ApiProperty({example: '1', description: ''})
+		@ApiProperty({example: '1', description: 'Количеяство продукции'})
     @Column({type: DataType.INTEGER})
     kol: number;
 
@@ -43,23 +43,23 @@ export class Shipments extends Model<Shipments, ShipmentsAttrCreate> {
     @Column({type: DataType.BOOLEAN, defaultValue: false})
     bron: boolean;
 
-		@ApiProperty({example: '1', description: ''})
+		@ApiProperty({example: '1', description: 'Название файла основания'})
     @Column({type: DataType.STRING})
     base: string;
 
-		@ApiProperty({example: '1', description: ''})
+		@ApiProperty({example: '1', description: 'Если заказчик склад'})
     @Column({type: DataType.BOOLEAN, defaultValue: true})
     to_sklad: boolean;
     
-		@ApiProperty({example: '1', description: ''})
+		@ApiProperty({example: '1', description: 'Список сборок и деталей'})
     @Column({type: DataType.TEXT})
     list_cbed_detal: string;
 
-    @ApiProperty({example: '1', description: ''})
+    @ApiProperty({example: '1', description: 'Список сборок и деталей входящих в основные сборки'})
     @Column({type: DataType.TEXT})
     list_hidden_cbed_detal: string;
 
-		@ApiProperty({example: '1', description: ''})
+		@ApiProperty({example: '1', description: 'Примечание к заказу'})
     @Column({type: DataType.STRING})
     description: string;
 
@@ -77,7 +77,7 @@ export class Shipments extends Model<Shipments, ShipmentsAttrCreate> {
     @BelongsTo(() =>Buyer)
     buyer: Buyer;
 
-    @ApiProperty({example: '1', description: ''})
+    @ApiProperty({example: '1', description: 'Статус заказа'})
     @Column({type: DataType.STRING, defaultValue: statusShipment.order})
     status: string;
 

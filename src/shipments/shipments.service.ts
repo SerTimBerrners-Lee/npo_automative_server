@@ -257,9 +257,9 @@ export class ShipmentsService {
 		}
 	}
 
-	async getAllShipments() {
-		const shipments = await this.shipmentsReprository.findAll({include: {all: true}})
-		return shipments
+	async getAllShipments(light: string = 'false') {
+		if(light == 'false') return await this.shipmentsReprository.findAll({include: {all: true}})
+		if(light == 'true') return await this.shipmentsReprository.findAll({ attributes: ['id', 'number_order', 'date_shipments'] })
 	}
 
 	async getAllShipmentsSclad(to_sclad: boolean) {
@@ -279,20 +279,39 @@ export class ShipmentsService {
 		return await this.shipmentsReprository.findByPk(id, {include: {all: true}})
 	}
 
-	async getAllShipmentsAssemble() {
-		const shipments = await this.shipmentsReprository.findAll({include: {all: true}})
+	async getAllShipmentsAssemble(light: string = 'false') {
+		const shipments = await this.shipmentsReprository.findAll({
+			include: [
+				light == 'false' ? {all: true} :
+				'cbeds'
+			],
+			attributes: light ? ['id', 'number_order', 'date_shipments'] : { exclude: ['updatedAt', 'createdAt']}
+		})
 		const assemble: any = []
 		for(let sh of shipments) {
 			if(sh.cbeds && sh.cbeds.length) assemble.push(sh)
 		}
+		
 		return assemble
 	}
 
-	async getAllShipmentsMetaloworking() {
-		const shipments = await this.shipmentsReprository.findAll({include: {all: true}})
+	async getAllShipmentsMetaloworking(light: string = 'false') {
+		const shipments = await this.shipmentsReprository.findAll({
+			include: [
+				light == 'false' ? {all: true} :
+				'detals'
+			],
+			attributes: light ? ['id', 'number_order', 'date_shipments'] : { exclude: ['updatedAt', 'createdAt']}
+		})
 		const metaloworking: any = []
 		for(let sh of shipments) {
 			if(sh.detals && sh.detals.length) metaloworking.push(sh)
+		}
+
+		if(light == 'true') {
+			for(let sh of metaloworking) {
+				delete sh['detals']
+			}
 		}
 		return metaloworking
 	}

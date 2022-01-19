@@ -266,11 +266,18 @@ export class CbedService {
     }
 
     async getAllDeficitCbed() {
-		const cbeds = await this.cbedReprository.findAll({include: {all: true}, where: {
+		const cbeds = await this.cbedReprository.findAll({include: [
+            {
+                model: TechProcess
+            },
+            'shipments'
+        ], 
+        where: {
             shipments_kolvo: {
                 [Op.gt]: 0
             }
-        }})
+        },
+        })
         return cbeds
 	}
 

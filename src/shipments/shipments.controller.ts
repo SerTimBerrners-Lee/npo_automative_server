@@ -39,9 +39,9 @@ export class ShipmentsController {
 	}
 
 	@ApiOperation({summary: 'Получить все заказы'})
-  @Get()
-	getAllShipments() {
-		return this.shipmentsSettings.getAllShipments();
+  @Get('/all/:light')
+	getAllShipments(@Param('light') light: string = 'false') {
+		return this.shipmentsSettings.getAllShipments(light);
 	}
 
 	@ApiOperation({summary: 'Получить все заказы в зависимости на складе или нет'})
@@ -51,15 +51,15 @@ export class ShipmentsController {
 	}
 
 	@ApiOperation({summary: 'Получить все заказы в сборке'})
-  @Get('/assemble')
-	getAllShipmentsAssemble() {
-		return this.shipmentsSettings.getAllShipmentsAssemble();
+  @Get('/assemble/:light')
+	getAllShipmentsAssemble(@Param('light') light: string = 'false') {
+		return this.shipmentsSettings.getAllShipmentsAssemble(light);
 	}
 
 	@ApiOperation({summary: 'Получить все детали'})
-  @Get('/metaloworking')
-	getAllShipmentsMetaloworking() {
-		return this.shipmentsSettings.getAllShipmentsMetaloworking();
+  @Get('/metaloworking/:light')
+	getAllShipmentsMetaloworking(@Param('light') light: string = 'false') {
+		return this.shipmentsSettings.getAllShipmentsMetaloworking(light);
 	}
 
 	@ApiOperation({summary: 'Получить все заказы в сборке'})

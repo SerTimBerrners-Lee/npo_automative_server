@@ -592,22 +592,28 @@ export class DetalService {
     // Получаем все Дефицитные детали вместе с чпу
 
     async getAllDeficitDeficit() {
-		const detals = await this.detalReprository.findAll({include: [{all: true}, {
-            model: TechProcess, 
-            include: [{
-                model: Operation,
-                include: [
-                    {
-                        model: TypeOperation
-                    }
-                ], 
-                attributes: ['id']
-            }]
-        }], where: {
+		const detals = await this.detalReprository.findAll({include: [
+            {
+                model: TechProcess, 
+                include: [{
+                    model: Operation,
+                    include: [
+                        {
+                            model: TypeOperation
+                        }
+                    ], 
+                    attributes: ['id']
+                }]
+            },
+            'shipments'
+        ], 
+        where: {
             shipments_kolvo: {
                 [Op.gt]: 0
             }
-        }})
+        },
+
+        })
 
         return detals
 	}
