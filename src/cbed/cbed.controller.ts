@@ -16,6 +16,12 @@ export class CbedController {
         return this.cbedService.getCbedIncludeOperation()
     }
 
+    @ApiOperation({summary: 'Получаем все артиклы СБ'})
+    @Get('/articl/')
+    getAllCbedArticl() {
+        return this.cbedService.getAllCbedArticl()
+    }
+
     @ApiOperation({summary: 'Создаем Сборочную единицу'})
     @UseInterceptors(FileFieldsInterceptor([
         {name: 'document', maxCount: 40}
@@ -42,12 +48,6 @@ export class CbedController {
     @Get('/:light')
     getAllCbed(@Param('light') light: string) {
         return this.cbedService.getAllCbed(light)
-    }
-
-    @ApiOperation({summary: 'Получаем все артиклы СБ'})
-    @Get('/articl')
-    getAllCbedArticl() {
-        return this.cbedService.getAllCbedArticl()
     }
 
     @ApiOperation({summary: 'Получаем все дифицитные сборочные единицы'})

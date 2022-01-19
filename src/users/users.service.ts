@@ -154,10 +154,11 @@ export class UsersService {
     async getUser(light: string) {
         if(light == 'true')
             return await this.userRepository.findAll({
+                attributes: ['id', 'initial', 'login', 'tabel', 'banned'],
                 include: ['role'],
                 order: [
                     ['tabel', 'ASC']
-                ]
+                ],
             })
         else
             return await this.userRepository.findAll({
