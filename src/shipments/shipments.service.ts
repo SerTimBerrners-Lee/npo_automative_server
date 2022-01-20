@@ -2,7 +2,9 @@ import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
 import { InjectModel } from '@nestjs/sequelize';
 import { AssembleService } from 'src/assemble/assemble.service';
 import { BuyerService } from 'src/buyer/buyer.service';
+import { Cbed } from 'src/cbed/cbed.model';
 import { CbedService } from 'src/cbed/cbed.service';
+import { Detal } from 'src/detal/detal.model';
 import { DetalService } from 'src/detal/detal.service';
 import { DocumentsService } from 'src/documents/documents.service';
 import { DateMethods } from 'src/files/date.methods';
@@ -317,7 +319,17 @@ export class ShipmentsService {
 	}
 
 	async getAllShipmentsById(id: number) {
-		return await this.shipmentsReprository.findByPk(id, {include: {all: true}})
+		return await this.shipmentsReprository.findByPk(id, {include:[
+			{all: true},
+			{
+				model: Cbed, 
+				include: ['shipments']
+			},
+			{
+				model: Detal, 
+				include: ['shipments']
+			}
+		]})
 	}
 
 }

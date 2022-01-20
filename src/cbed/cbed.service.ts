@@ -285,6 +285,7 @@ export class CbedService {
         for(let inx in cbeds) {
             const remaining = await this.minRemainder(cbeds[inx].id, cbeds[inx].shipments, 'cbed')
             cbeds[inx].min_remaining = remaining
+            await cbeds[inx].save()
         }
 
         return cbeds
@@ -307,12 +308,14 @@ export class CbedService {
                     console.log(product, product_min_remainder, 'product_min_remainder')
 
                     let object: any;
-                        if(list_cd) 
-                            object = this.searchIzdToList(izd_id, izd_type, JSON.parse(list_cd))
-                        if(list_hidden_cd) 
-                            object = this.searchIzdToList(izd_id, izd_type, JSON.parse(list_hidden_cd))
-
-                        if(object) remainder += (object.kol * product_min_remainder)
+                    let object_two: any;
+                    if(list_cd && list_cd.length) 
+                        object = this.searchIzdToList(izd_id, izd_type, JSON.parse(list_cd))
+                    if(list_hidden_cd && list_hidden_cd.length) 
+                        object_two = this.searchIzdToList(izd_id, izd_type, JSON.parse(list_hidden_cd))
+                        
+                    if(object) remainder += (object.kol * product_min_remainder)
+                    if(object_two) remainder += (object_two.kol * product_min_remainder)
                 } catch (e){ console.error(e)}
         }
         return remainder

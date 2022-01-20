@@ -619,6 +619,7 @@ export class DetalService {
         for(let inx in detals) {
             const remaining = await this.minRemainder(detals[inx].id, detals[inx].shipments, 'detal')
             detals[inx].min_remaining = remaining
+            await detals[inx].save()
         }
 
         return detals
@@ -632,6 +633,7 @@ export class DetalService {
         for(let item of shipments) {
                 if(!item.productId) continue;
                 const product = await this.productReprository.findByPk(item.productId)
+                if(izd_id == 144) console.log(product)
 
                 let list_cd = item.list_cbed_detal;
                 let list_hidden_cd = item.list_hidden_cbed_detal;
@@ -640,12 +642,17 @@ export class DetalService {
                     product_min_remainder = Number(product_min_remainder.znach)
 
                     let object: any;
-                        if(list_cd) 
-                            object = this.searchIzdToList(izd_id, izd_type, JSON.parse(list_cd))
-                        if(list_hidden_cd) 
-                            object = this.searchIzdToList(izd_id, izd_type, JSON.parse(list_hidden_cd))
+                    let object_two: any;
+                    if(list_cd && list_cd.length) 
+                        object = this.searchIzdToList(izd_id, izd_type, JSON.parse(list_cd))
+                    if(list_hidden_cd && list_hidden_cd.length) 
+                        object_two = this.searchIzdToList(izd_id, izd_type, JSON.parse(list_hidden_cd))
 
-                        if(object) remainder += (object.kol * product_min_remainder)
+                    if(object) remainder += (object.kol * product_min_remainder)
+                    if(object_two) remainder += (object_two.kol * product_min_remainder)
+
+
+                    if(izd_id == 144) console.log(item)
                 } catch (e){ console.error(e)}
         }
         return remainder
