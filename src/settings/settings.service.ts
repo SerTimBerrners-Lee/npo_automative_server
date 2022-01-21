@@ -529,6 +529,10 @@ export class SettingsService {
         return await this.filesService.getLoggerServer()
     }
 
+    async writeServerLog() {
+        return await this.filesService.writeServerLog()
+    }
+
     async newDB() {
         const new_db = await this.filesService.newBackup()
         return new_db

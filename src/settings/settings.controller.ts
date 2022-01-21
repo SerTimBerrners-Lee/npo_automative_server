@@ -1,4 +1,4 @@
-import { Body, Controller, Delete, Get, Param, Post, Put, UploadedFiles, UseInterceptors } from '@nestjs/common';
+import { Body, Controller, Delete, Get, Param, Post, Put, Render, UploadedFiles, UseInterceptors } from '@nestjs/common';
 import { FileFieldsInterceptor } from '@nestjs/platform-express';
 import { ApiOperation, ApiTags } from '@nestjs/swagger';
 import { CreateEdizmDto } from './dto/create-edizm.dto';
@@ -190,6 +190,12 @@ export class SettingsController {
     @Get('/getserverlog')
     getServerLog() {
         return this.settingsService.getServerLog()
+    }
+
+    @ApiOperation({summary: 'Пишем Логирование Сервера'})
+    @Get('/writeserverlog')
+    writeServerLog() {
+        return this.settingsService.writeServerLog()
     }
 
     @ApiOperation({summary: 'Создать новую резервную копию'})

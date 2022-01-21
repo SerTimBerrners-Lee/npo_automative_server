@@ -6,6 +6,7 @@ import { opendir } from 'fs/promises';
 import { DateMethods } from 'src/files/date.methods';
 const util = require('util');
 const exec = util.promisify(require('child_process').exec);
+import { parse } from 'node-html-parser';
 
 interface AttrFilesReturn {
     readonly name: string;
@@ -13,10 +14,11 @@ interface AttrFilesReturn {
     readonly size: string;
 }
 
-const DIR_SCRIPT = '/home/npo/Desktop/script/pg_dump.sh'
+const DIR_SCRIPT = '/home/npo/Desktop/script/'
 const DIR_BACKUP = '/home/npo/Desktop/db'
-const HOME_DIR = '/home/npo/'
-const LOGGER_DIR = `${HOME_DIR}Desktop/npo_automative_server/dist/static/logger.log`
+const HOME_DIR = '/home/david/'
+const PUBLIC_DIR = `${HOME_DIR}Desktop/npo_automative_server/dist/static/public/`
+const STATIC_DIR = `${HOME_DIR}Desktop/npo_automative_server/dist/static/`
 @Injectable()
 export class FilesService {
 
@@ -56,7 +58,7 @@ export class FilesService {
     async newBackup() {
         try {
             if(fs.existsSync(DIR_SCRIPT)) {
-                await exec(`sh ${DIR_SCRIPT}`)
+                await exec(`sh ${DIR_SCRIPT}pg_dump.sh`)
                 return true
             }
             return false
@@ -65,18 +67,75 @@ export class FilesService {
         }
     }
 
-    async getLoggerServer() {
-        fs.readFile(`${LOGGER_DIR}`, 'utf8', (err, result) => {
-            if(err) {
-                console.log(err)
-                return err;
-            }
-            console.log(result)
-            console.log(LOGGER_DIR)
+    async writeServerLog() {
+        if(!fs.existsSync(PUBLIC_DIR))
+            fs.mkdirSync(PUBLIC_DIR, { recursive: true })
 
-            return result
-        })
+        try {
+            await exec(`sh ${DIR_SCRIPT}logger.sh`)
+            return true
+        } catch(e) { 
+            throw new HttpException('Произошла ошибка При Создании логера', HttpStatus.BAD_GATEWAY)
+        }
+    }
+
+    async getLoggerServer() {
+
+        if(!fs.existsSync(PUBLIC_DIR)) {
+            fs.mkdirSync(PUBLIC_DIR, { recursive: true })
+        }
+
+        const data = fs.readFileSync(`${STATIC_DIR}logger.log`, 'utf8')
+        const html = this.returnTemplate(data)
+        
+        fs.writeFileSync(`${PUBLIC_DIR}logger.html`, html)
+        return fs.readFileSync(`${PUBLIC_DIR}logger.html`, 'utf8')
+
     } 
+
+    returnTemplate(data: string) {
+        const format = `
+                <p>
+                    ${data.split('\n').join('</p><p>')}
+                </p>
+            `;
+
+        const html = parse(format)
+        let result = []
+        for(const item of html.querySelectorAll('p')) {
+            const pos = item.innerText.indexOf(':')
+            if(pos != -1) {
+                let arr = item.innerText.split(':')
+                const text = [`<span class='param'> ${[arr[0]]} :</span> `].concat(arr[1]).join('')
+                item.innerHTML = text
+            }
+            result.push(item)
+        }
+        return `
+            <!DOCTYPE html>
+            <html>
+                <head>
+                    <style>
+                        .main {
+                            font-size: 20px;
+                            padding: 25px;
+                        }
+                        .param {
+                            font-weight: bold;
+                            font-size: 21;
+                        }
+                    </style>
+                    <title>Лог Сервера</title>
+                </head>
+                <body>
+                    <div class='main'>
+                        ${result.join('')}
+                    </div>
+                </body>
+            </html>
+        `;
+
+    }
 
     async dropDumpDB(dump_name: string) {
         try {

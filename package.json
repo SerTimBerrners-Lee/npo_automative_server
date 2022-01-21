@@ -36,6 +36,7 @@
     "class-validator": "^0.13.1",
     "cross-env": "^7.0.3",
     "mysql2": "^2.3.0",
+    "node-html-parser": "^5.2.0",
     "pdf-image": "^2.0.0",
     "pdf-poppler": "^0.2.1",
     "pg": "^8.7.1",
