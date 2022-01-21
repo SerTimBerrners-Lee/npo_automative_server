@@ -15,6 +15,8 @@ interface AttrFilesReturn {
 
 const DIR_SCRIPT = '/home/npo/Desktop/script/pg_dump.sh'
 const DIR_BACKUP = '/home/npo/Desktop/db'
+const HOME_DIR = '/home/npo/'
+const LOGGER_DIR = `${HOME_DIR}Desktop/npo_automative_server/dist/static/logger.log`
 @Injectable()
 export class FilesService {
 
@@ -62,6 +64,17 @@ export class FilesService {
             throw new HttpException('Произошла ошибка Дириктории не найдено', HttpStatus.INTERNAL_SERVER_ERROR)
         }
     }
+
+    async getLoggerServer() {
+        fs.readFile(`${LOGGER_DIR}`, 'utf8', (err, result) => {
+            if(err) {
+                console.log(err)
+                return err;
+            }
+            
+            return result
+        })
+    } 
 
     async dropDumpDB(dump_name: string) {
         try {

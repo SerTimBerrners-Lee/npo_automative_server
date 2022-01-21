@@ -186,6 +186,12 @@ export class SettingsController {
         return this.settingsService.getAllDB()
     }
 
+    @ApiOperation({summary: 'Получаем Логирование Сервера'})
+    @Get('/exit')
+    getServerLog() {
+        return this.settingsService.getServerLog()
+    }
+
     @ApiOperation({summary: 'Создать новую резервную копию'})
     @Get('/db/new')
     newDB() {

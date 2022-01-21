@@ -110,6 +110,7 @@ export class Shipments extends Model<Shipments, ShipmentsAttrCreate> {
       // Если просрочено по времени - меняем статус при условии что задача не удалена
       const dt = new DateMethods()
 
+      if(!shipment?.length) return;
       for(const item of shipment) {
         if(
           !item.ban &&
