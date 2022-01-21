@@ -71,7 +71,9 @@ export class FilesService {
                 console.log(err)
                 return err;
             }
-            
+            console.log(result)
+            console.log(LOGGER_DIR)
+
             return result
         })
     } 
