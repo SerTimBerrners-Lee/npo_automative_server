@@ -1,20 +1,23 @@
 export enum StatusAssemble {
-  'В процессе',
-  'Готово',
-  'Просрочено' 
+  performed = 'В процессе',
+  done = 'Готово',
+  ban = 'В архиве',
+  overbue = 'Просрочено' 
 }
 
 export enum StatusMetaloworking {
-  'В процессе',
-  'Готово',
-  'Просрочено' 
+  performed = 'В процессе',
+  done = 'Готово',
+  ban = 'В архиве',
+  overbue = 'Просрочено' 
 }
 
 export enum statusShipment {
 	order = 'Заказано',
-	noOrder = 'Не заказано',
+	ban = 'Удалено',
 	performed = 'Выполняется',
-	done = 'Выполнено'
+	done = 'Выполнено',
+  overbue = 'Просрочено' 
 }
 
 export enum statusDelivery {

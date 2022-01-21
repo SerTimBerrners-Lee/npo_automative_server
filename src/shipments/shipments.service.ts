@@ -8,6 +8,7 @@ import { Detal } from 'src/detal/detal.model';
 import { DetalService } from 'src/detal/detal.service';
 import { DocumentsService } from 'src/documents/documents.service';
 import { DateMethods } from 'src/files/date.methods';
+import { statusShipment } from 'src/files/enums';
 import { MetaloworkingService } from 'src/metaloworking/metaloworking.service';
 import { ProductService } from 'src/product/product.service';
 import { UpCreateShipmentsDto } from './dto/up-create-shipments.dto';
@@ -201,6 +202,13 @@ export class ShipmentsService {
 		if(!shipments) 
 			throw new HttpException('Не удалось найти задачу', HttpStatus.NOT_FOUND)
 
+		if(!shipments.ban) {
+			shipments.ban = true
+			shipments.status = statusShipment.ban
+			await shipments.save()
+			return shipments.id
+		}
+
 		if(shipments.list_cbed_detal) {
 			try {
 				let pars = JSON.parse(shipments.list_cbed_detal)
@@ -330,6 +338,14 @@ export class ShipmentsService {
 				include: ['shipments']
 			}
 		]})
+	}
+
+	async updateStatus(shipments: Array<Shipments>, new_status: string) {
+		for(let item of shipments) {
+			if(item.ban) continue;
+			item.status = new_status
+			await item.save()
+		}
 	}
 
 }

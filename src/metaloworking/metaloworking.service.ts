@@ -4,6 +4,7 @@ import { Detal } from 'src/detal/detal.model';
 import { DetalService } from 'src/detal/detal.service';
 import { Operation } from 'src/detal/operation.model';
 import { TechProcess } from 'src/detal/tech-process.model';
+import { StatusMetaloworking, statusShipment } from 'src/files/enums';
 import { ProductService } from 'src/product/product.service';
 import { PodPodMaterial } from 'src/settings/pod-pod-material.model';
 import { SettingsService } from 'src/settings/settings.service';
@@ -16,7 +17,9 @@ import { Metaloworking } from './metaloworking.model';
 @Injectable()
 export class MetaloworkingService {
 	constructor(
-		@InjectModel(Metaloworking) private metaloworkingReprositroy: typeof Metaloworking,  
+		@InjectModel(Metaloworking) private metaloworkingReprositroy: typeof Metaloworking, 
+		@Inject(forwardRef(()=> ShipmentsService))
+		private shipmentsService: ShipmentsService, 
 		private detalService: DetalService,
 		private settingsService: SettingsService) {}
 
@@ -29,7 +32,7 @@ export class MetaloworkingService {
 		if(!metaloworking)
 			throw new HttpException('Не удалось отправить в производство', HttpStatus.BAD_GATEWAY)
 
-		if(!dto.number_order?.trim()) 
+		if(!dto.number_order.trim()) 
 			metaloworking.number_order = String(metaloworking.id)
 		if(!dto.date_order) metaloworking.date_order = new Date().toLocaleString('ru-RU').split(',')[0]
 		else metaloworking.number_order = dto.number_order
@@ -39,6 +42,9 @@ export class MetaloworkingService {
 		if(!dto.detal_id) return metaloworking
 		const detal = await this.detalService.findByIdDetal(dto.detal_id)
 		if(!detal) return metaloworking
+
+		if(detal.shipments.length) 
+			await this.shipmentsService.updateStatus(detal.shipments, statusShipment.performed)
 
 		let differece = detal.metalloworking_kolvo
 		metaloworking.detal_id = detal.id
@@ -143,6 +149,7 @@ export class MetaloworkingService {
 		if(!metalloworking) throw new HttpException('Не удалось удалить металообработки', HttpStatus.BAD_REQUEST)
 		if(!metalloworking.ban) {
 			metalloworking.ban = true
+			metalloworking.status = StatusMetaloworking.ban
 			await	metalloworking.save()
 			return id
 		}
@@ -164,6 +171,7 @@ export class MetaloworkingService {
 		if(!metalloworking) throw new HttpException('Не удалось вернуть металообработки из архива', HttpStatus.BAD_REQUEST)
 
 		metalloworking.ban = false
+		metalloworking.status = StatusMetaloworking.performed
 		await metalloworking.save()
 		return id
 	}

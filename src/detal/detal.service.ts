@@ -9,6 +9,7 @@ import { DocumentsService } from 'src/documents/documents.service';
 import { Equipment } from 'src/equipment/equipment.model';
 import { RemoveDocumentDto } from 'src/files/dto/remove-document.dto';
 import { NameInstrument } from 'src/instrument/name-instrument.model';
+import { Metaloworking } from 'src/metaloworking/metaloworking.model';
 import { Product } from 'src/product/product.model';
 import { PodPodMaterial } from 'src/settings/pod-pod-material.model';
 import { Shipments } from 'src/shipments/shipments.model';
@@ -577,7 +578,9 @@ export class DetalService {
     }
 
     async findByIdDetal(id: number) {
-        return await this.detalReprository.findByPk(id, {include: { all: true }})
+        return await this.detalReprository.findByPk(id, {include: [
+            { all: true },
+        ]})
     }
 
     async removeDocumentDetal(dto: RemoveDocumentDto) {
@@ -606,6 +609,10 @@ export class DetalService {
                     ], 
                     attributes: ['id']
                 }]
+            },
+            {
+                model: Metaloworking,
+                attributes: ['id', 'date_order', 'date_shipments', 'kolvo_shipments', 'number_order']
             },
             'shipments'
         ], 

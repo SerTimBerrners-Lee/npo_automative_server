@@ -42,7 +42,7 @@ export class Metaloworking extends Model<Metaloworking, MetaloworkingAttrCreate>
     description: string;
 
     @ApiProperty({example: '', description: ''})
-    @Column({type: DataType.STRING, defaultValue: StatusMetaloworking[0]})
+    @Column({type: DataType.STRING, defaultValue: StatusMetaloworking.performed})
     status: string;
 
     @ForeignKey(() => Detal)

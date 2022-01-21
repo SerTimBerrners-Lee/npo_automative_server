@@ -51,4 +51,17 @@ export class DateMethods {
 		return result
 
 	}
+
+	public dateDifference = (date_one = new Date().toLocaleString('ru-RU').split(',')[0], date_two: string) => {
+		if(!date_two) return 0
+		const toFormatString = (date: any) => {
+			const spl = date.split('.')
+			return `${spl[2]}-${spl[1]}-${spl[0]}T10:20:30Z`
+		}
+	
+		let date1 = new Date(toFormatString(date_one));
+		let date2 = new Date(toFormatString(date_two));
+		const mat = Math.ceil(Math.abs(date2.getTime() - date1.getTime()) / (1000 * 3600 * 24));
+		return date2.getTime() < date1.getTime() ? -mat: mat
+	}
 }

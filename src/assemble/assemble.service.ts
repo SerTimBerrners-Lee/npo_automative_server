@@ -5,6 +5,7 @@ import { CbedService } from 'src/cbed/cbed.service';
 import { DetalService } from 'src/detal/detal.service';
 import { Operation } from 'src/detal/operation.model';
 import { TechProcess } from 'src/detal/tech-process.model';
+import { StatusAssemble, statusShipment } from 'src/files/enums';
 import { MetaloworkingService } from 'src/metaloworking/metaloworking.service';
 import { ProductService } from 'src/product/product.service';
 import { SettingsService } from 'src/settings/settings.service';
@@ -17,6 +18,8 @@ import { UpdateAssembleDto } from './dto/update-assemble.dto';
 @Injectable()
 export class AssembleService {
 	constructor(@InjectModel(Assemble) private assembleReprository: typeof Assemble,
+		@Inject(forwardRef(()=> ShipmentsService))
+		private shipmentsService: ShipmentsService,
 		private cbedService: CbedService,
 		private settingsService: SettingsService, 
 		private detalService: DetalService, 
@@ -32,7 +35,7 @@ export class AssembleService {
 		if(!assemble)
 			throw new HttpException('Не удалось отправить в производство', HttpStatus.BAD_GATEWAY)
 		
-		if(!dto.number_order?.trim()) 
+		if(!dto.number_order.trim()) 
 			assemble.number_order = String(assemble.id)
 		if(!dto.date_order) assemble.date_order = new Date().toLocaleString('ru-RU').split(',')[0]
 		else assemble.number_order = dto.number_order
@@ -42,6 +45,9 @@ export class AssembleService {
 		if(!dto.cbed_id) return assemble
 		const cbed = await this.cbedService.findById(dto.cbed_id)	
 		if(!cbed) return assemble
+
+		if(cbed.shipments.length) 
+			await this.shipmentsService.updateStatus(cbed.shipments, statusShipment.performed)
 
 		let differece = cbed.assemble_kolvo
 		assemble.cbed_id = cbed.id
@@ -214,6 +220,7 @@ export class AssembleService {
 		if(!ass) throw new HttpException('Не удалось удалить Сборку', HttpStatus.BAD_REQUEST)
 		if(!ass.ban) {
 			ass.ban = true
+			ass.status = StatusAssemble.ban
 			await	ass.save()
 			return id
 		}	// Если значение не БАН - переводим в БАН и не отображаем
@@ -235,6 +242,7 @@ export class AssembleService {
 		if(!ass) throw new HttpException('Не удалось вернуть Сборку из Архива', HttpStatus.BAD_REQUEST)
 
 		ass.ban = false
+		ass.status = StatusAssemble.performed
 		await ass.save()
 		return id
 	}

@@ -44,7 +44,7 @@ export class Assemble extends Model<Assemble, AssembleAttrCreate> {
   description: string;
 
   @ApiProperty({example: '', description: ''})
-  @Column({type: DataType.STRING, defaultValue: StatusAssemble[0]})
+  @Column({type: DataType.STRING, defaultValue: StatusAssemble.performed})
   status: string;
 
   @ForeignKey(() => Cbed)

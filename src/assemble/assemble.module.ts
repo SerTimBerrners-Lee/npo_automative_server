@@ -21,7 +21,8 @@ import { AssembleService } from './assemble.service';
 		SettingsModule,
 		DetalModule,
 		MetaloworkingModule,
-		ProductModule
+		ProductModule,
+		forwardRef(()=> ShipmentsModule),
 ],
 	exports: [AssembleService]
 })

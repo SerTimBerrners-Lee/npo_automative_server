@@ -1,10 +1,11 @@
 import { ApiProperty } from "@nestjs/swagger";
-import { Model, Column, DataType, Table, ForeignKey, BelongsTo, BelongsToMany, HasMany} from "sequelize-typescript";
+import { Model, Column, DataType, Table, ForeignKey, BelongsTo, BelongsToMany, HasMany, BeforeFind, AfterFind} from "sequelize-typescript";
 import { Buyer } from "src/buyer/buyer.model";
 import { Cbed } from "src/cbed/cbed.model";
 import { Detal } from "src/detal/detal.model";
 import { DocumentsShipments } from "src/documents/documents-shipments.mode";
 import { Documents } from "src/documents/documents.model";
+import { DateMethods } from "src/files/date.methods";
 import { statusShipment } from "src/files/enums";
 import { Product } from "src/product/product.model";
 import { PodPodMaterial } from "src/settings/pod-pod-material.model";
@@ -22,6 +23,10 @@ export class Shipments extends Model<Shipments, ShipmentsAttrCreate> {
     @ApiProperty({example: '1', description: 'Уникальный идентификатор'})
     @Column({type: DataType.INTEGER, unique: true, autoIncrement: true, primaryKey: true})
     id: number;
+
+    @ApiProperty({example: false, description: 'Архив'})
+    @Column({type: DataType.BOOLEAN, defaultValue: false})
+    ban: boolean;
 
 		@ApiProperty({example: '1', description: 'Дата заказа'})
     @Column({type: DataType.STRING})
@@ -99,4 +104,20 @@ export class Shipments extends Model<Shipments, ShipmentsAttrCreate> {
 
     @BelongsToMany(() => Documents, () => DocumentsShipments)
     documents: DocumentsShipments[];
+
+    @AfterFind
+    static async checkOverbye(shipment: Array<Shipments>) {
+      // Если просрочено по времени - меняем статус при условии что задача не удалена
+      const dt = new DateMethods()
+
+      for(const item of shipment) {
+        if(
+          !item.ban &&
+          dt.dateDifference(undefined, item.date_shipments) < 1 &&
+          item.status != statusShipment.overbue) {
+          item.status = statusShipment.overbue
+          await item.save()
+        }
+      }
+  }
 }  

@@ -2,6 +2,7 @@
 import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
 import { InjectModel } from '@nestjs/sequelize';
 import { Op } from 'sequelize';
+import { Assemble } from 'src/assemble/assemble.model';
 import { Detal } from 'src/detal/detal.model';
 import { TechProcess } from 'src/detal/tech-process.model';
 import { DocumentsService } from 'src/documents/documents.service';
@@ -272,6 +273,10 @@ export class CbedService {
 		const cbeds = await this.cbedReprository.findAll({include: [
             {
                 model: TechProcess
+            },
+            {
+                model: Assemble,
+                attributes: ['id', 'date_order', 'date_shipments', 'kolvo_shipments', 'number_order']
             },
             'shipments'
         ], 

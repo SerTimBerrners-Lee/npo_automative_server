@@ -150,10 +150,7 @@ export class Detal extends Model<Detal, DetalCreationAttrs> {
 
     @BelongsToMany(() => Product, () => ProductDetal)
     products: Product[];
-
-    @HasMany(() => Actions)
-    actions: Actions[];
-
+    
     @HasMany(() => Metaloworking)
     metaloworking: Metaloworking[];
 

@@ -4,6 +4,7 @@ import { DetalModule } from 'src/detal/detal.module';
 import { ProductModule } from 'src/product/product.module';
 import { SettingsModule } from 'src/settings/settings.module';
 import { ShipmentsModule } from 'src/shipments/shipments.module';
+import { ShipmentsService } from 'src/shipments/shipments.service';
 import { MetaloworkingController } from './metaloworking.controller';
 import { Metaloworking } from './metaloworking.model';
 import { MetaloworkingService } from './metaloworking.service';
@@ -15,9 +16,10 @@ import { MetaloworkingService } from './metaloworking.service';
 		SequelizeModule.forFeature([
 			Metaloworking
 		]),
+		forwardRef(()=> ShipmentsModule),
 		DetalModule,
 		SettingsModule,
-		ProductModule
+		ProductModule,
 ],
 	exports: [MetaloworkingService]
 })
