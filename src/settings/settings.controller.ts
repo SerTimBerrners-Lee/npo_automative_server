@@ -187,7 +187,7 @@ export class SettingsController {
     }
 
     @ApiOperation({summary: 'Получаем Логирование Сервера'})
-    @Get('/exit')
+    @Get('/getserverlog')
     getServerLog() {
         return this.settingsService.getServerLog()
     }
