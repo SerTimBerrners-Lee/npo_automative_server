@@ -1,5 +1,6 @@
 import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
 import { InjectModel } from '@nestjs/sequelize';
+import { Sequelize } from 'sequelize';
 import { Cbed } from 'src/cbed/cbed.model';
 import { Detal } from 'src/detal/detal.model';
 import { TechProcess } from 'src/detal/tech-process.model';
@@ -229,6 +230,37 @@ export class ProductService {
 
     async getAllProductArticl() {
         return await this.productReprository.findAll({attributes: ['articl']})
+    }
+
+    async getDificitProductArticl() {
+        const products = await this.productReprository.findAll({
+            attributes: ['haracteriatic', 'id', 'product_kolvo', 'shipments_kolvo']
+        })
+
+        let arrIdProducts = [];
+
+        for(const item of products) {
+            try {
+                const har = JSON.parse(item.haracteriatic)[1].znach
+                if(item.min_remaining != Number(har)) {
+                    item.min_remaining = Number(har)
+                    await item.save()
+                }
+                if((item.product_kolvo - item.shipments_kolvo) < har) arrIdProducts.push(item.id)
+            } catch(e) {console.error(e)}
+        }
+
+        return await this.productReprository.findAll({
+            include: [
+                {
+                    model: TechProcess
+                },
+                'shipments'
+            ],
+            where: {
+                id: arrIdProducts
+            }
+        })
     }
 
     async attachFileToProduct(product_id: number, file_id: number) {

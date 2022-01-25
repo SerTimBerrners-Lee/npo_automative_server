@@ -8,17 +8,23 @@ import { ProductService } from './product.service';
 @Controller('product')
 export class ProductController {
     constructor(private productService: ProductService) {}
-
+    
     @ApiOperation({summary: 'Получаем Массив ID Изделий у которых есть операции'})
     @Get('/operation/')
     getProductIncludeOperation() {
         return this.productService.getProductIncludeOperation()
     }
     
+    @ApiOperation({summary: 'Получаем Дефицит продукции'})
+    @Get('/get/deficit/')
+    getDificitProductArticl() {
+        return this.productService.getDificitProductArticl()
+    }
+
     @ApiOperation({summary: 'Создаем Изделие'})
     @UseInterceptors(FileFieldsInterceptor([
         {name: 'document', maxCount: 40}
-    ])) 
+    ]))
     @Post('/')
     createNewProduct(
         @Body() dto: CreateProductDto, 
@@ -42,6 +48,7 @@ export class ProductController {
     getAllProductArticl() {
         return this.productService.getAllProductArticl()
     }
+
 
     @ApiOperation({summary: 'Получаем все Изделия'})
     @Get('/:light')

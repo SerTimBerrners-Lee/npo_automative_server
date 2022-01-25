@@ -41,6 +41,10 @@ export class Product extends Model<Product, ProductCreationAttrs> {
     @Column({type: DataType.INTEGER, defaultValue: 0})
     shipments_kolvo: number;
 
+    @ApiProperty({example: 12, description: 'Минимальное количество продукции'})
+    @Column({type: DataType.INTEGER, defaultValue: 0})
+    min_remaining: number;
+
     @ApiProperty({example: 12, description: 'Срок поставки'})
     @Column({type: DataType.STRING, allowNull: true})
     fabricNumber: string; 
@@ -109,6 +113,6 @@ export class Product extends Model<Product, ProductCreationAttrs> {
     @HasOne(() => Sebestoim)
     sebestoim: Sebestoim;
 
-    @HasOne(() => Shipments)
-    shipmen: Shipments;
+    @HasMany(() => Shipments)
+    shipments: Shipments[];
 }     

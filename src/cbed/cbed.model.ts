@@ -60,31 +60,31 @@ export class Cbed extends Model<Cbed, CbedCreationAttrs> {
     @Column({type: DataType.STRING, allowNull: true})
     description: string; 
 
-    @ApiProperty({example: 12, description: 'Срок поставки'})
+    @ApiProperty({example: 12, description: 'Сборки к которым принадлежит эта сборка.'})
     @Column({type: DataType.TEXT, defaultValue: '[]'})
-    cbed: any; 
+    cbed: any;
 
-    @ApiProperty({example: 12, description: 'Срок поставки'})
+    @ApiProperty({example: 12, description: 'Параметры'})
     @Column({type: DataType.TEXT, allowNull: true})
     parametrs: any; 
 
-    @ApiProperty({example: 12, description: 'Срок поставки'})
+    @ApiProperty({example: 12, description: 'Характеристики'})
     @Column({type: DataType.TEXT, allowNull: true})
     haracteriatic: any;
 
-    @ApiProperty({example: 12, description: 'Срок поставки'})
+    @ApiProperty({example: 12, description: 'Список материала в комплектации'})
     @Column({type: DataType.TEXT, allowNull: true})
     materialList: any;
 
-    @ApiProperty({example: 12, description: 'Срок поставки'})
+    @ApiProperty({example: 12, description: 'Список покуптых материалов в комплектации'})
     @Column({type: DataType.TEXT, allowNull: true})
     listPokDet: any;
 
-    @ApiProperty({example: 12, description: 'Срок поставки'})
+    @ApiProperty({example: 12, description: 'Список Сборочных единиц в комплектации'})
     @Column({type: DataType.TEXT, allowNull: true})
     listCbed: any;
 
-    @ApiProperty({example: 12, description: 'Срок поставки'})
+    @ApiProperty({example: 12, description: 'Список Деталей в комплектации'})
     @Column({type: DataType.TEXT, allowNull: true})
     listDetal: any;
 

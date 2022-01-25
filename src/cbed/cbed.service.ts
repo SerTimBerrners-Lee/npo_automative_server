@@ -1,6 +1,7 @@
 
 import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
 import { InjectModel } from '@nestjs/sequelize';
+import { Sequelize } from 'sequelize';
 import { Op } from 'sequelize';
 import { Assemble } from 'src/assemble/assemble.model';
 import { Detal } from 'src/detal/detal.model';
@@ -9,7 +10,6 @@ import { DocumentsService } from 'src/documents/documents.service';
 import { RemoveDocumentDto } from 'src/files/dto/remove-document.dto';
 import { Product } from 'src/product/product.model';
 import { PodPodMaterial } from 'src/settings/pod-pod-material.model';
-import { Shipments } from 'src/shipments/shipments.model';
 import { User } from 'src/users/users.model';
 import { Cbed } from './cbed.model';
 import { CreateCbedDto } from './dto/create-cbed.dto';
@@ -280,15 +280,13 @@ export class CbedService {
             },
             'shipments'
         ], 
-        where: {
-            shipments_kolvo: {
-                [Op.gt]: 0
-            }
-        },
+            where: Sequelize.where(
+                Sequelize.col('cbed_kolvo'), '<', Sequelize.col('min_remaining')
+            )
         })
-
+        
         for(let inx in cbeds) {
-            const remaining = await this.minRemainder(cbeds[inx].id, cbeds[inx].shipments, 'cbed')
+            const remaining = await this.minRemainder(cbeds[inx].id, cbeds[inx])
             cbeds[inx].min_remaining = remaining
             await cbeds[inx].save()
         }
@@ -296,33 +294,70 @@ export class CbedService {
         return cbeds
 	}
 
-    // return min remainder
-    // Получаем продукт и его минимальное потребление
-    // Получаем изделие в заказе и * количестово на мин. потребление
-    async minRemainder(izd_id: number, shipments: Array<Shipments>, izd_type: string): Promise<number> {
+    async minRemainder(izd_id: number, cbed: Cbed): Promise<number> {
         let remainder = 0;
-        for(let item of shipments) {
-                if(!item.productId) continue;
-                const product = await this.productReprository.findByPk(item.productId)
+        let list_cb_arr = [];
 
-                let list_cd = item.list_cbed_detal;
-                let list_hidden_cd = item.list_hidden_cbed_detal;
-                try {
-                    let product_min_remainder = JSON.parse(product.haracteriatic)[1]
-                    product_min_remainder = Number(product_min_remainder.znach)
-                    console.log(product, product_min_remainder, 'product_min_remainder')
+        try {
+            const cbeds = JSON.parse(cbed.cbed)
+            for(const cb of cbeds) {
+                list_cb_arr.push(cb.id)
+            }
+        } catch(err) {console.error(err)}
 
-                    let object: any;
-                    let object_two: any;
-                    if(list_cd && list_cd.length) 
-                        object = this.searchIzdToList(izd_id, izd_type, JSON.parse(list_cd))
-                    if(list_hidden_cd && list_hidden_cd.length) 
-                        object_two = this.searchIzdToList(izd_id, izd_type, JSON.parse(list_hidden_cd))
-                        
-                    if(object) remainder += (object.kol * product_min_remainder)
-                    if(object_two) remainder += (object_two.kol * product_min_remainder)
-                } catch (e){ console.error(e)}
+        const getCbeds = await this.cbedReprository.findAll({
+            where: {
+                id: list_cb_arr
+            },
+            attributes: ['id', 'listCbed']
+        })
+
+        remainder += await this.getMinProductRemain(izd_id, remainder)
+
+        for(const cb of getCbeds) {
+            try {
+                const listCbed = JSON.parse(cb.listCbed)
+                for(const item of listCbed) {
+                    if(item.id == izd_id && Number(item.kol)) {
+                        // сдесь нужно сделать рекурсивный поиск
+                        remainder += Number(item.kol) * await this.getMinProductRemain(cb.id, 0)
+                    }
+                }
+            } catch(err) {console.error(err)}
         }
+        return remainder
+        
+    }
+
+    async getMinProductRemain(izd_id: number, remainder: number): Promise<number> {
+        const product = await this.productReprository.findAll({
+            include: [
+                {
+                    model: Cbed,
+                    attributes: ['id'],
+                    where: {
+                        id: izd_id
+                    }
+                }
+            ],
+            attributes: ['haracteriatic', 'listCbed']
+        })
+
+        if(!product.length) return remainder
+
+        for(const item of product) {
+            try {
+                const haracteriatic = JSON.parse(item.haracteriatic)[1].znach
+                const listCbed = JSON.parse(item.listCbed)
+                for(const cb of listCbed) {
+                    if(cb.cb.id == izd_id) {
+                        remainder += Number(cb.kol) * (haracteriatic || 1)
+                    }
+                }
+
+            } catch(e) {console.error(e)}
+        }
+
         return remainder
     }
 
