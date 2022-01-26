@@ -14,12 +14,6 @@ export class ProductController {
     getProductIncludeOperation() {
         return this.productService.getProductIncludeOperation()
     }
-    
-    @ApiOperation({summary: 'Получаем Дефицит продукции'})
-    @Get('/get/deficit/')
-    getDificitProductArticl() {
-        return this.productService.getDificitProductArticl()
-    }
 
     @ApiOperation({summary: 'Создаем Изделие'})
     @UseInterceptors(FileFieldsInterceptor([

@@ -22,12 +22,6 @@ export class DetalController {
         return this.detalService.getDetalIncludeOperation()
     }
 
-    @ApiOperation({summary: 'Получаем все дифицитные детали'})
-    @Get('/deficit')
-    getAllDeficitCbed() {
-        return this.detalService.getAllDeficitDeficit()
-    }
-
     @ApiOperation({summary: 'Получаем все артиклы детали'})
     @Get('/articl')
     getAllDetalArticl() {

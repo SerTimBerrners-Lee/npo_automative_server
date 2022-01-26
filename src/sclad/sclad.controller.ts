@@ -32,5 +32,23 @@ export class ScladController {
     createMark(@Body() dto: CreateMarkDto) {
         return this.scladService.createMark(dto)
     }
+
+    @ApiOperation({summary: 'Получаем все дифицитные детали'})
+    @Get('/deficit/detal')
+    getAllDeficitDetal() {
+        return this.scladService.getAllDeficitDetal()
+    }
+
+    @ApiOperation({summary: 'Получаем все дифицитные сборочные единицы'})
+    @Get('/deficit/cbed')
+    getAllDeficitCbed() {
+        return this.scladService.getAllDeficitCbed()
+    }
+
+    @ApiOperation({summary: 'Получаем все дифицитные Продукты'})
+    @Get('/deficit/product')
+    getAllDeficitProduct() {
+        return this.scladService.getAllDeficitProduct()
+    }
 }
     

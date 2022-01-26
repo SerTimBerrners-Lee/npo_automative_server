@@ -232,37 +232,6 @@ export class ProductService {
         return await this.productReprository.findAll({attributes: ['articl']})
     }
 
-    async getDificitProductArticl() {
-        const products = await this.productReprository.findAll({
-            attributes: ['haracteriatic', 'id', 'product_kolvo', 'shipments_kolvo']
-        })
-
-        let arrIdProducts = [];
-
-        for(const item of products) {
-            try {
-                const har = JSON.parse(item.haracteriatic)[1].znach
-                if(item.min_remaining != Number(har)) {
-                    item.min_remaining = Number(har)
-                    await item.save()
-                }
-                if((item.product_kolvo - item.shipments_kolvo) < har) arrIdProducts.push(item.id)
-            } catch(e) {console.error(e)}
-        }
-
-        return await this.productReprository.findAll({
-            include: [
-                {
-                    model: TechProcess
-                },
-                'shipments'
-            ],
-            where: {
-                id: arrIdProducts
-            }
-        })
-    }
-
     async attachFileToProduct(product_id: number, file_id: number) {
         const product = await this.productReprository.findByPk(product_id)
         const file = await this.documentsService.getFileById(file_id)
