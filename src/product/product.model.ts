@@ -40,6 +40,10 @@ export class Product extends Model<Product, ProductCreationAttrs> {
     @ApiProperty({example: 12, description: 'Количество Продукции Заказано'})
     @Column({type: DataType.INTEGER, defaultValue: 0})
     shipments_kolvo: number;
+ 
+    @ApiProperty({example: 1, description: 'Количество Заказаных на Изделие'})
+    @Column({type: DataType.INTEGER, defaultValue: 0})
+    assemble_kolvo: number; 
 
     @ApiProperty({example: 12, description: 'Минимальное количество продукции'})
     @Column({type: DataType.INTEGER, defaultValue: 0})

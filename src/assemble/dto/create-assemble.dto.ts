@@ -6,4 +6,5 @@ export class CreateAssembleDto {
 	readonly shipments_kolvo: 	number;
 	readonly description : 			string;
 	readonly cbed_id: 					number;	
+	readonly type: 							string;
 } 

@@ -7,7 +7,7 @@ import { Operation } from 'src/detal/operation.model';
 import { TechProcess } from 'src/detal/tech-process.model';
 import { StatusAssemble, statusShipment } from 'src/files/enums';
 import { MetaloworkingService } from 'src/metaloworking/metaloworking.service';
-import { ProductService } from 'src/product/product.service';
+import { Product } from 'src/product/product.model';
 import { SettingsService } from 'src/settings/settings.service';
 import { Shipments } from 'src/shipments/shipments.model';
 import { ShipmentsService } from 'src/shipments/shipments.service';
@@ -20,6 +20,7 @@ export class AssembleService {
 	constructor(@InjectModel(Assemble) private assembleReprository: typeof Assemble,
 		@Inject(forwardRef(()=> ShipmentsService))
 		private shipmentsService: ShipmentsService,
+		@InjectModel(Product) private productReprostory: typeof Product,
 		private cbedService: CbedService,
 		private settingsService: SettingsService, 
 		private detalService: DetalService, 
@@ -37,16 +38,19 @@ export class AssembleService {
 		
 		if(!dto.number_order.trim()) 
 			assemble.number_order = String(assemble.id)
-		if(!dto.date_order) assemble.date_order = new Date().toLocaleString('ru-RU').split(',')[0]
 		else assemble.number_order = dto.number_order
+		if(!dto.date_order) assemble.date_order = new Date().toLocaleString('ru-RU').split(',')[0]
 
 		await assemble.save()
 
 		if(!dto.cbed_id) return assemble
-		const cbed = await this.cbedService.findById(dto.cbed_id)	
+		let cbed: Cbed | Product;
+		if(dto.type == 'prod') 
+			cbed = await this.productReprostory.findByPk(dto.cbed_id, {include: ['shipments']})
+		else cbed = await this.cbedService.findById(dto.cbed_id, 'true')	
 		if(!cbed) return assemble
 
-		if(cbed.shipments.length) 
+		if(cbed.shipments?.length) 
 			await this.shipmentsService.updateStatus(cbed.shipments, statusShipment.performed)
 
 		let differece = cbed.assemble_kolvo
@@ -55,7 +59,7 @@ export class AssembleService {
 		cbed.assemble_kolvo = cbed.assemble_kolvo + dto.my_kolvo
 		await assemble.save()
 
-		// shipments_kolvo -- сколько заказано в задачах на тгрузку (Дефицит)
+		// shipments_kolvo -- сколько заказано в задачах на отгрузку (Дефицит)
 		// my_kolvo -- которое мы указали для производства
 		// assemble_kolvo -- всего заказано на производстве в СБОРКЕ
 			
@@ -63,7 +67,7 @@ export class AssembleService {
 		return result
 	}
 
-	private async middlewareUpdate(ass: Assemble, cbed: Cbed, my_kolvo: number, differece: number) {
+	private async middlewareUpdate(ass: Assemble, cbed: Cbed | Product, my_kolvo: number, differece: number) {
 		const all_kolvo_metal = await this.assembleReprository.findAll({attributes: ['cbed_id', 'kolvo_shipments', 'id'], where: {cbed_id: cbed.id}})
 		let count_ass = 0 // Количество уже заказанных
 		for(let item of all_kolvo_metal) {
@@ -119,7 +123,7 @@ export class AssembleService {
 		return ass
 	}
 
-	private async countFunction(cbed: Cbed, differenc: number) {
+	private async countFunction(cbed: Cbed | Product, differenc: number) {
 		await this.shipmentsMaterialsForIzd(cbed, differenc)
 		if(cbed.listDetal)
 			await this.parseDetalJson(cbed.listDetal, differenc)
@@ -128,7 +132,7 @@ export class AssembleService {
 	}
 
 	// Промежуточная функция Проверка на покупные и просто материалы
-	async shipmentsMaterialsForIzd(izd: Cbed, kolvo_all: any = 1) {
+	async shipmentsMaterialsForIzd(izd: Cbed | Product, kolvo_all: any = 1) {
 		if(izd.materialList) 
 			await this.settingsService.formationDeficitMaterial(izd.materialList, kolvo_all)
 		if(izd.listPokDet) 

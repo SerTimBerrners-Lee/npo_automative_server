@@ -219,7 +219,11 @@ export class CbedService {
         }
     }
 
-    async findById(id: number) {
+    async findById(id: number, light = 'false') {
+        if(light == 'true') return await this.cbedReprository.findByPk(id, {
+            include: ['shipments']
+        })
+        
         return await this.cbedReprository.findByPk(id, {include: [
             {all: true},
             {

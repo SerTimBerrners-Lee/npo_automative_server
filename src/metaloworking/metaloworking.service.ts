@@ -34,8 +34,8 @@ export class MetaloworkingService {
 
 		if(!dto.number_order.trim()) 
 			metaloworking.number_order = String(metaloworking.id)
-		if(!dto.date_order) metaloworking.date_order = new Date().toLocaleString('ru-RU').split(',')[0]
 		else metaloworking.number_order = dto.number_order
+		if(!dto.date_order) metaloworking.date_order = new Date().toLocaleString('ru-RU').split(',')[0]
 
 		await metaloworking.save()
 

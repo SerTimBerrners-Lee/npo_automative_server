@@ -3,6 +3,7 @@ import { SequelizeModule } from '@nestjs/sequelize';
 import { CbedModule } from 'src/cbed/cbed.module';
 import { DetalModule } from 'src/detal/detal.module';
 import { MetaloworkingModule } from 'src/metaloworking/metaloworking.module';
+import { Product } from 'src/product/product.model';
 import { ProductModule } from 'src/product/product.module';
 import { SettingsModule } from 'src/settings/settings.module';
 import { ShipmentsModule } from 'src/shipments/shipments.module';
@@ -15,7 +16,8 @@ import { AssembleService } from './assemble.service';
 	providers: [AssembleService],
 	imports: [
 		SequelizeModule.forFeature([
-			Assemble
+			Assemble,
+			Product
 		]),
 		CbedModule,
 		SettingsModule,
