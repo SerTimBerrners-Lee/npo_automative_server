@@ -31,14 +31,14 @@ export class AssembleService {
 		const assemble = await this.assembleReprository
 			.create({
 				date_order: dto.date_order,
-				description: dto.description
+				description: dto.description,
+				type_izd: dto.type
 			})
 		if(!assemble)
 			throw new HttpException('Не удалось отправить в производство', HttpStatus.BAD_GATEWAY)
 		
-		if(!dto.number_order.trim()) 
-			assemble.number_order = String(assemble.id)
-		else assemble.number_order = dto.number_order
+
+		assemble.number_order = String(assemble.id) + dto.number_order.trim()
 		if(!dto.date_order) assemble.date_order = new Date().toLocaleString('ru-RU').split(',')[0]
 
 		await assemble.save()

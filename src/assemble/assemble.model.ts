@@ -6,6 +6,7 @@ import { StatusAssemble } from "src/files/enums";
 interface AssembleAttrCreate {
   date_order: string;
   description: string;
+  type_izd: string;
 }
  
 @Table({tableName: 'assemble'})
@@ -22,6 +23,10 @@ export class Assemble extends Model<Assemble, AssembleAttrCreate> {
   @ApiProperty({example: '1', description: ''})
   @Column({type: DataType.STRING})
   date_order: string;
+
+  @ApiProperty({example: '1', description: 'Сборка или продукция'})
+  @Column({type: DataType.STRING})
+  type_izd: string;
 
   @ApiProperty({example: '1', description: ''})
   @Column({type: DataType.STRING})

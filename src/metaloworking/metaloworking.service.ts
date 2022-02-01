@@ -32,9 +32,7 @@ export class MetaloworkingService {
 		if(!metaloworking)
 			throw new HttpException('Не удалось отправить в производство', HttpStatus.BAD_GATEWAY)
 
-		if(!dto.number_order.trim()) 
-			metaloworking.number_order = String(metaloworking.id)
-		else metaloworking.number_order = dto.number_order
+		metaloworking.number_order = String(metaloworking.id) + dto.number_order.trim()
 		if(!dto.date_order) metaloworking.date_order = new Date().toLocaleString('ru-RU').split(',')[0]
 
 		await metaloworking.save()
