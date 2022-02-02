@@ -173,16 +173,27 @@ export class DocumentsService {
     }
 
     async getAllDocument() {
-        const docsD = this.documentReprository.findAll()
+        const docsD = await this.documentReprository.findAll({where: {banned: false}})
         return docsD
     } 
+
+    async getAllBanDocuments(length: number) {
+        const query = {where: {banned: true}}
+        const count = await this.documentReprository.count(query)
+        if(count == length) return count;
+         
+        const docs = await this.documentReprository.findAll(query)
+        return docs
+    }
 
     async getAllNamesDocuments() {
         return await this.documentReprository.findAll({attributes: ['name']})
     }
 
     async getFileById(id:number) {
-        return await this.documentReprository.findByPk(id)
+        return await this.documentReprository.findByPk(id, {
+            include: {all: true}
+        })
     }
  
     async banFile(id: number) {
@@ -197,9 +208,9 @@ export class DocumentsService {
     }
 
     async changeType(dto: ChangeTypeDto) {
-        const documents = await this.documentReprository.findByPk(dto.id)
+        const documents = await this.documentReprository.findByPk(dto.id, {attributes: ['id', 'type']})
         if(!documents)
-            throw new HttpException('', HttpStatus.NOT_FOUND)
+            throw new HttpException('Документ не найден', HttpStatus.NOT_FOUND)
 
         documents.type = dto.type
         await documents.save()

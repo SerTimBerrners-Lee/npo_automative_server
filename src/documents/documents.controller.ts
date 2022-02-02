@@ -38,6 +38,12 @@ export class DocumentsController {
         return this.documentService.getAllDocument()
     }
 
+    @ApiOperation({summary: 'Получение всех архивных документов'})
+    @Get('/banned/all/:length')
+    getAllBanDocuments(@Param('length') length: number) {
+        return this.documentService.getAllBanDocuments(length)
+    }
+
     @ApiOperation({summary: 'Получение наименования документов'})
     @Get('/names')
     getAllNamesDocuments() {

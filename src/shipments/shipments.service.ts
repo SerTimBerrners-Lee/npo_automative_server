@@ -34,6 +34,7 @@ export class ShipmentsService {
 				order: [
 					['id', 'DESC']
 				],
+				attributes: ['id'],
 				limit: 1
 			})
 		let endYears = dm.date().split('.')[dm.date().split('.').length - 1].slice(2);
@@ -165,7 +166,7 @@ export class ShipmentsService {
 		if(data.product && !data.is_not_product) {
 			const product = await this.productService.getById(data.product.id)
 			if(product) {
-				product.shipments_kolvo = data.kol
+				product.shipments_kolvo += data.kol
 				shipment.productId = product.id
 				await product.save()
 				await shipment.save()
