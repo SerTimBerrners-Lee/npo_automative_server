@@ -217,6 +217,13 @@ export class ProductService {
         ]})
     }
 
+    async getProductSchipmentsById(id: number) {
+        return await this.productReprository.findByPk(id, {
+            include: ['shipments'],
+            attributes: []
+        })
+    }
+
     async removeDocumentProduct(dto: RemoveDocumentDto) {
         const product = await this.productReprository.findByPk(dto.id_object, {include: {all: true}})
         const document = await this.documentsService.getFileById(dto.id_document)

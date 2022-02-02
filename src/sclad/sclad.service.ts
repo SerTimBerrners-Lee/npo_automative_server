@@ -1,5 +1,6 @@
 import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
 import { InjectModel } from '@nestjs/sequelize';
+import { Op } from 'sequelize';
 import { Sequelize } from 'sequelize';
 import { Assemble } from 'src/assemble/assemble.model';
 import { AssembleService } from 'src/assemble/assemble.service';
@@ -129,15 +130,22 @@ export class ScladService {
             },
             'shipments'
         ], 
-            where: Sequelize.where(
-                Sequelize.col('cbed_kolvo'), '<', Sequelize.col('min_remaining')
-            )
+            where: {
+                [Op.or]: [
+                    Sequelize.where(
+                        Sequelize.col('cbed_kolvo'), '<', Sequelize.col('min_remaining')
+                    ),
+                    Sequelize.where(
+                        Sequelize.col('min_remaining'), '<', Sequelize.col('shipments_kolvo') 
+                    )
+                ]
+            }
         })
-        
+
         for(let inx in cbeds) {
             const remaining = await this.minRemainder(cbeds[inx], 'cbed')
             cbeds[inx].min_remaining = remaining
-            await cbeds[inx].save()
+            await cbeds[inx].save() 
         }
 
         return cbeds
@@ -165,9 +173,16 @@ export class ScladService {
             },
             'shipments'
         ], 
-        where: Sequelize.where(
-            Sequelize.col('detal_kolvo'), '<', Sequelize.col('min_remaining')
-        )
+        where: {
+            [Op.or]: [
+                Sequelize.where(
+                    Sequelize.col('detal_kolvo'), '<', Sequelize.col('min_remaining') 
+                ),
+                Sequelize.where(
+                    Sequelize.col('min_remaining'), '<', Sequelize.col('shipments_kolvo') 
+                ),
+            ]
+        }
         })
 
         for(let inx in detals) {
