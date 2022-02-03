@@ -1,7 +1,8 @@
-import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
+import { HttpException, HttpStatus, Injectable, Logger } from '@nestjs/common';
 import { InjectModel } from '@nestjs/sequelize';
 import { Op } from 'sequelize';
 import { Sequelize } from 'sequelize';
+import { Where } from 'sequelize/types/lib/utils';
 import { Assemble } from 'src/assemble/assemble.model';
 import { AssembleService } from 'src/assemble/assemble.service';
 import { Cbed } from 'src/cbed/cbed.model';
@@ -28,7 +29,11 @@ export class ScladService {
         @InjectModel(Detal) private detalReprository: typeof Detal,
         private assembleService: AssembleService,
         private metaloworkingService: MetaloworkingService,
-        ) {}
+        ) {
+            this.logger = new Logger()
+        }
+
+    private logger: Logger
 
     async updateDeficit(dto: UpdateDeficitDto) {
         const deficit = await this.deficitReprository.update(
@@ -214,13 +219,19 @@ export class ScladService {
         let list_id_arr = [];
         let listType = 'listCbed'
         let keyList = 'cb'
+        let query = {}
         if(type == 'detal') {
             listType = 'listDetal'
             keyList = 'det'
+            query['include']= [{
+                model: Detal,
+                where: {
+                    id: izd.id
+                }
+            }]
         }
-
-        // если это сборка
         if(type == 'cbed') {
+            query['where'] = { id: list_id_arr }
             try {
                 const cbeds = JSON.parse(izd.cbed)
                 for(const cb of cbeds) {
@@ -228,14 +239,9 @@ export class ScladService {
                 }
             } catch(err) {console.error(err)}   
         }
-        else list_id_arr.push(izd.id)
 
-        const getCbeds = await this.cbedReprository.findAll({
-            where: {
-                id: list_id_arr
-            },
-            attributes: ['id', listType]
-        })
+        query['attributes'] = ['id', listType]
+        const getCbeds = await this.cbedReprository.findAll(query)
 
         remainder += await this.getMinProductRemain(izd.id, remainder, listType, type, keyList)
 
@@ -244,16 +250,24 @@ export class ScladService {
                 if(!cb[listType]) continue;
                 const listIzd = JSON.parse(cb[listType])
                 for(const item of listIzd) {
-                    if(item[keyList].id == izd.id && Number(item.kol)) {
+                    if(item[keyList].id == izd.id && Number(item.kol)) 
                         remainder += Number(item.kol) * await this.getMinProductRemain(cb.id, 0, 'listCbed', 'cbed', 'cb')
-                    }
                 }
-            } catch(err) {console.error("\n\n\nISERROR\n\n\n", err)}
+            } catch(err) {this.logger.error("\n\n\nISERROR\n\n\n", err)}
         }
         return remainder
         
     }
 
+    /**
+     * 
+     * @param izd_id - id Cbed | id Detal
+     * @param remainder - потребность
+     * @param listType - listCbed | listDetal
+     * @param type - cbed | detal
+     * @param keyList cb | det
+     * @returns 
+     */
     async getMinProductRemain(izd_id: number, remainder: number, listType: string, type: string, keyList: string): Promise<number> {
         const product = await this.productReprository.findAll({
             include: [
@@ -275,11 +289,9 @@ export class ScladService {
                 const haracteriatic = JSON.parse(item.haracteriatic)[1].znach
                 const listIzd = JSON.parse(item[listType])
                 for(const item of listIzd) {
-                    if(item[keyList].id == izd_id) {
+                    if(item[keyList].id == izd_id)
                         remainder += Number(item.kol) * (haracteriatic || 1)
-                    }
                 }
-
             } catch(e) {console.error(e)}
         }
 
