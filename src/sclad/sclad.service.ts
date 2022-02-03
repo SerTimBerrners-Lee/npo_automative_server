@@ -112,7 +112,7 @@ export class ScladService {
             try {
                 const har = JSON.parse(item.haracteriatic)[1].znach
                 if(item.min_remaining != Number(har)) {
-                    item.min_remaining = Number(har) + item.shipments_kolvo
+                    item.min_remaining = Number(har)
                     await item.save()
                 }
                 if((item.product_kolvo - item.shipments_kolvo) < har) arrIdProducts.push(item.id)
@@ -139,7 +139,7 @@ export class ScladService {
 
         for(let inx in cbeds) {
             const remaining = await this.minRemainder(cbeds[inx], 'cbed')
-            cbeds[inx].min_remaining = remaining + cbeds[inx].shipments_kolvo
+            cbeds[inx].min_remaining = remaining
             await cbeds[inx].save() 
         }
 
@@ -175,7 +175,7 @@ export class ScladService {
 
         for(let inx in detals) {
             const remaining = await this.minRemainder(detals[inx], 'detal')
-            detals[inx].min_remaining = remaining + detals[inx].shipments_kolvo
+            detals[inx].min_remaining = remaining 
             await detals[inx].save()
         }
 
