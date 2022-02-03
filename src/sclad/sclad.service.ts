@@ -88,6 +88,14 @@ export class ScladService {
         await objects.save()
     }
 
+    /**
+     * 
+     * Дефициты
+     * Получаем все объекты, потом подсчитываем и сохраняем минимальный остаток
+     * Сохраняем все
+     * Вытаскиваем дифицит по параметрам сново 
+     */
+
     async getAllDeficitProduct() {
         const products = await this.productReprository.findAll({
             attributes: ['haracteriatic', 'id', 'product_kolvo', 'shipments_kolvo']
@@ -99,7 +107,7 @@ export class ScladService {
             try {
                 const har = JSON.parse(item.haracteriatic)[1].znach
                 if(item.min_remaining != Number(har)) {
-                    item.min_remaining = Number(har)
+                    item.min_remaining = Number(har) + item.shipments_kolvo
                     await item.save()
                 }
                 if((item.product_kolvo - item.shipments_kolvo) < har) arrIdProducts.push(item.id)
@@ -120,7 +128,17 @@ export class ScladService {
     }
 
     async getAllDeficitCbed() {
-		const cbeds = await this.cbedReprository.findAll({include: [
+		const cbeds = await this.cbedReprository.findAll({
+            attributes: {exclude: ['attention', 'haracteriatic', 'parametrs', 'description']}
+        })
+
+        for(let inx in cbeds) {
+            const remaining = await this.minRemainder(cbeds[inx], 'cbed')
+            cbeds[inx].min_remaining = remaining + cbeds[inx].shipments_kolvo
+            await cbeds[inx].save() 
+        }
+
+        const deficitCbed = await this.cbedReprository.findAll({include: [
             {
                 model: TechProcess
             },
@@ -142,19 +160,22 @@ export class ScladService {
             }
         })
 
-        for(let inx in cbeds) {
-            const remaining = await this.minRemainder(cbeds[inx], 'cbed')
-            cbeds[inx].min_remaining = remaining
-            await cbeds[inx].save() 
-        }
-
-        return cbeds
+        return deficitCbed
 	}
 
-    // Получаем все Дефицитные детали вместе с чпу
-
     async getAllDeficitDetal() {
-		const detals = await this.detalReprository.findAll({include: [
+        const detals = await this.detalReprository.findAll({
+            attributes: {exclude: ['attention', 'haracteriatic', 'parametrs', 'description']}
+        })
+
+        for(let inx in detals) {
+            const remaining = await this.minRemainder(detals[inx], 'detal')
+            detals[inx].min_remaining = remaining + detals[inx].shipments_kolvo
+            await detals[inx].save()
+        }
+
+
+		const deficitDetal = await this.detalReprository.findAll({include: [
             {
                 model: TechProcess, 
                 include: [{
@@ -185,13 +206,7 @@ export class ScladService {
         }
         })
 
-        for(let inx in detals) {
-            const remaining = await this.minRemainder(detals[inx], 'detal')
-            detals[inx].min_remaining = remaining
-            await detals[inx].save()
-        }
-
-        return detals
+        return deficitDetal
 	}
 
     async minRemainder(izd: Cbed | Detal, type: string): Promise<number> {
