@@ -253,15 +253,18 @@ export class CbedService {
     }       
 
     async getOneCbedById(id: number, light: boolean = false) {
-        if(light) return await this.cbedReprository.findByPk(id)
-        
-        return await this.cbedReprository.findByPk(id,  {include: [
-            {all: true},
+        let result: Cbed
+        if(light) result = await this.cbedReprository.findByPk(id)
+        else result = await this.cbedReprository.findByPk(id,  {include: [
             {
-            model: TechProcess,
-            include: ['operations']
-            }
+                model: TechProcess,
+                include: ['operations']
+            },
+            'documents'
         ]})
+
+        console.log('\n\n\n', result)
+        return result
     }
 
     async removeDocumentCbed(dto: RemoveDocumentDto) {

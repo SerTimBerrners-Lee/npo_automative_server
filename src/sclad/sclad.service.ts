@@ -10,10 +10,13 @@ import { Detal } from 'src/detal/detal.model';
 import { Operation } from 'src/detal/operation.model';
 import { TechProcess } from 'src/detal/tech-process.model';
 import { TypeOperation } from 'src/detal/type-operation.model';
-import { StatusAssemble, StatusMetaloworking } from 'src/files/enums';
+import { EZ_KOLVO, StatusAssemble, StatusMetaloworking } from 'src/files/enums';
 import { Metaloworking } from 'src/metaloworking/metaloworking.model';
 import { MetaloworkingService } from 'src/metaloworking/metaloworking.service';
 import { Product } from 'src/product/product.model';
+import { Material } from 'src/settings/material.model';
+import { PodMaterial } from 'src/settings/pod-material.model';
+import { PodPodMaterial } from 'src/settings/pod-pod-material.model';
 import { Deficit } from './deficit.model';
 import { UpdateDeficitDto } from './dto/create-deficite.dto';
 import { CreateMarkDto } from './dto/create-mark.dto';
@@ -27,6 +30,7 @@ export class ScladService {
         @InjectModel(Product) private productReprository: typeof Product,
         @InjectModel(Cbed) private cbedReprository: typeof Cbed,
         @InjectModel(Detal) private detalReprository: typeof Detal,
+        @InjectModel(PodPodMaterial) private material: typeof PodPodMaterial,
         private assembleService: AssembleService,
         private metaloworkingService: MetaloworkingService,
         ) {
@@ -124,7 +128,7 @@ export class ScladService {
                 {
                     model: TechProcess
                 },
-                'shipments'
+                'shipments' 
             ],
             where: {
                 id: arrIdProducts
@@ -305,4 +309,173 @@ export class ScladService {
         }
         return undefined;	
     }
+
+
+    // Deficit  materials
+    async getAllMaterialDeficit() {
+        await this.writtingDeficitMaterials()
+        const materials = await this.material.findAll({
+            include: [
+                {model: Material},
+                {model: PodMaterial}
+            ],
+            where: {
+                [Op.or]: [
+                    Sequelize.where(
+                        Sequelize.col('material_kolvo'), '<', Sequelize.col('min_remaining') 
+                    ),
+                    Sequelize.where(
+                        Sequelize.col('min_remaining'), '<', Sequelize.col('shipments_kolvo') 
+                    ),
+                ]
+            }
+        })
+
+        if(!materials)
+            throw new HttpException('Произошла ошибка при получении дефицита. ', HttpStatus.BAD_REQUEST)
+
+        return materials
+    }
+
+    // Начальная функция для подсчета дифицита 
+    async writtingDeficitMaterials() {
+        const material = await this.material.findAll({
+            attributes: ['id', 'shipments_kolvo', 'material_kolvo', 'ez_kolvo'],
+        })
+        if(!material) return false;
+
+        for(const item of material) {
+            item.shipments_kolvo = 0
+            item.material_kolvo = 0
+            item.ez_kolvo = EZ_KOLVO
+            await item.save()
+ 
+            await this.getAllRemObjectForMat(item.id)
+        }
+    }
+
+    // Получаем все Объекты к которым принадлежит материал
+    async getAllRemObjectForMat(mat_id: number) {
+        const include = [{
+            model: PodPodMaterial,
+            where: {id: mat_id},
+            attributes: ['id']
+        }]
+        const attrimbute = ['materialList', 'min_remaining', 'shipments_kolvo', 'min_remaining']
+        
+        const allProduct = await this.productReprository.findAll({include, 
+            attributes: ['listPokDet', ...attrimbute]
+        })
+        const allCbed = await this.cbedReprository.findAll({include, 
+            attributes: ['listPokDet', ...attrimbute]
+        })
+        const allDetal = await this.detalReprository.findAll({include, 
+            attributes: ['mat_zag', 'mat_zag_zam', ...attrimbute]
+        })
+
+        let allData = JSON.parse(JSON.stringify([...allProduct, ...allCbed, ...allDetal]))
+        // Получили все обьекты в кот может быть материал
+
+        try {
+            for(const item of allData) {
+                if(item.materialList) 
+                    item.materialList = JSON.parse(item.materialList)
+                else item.materialList = []
+                if(item?.listPokDet && item.listPokDet)
+                    item.listPokDet = JSON.parse(item.listPokDet)
+                else item.listPokDet = []
+
+                if(item.mat_zag) item.materialList.push({
+                    mat: {id: item.mat_zag},
+                    kol: 1,
+                    ez: 1
+                })
+                if(item.mat_zag_zam) item.materialList.push({
+                    mat: {id: item.mat_zag_zam},
+                    kol: 1,
+                    ez: 1
+                })
+
+                item.materialList = [...item.materialList, ...item.listPokDet]
+                delete item.listPokDet
+
+                for(const mat of item.materialList) {
+                    if(!mat || !mat?.mat) continue;
+                    if(mat.mat.id == mat_id) {
+                        for(const res of item.materials) {
+                            const material = await this.material.findByPk(res.id, {
+                                attributes: ['ez_kolvo', 'id', 'shipments_kolvo', 'min_remaining', 'material_kolvo', 'kolvo']
+                            })
+                            let {min_remaining, shipments_kolvo} = item
+                            await this.formationDeficitMaterial(mat, {min_remaining, shipments_kolvo}, material)
+                        }
+                    }
+                }
+            }
+        } catch(err) {
+            console.error(err)
+            this.logger.error("Произошла ошибка при парсинге списка материалов в Объектах.")
+        }
+
+        return true
+
+    }
+    
+     // Сохраняем количество для каждой ЕИ Материала
+	async formationDeficitMaterial(materialObj: any, vars: any, material: PodPodMaterial) {
+        if(!materialObj) return false;
+        if(materialObj.ez != 1) console.log('ez\n\n\n', materialObj, '\n\n\n')
+
+        let ez_kolvo = material.ez_kolvo;
+        let kolvo = material.kolvo
+        try {
+            ez_kolvo = JSON.parse(ez_kolvo)
+            kolvo = JSON.parse(kolvo)
+            
+            let shipments_kolvo = (Math.round(materialObj.kol) * Number(vars.min_remaining)) * 2
+            if(shipments_kolvo < 1) shipments_kolvo = 1
+            let min_remaining = (Math.round(materialObj.kol) * Number(vars.shipments_kolvo)) * 2
+            if(min_remaining < 1) min_remaining = 1
+
+            material.shipments_kolvo += (Math.round(materialObj.kol) * Number(vars.shipments_kolvo))
+            material.min_remaining += (Math.round(materialObj.kol) * Number(vars.min_remaining))
+
+            switch(Number(materialObj.ez)) {
+                case 1:
+                    kolvo.c1 = true
+                    ez_kolvo.c1_kolvo.min_remaining += min_remaining
+                    ez_kolvo.c1_kolvo.shipments_kolvo += shipments_kolvo
+                break;
+                case 2:
+                    kolvo.c2 = true
+                    ez_kolvo.c2_kolvo.min_remaining += min_remaining
+                    ez_kolvo.c2_kolvo.shipments_kolvo += shipments_kolvo
+                break;
+                case 3:
+                    kolvo.c3 = true
+                    ez_kolvo.c3_kolvo.min_remaining += min_remaining
+                    ez_kolvo.c3_kolvo.shipments_kolvo += shipments_kolvo
+                break;
+                case 4:
+                    kolvo.c4 = true
+                    ez_kolvo.c4_kolvo.min_remaining += min_remaining
+                    ez_kolvo.c4_kolvo.shipments_kolvo += shipments_kolvo
+                break;
+                case 5:
+                    kolvo.c5 = true
+                    ez_kolvo.c5_kolvo.min_remaining += min_remaining
+                    ez_kolvo.c5_kolvo.shipments_kolvo += shipments_kolvo
+                break;
+                default:
+                    ez_kolvo.c1_kolvo.min_remaining += min_remaining
+                    ez_kolvo.c1_kolvo.shipments_kolvo += shipments_kolvo
+                break;
+            }
+            
+            material.kolvo = JSON.stringify(kolvo)
+            material.ez_kolvo = JSON.stringify(ez_kolvo)
+        } catch(err) {console.error(err+ '\n\n\nERROR IN STR: 410 \n\n\n')}
+
+        await material.save()
+	}
 }

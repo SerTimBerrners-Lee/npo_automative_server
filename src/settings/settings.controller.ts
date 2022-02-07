@@ -169,12 +169,6 @@ export class SettingsController {
     }
 
     @ApiOperation({summary: 'Получаем Дефицит материала'})
-    @Get('/materialprovider/')
-    getAllMaterialProvider() {
-        return this.settingsService.getAllMaterialProvider()
-    }
-
-    @ApiOperation({summary: 'Получаем Дефицит материала'})
     @Get('/materialprovider/:id')
     getAllMaterialProviderById(@Param('id') id: number) {
         return this.settingsService.getAllMaterialProviderById(id)

@@ -50,5 +50,11 @@ export class ScladController {
     getAllDeficitProduct() {
         return this.scladService.getAllDeficitProduct()
     }
+
+    @ApiOperation({summary: 'Получаем Дефицит материала'})
+    @Get('/materialdeficit')
+    getAllMaterialDeficit() {
+        return this.scladService.getAllMaterialDeficit()
+    }
 }
     

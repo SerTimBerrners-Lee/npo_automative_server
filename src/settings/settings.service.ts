@@ -491,10 +491,10 @@ export class SettingsService {
     }
 
     async getAllMaterialProvider() {
-        const materials = await this.podPodMaterialReprository.findAll({include: {all:true}})
+        const materials = await this.podPodMaterialReprository.findAll({include: {all: true}})
 
         if(!materials)
-            throw new HttpException('Материалов не найдено', HttpStatus.BAD_REQUEST)
+            throw new HttpException('Произошла ошибка при получении дефицита. ', HttpStatus.BAD_REQUEST)
 
         let materials_provider = []
         for(let material of materials) {
@@ -516,7 +516,6 @@ export class SettingsService {
                     new_materials.push(material)
             }
         }
-
         return new_materials
     }
 
@@ -565,35 +564,4 @@ export class SettingsService {
 
         return file
     }
-
-    // Плучает список материалов и сам материал 
-	async formationDeficitMaterial(materialList: string, kolvo_all: number) {
-		try {
-			const pars_mat = JSON.parse(materialList) // Парсим Массив материалов
-			if(!pars_mat || !pars_mat.length) return false
-            console.log(pars_mat, 'pars_mat')
-			for(let material of pars_mat) { // Проходим по каждому материалу отдельно и получаем его 
-				let mat_check = await this.getOnePPT(material.mat.id)
-				if(!mat_check) continue;
-
-				const pars_ez = JSON.parse(mat_check.ez_kolvo) // Получаем список ЕИ материала
-                console.log(pars_ez, 'pars_ez')
-				if(material.ez == 1 || !material.ez) 
-					pars_ez.c1_kolvo.shipments_kolvo = checkToNull(pars_ez.c1_kolvo.shipments_kolvo, Number(material.kol) * kolvo_all)
-				if(material.ez == 2) pars_ez.c2_kolvo.shipments_kolvo = checkToNull(pars_ez.c2_kolvo.shipments_kolvo, Number(material.kol) * kolvo_all)
-				if(material.ez == 3) pars_ez.c3_kolvo.shipments_kolvo = checkToNull(pars_ez.c3_kolvo.shipments_kolvo, Number(material.kol) * kolvo_all)
-				if(material.ez == 4) pars_ez.c4_kolvo.shipments_kolvo = checkToNull(pars_ez.c4_kolvo.shipments_kolvo, Number(material.kol) * kolvo_all)
-				if(material.ez == 5) pars_ez.c5_kolvo.shipments_kolvo = checkToNull(pars_ez.c5_kolvo.shipments_kolvo, Number(material.kol) * kolvo_all)
-				
-				mat_check.ez_kolvo = JSON.stringify(pars_ez)
-
-				mat_check.shipments_kolvo = mat_check.shipments_kolvo + (material.kol * kolvo_all)
-				await mat_check.save()
-			}
-
-            function checkToNull(a: number, b: number): number {
-                return a+b < 0 ? 0 : a+b 
-            }
-		} catch(e) {console.error(e)}
-	}
 }

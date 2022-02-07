@@ -21,9 +21,7 @@ export class ShipmentsService {
 		private productService: ProductService,
 		private cbedService: CbedService,
 		private detalService: DetalService,
-		private documentsService: DocumentsService, 
-		private assembleService: AssembleService,
-		private metaloworkingService: MetaloworkingService) {}
+		private documentsService: DocumentsService) {}
 
 	async createShipments(dto: UpCreateShipmentsDto, files: any) {
 		const dm = new DateMethods()
@@ -236,31 +234,25 @@ export class ShipmentsService {
 	 */
 	private async incrementShipmentsKolvo(izd: any, shipment: Shipments, action: string) {
 		if(izd.type == 'cbed') {
-			let izdels = await this.cbedService.findById(izd.obj.id) 
+			let izdels = await this.cbedService.findById(izd.obj.id, 'true') 
 			if(izdels) {
 				if(action == 'increment') {
 					izdels.shipments_kolvo = izdels.shipments_kolvo + Number(izd.kol)
-					await this.assembleService.shipmentsMaterialsForIzd(izdels, Number(izd.kol))
 					shipment.$add('cbeds', izdels.id)
 				} else {
 					izdels.shipments_kolvo = izdels.shipments_kolvo - Number(izd.kol)
-					let count = Number(izd.kol) > 0 ? - Number(izd.kol) : Number(izd.kol)
-					await this.assembleService.shipmentsMaterialsForIzd(izdels, count)
 					shipment.$remove('cbeds', izdels.id)
 				}
 				await izdels.save()
 			}
 		} else if(izd.type == 'detal') {
-				let izdels = await this.detalService.findByIdDetal(izd.obj.id)
+				let izdels = await this.detalService.findByIdDetal(izd.obj.id, 'true')
 				if(izdels) {
 					if(action == 'increment') {
 						izdels.shipments_kolvo = izdels.shipments_kolvo + Number(izd.kol)
-						await this.metaloworkingService.shipmentsMaterialsForDetal(izdels, Number(izd.kol))
 						shipment.$add('detals', izdels.id)
 					} else {
 						izdels.shipments_kolvo = izdels.shipments_kolvo - Number(izd.kol)
-						let count = Number(izd.kol) > 0 ? - Number(izd.kol) : Number(izd.kol)
-						await this.metaloworkingService.shipmentsMaterialsForDetal(izdels, count)
 						shipment.$remove('detals', izdels.id)
 					}
 					await izdels.save()

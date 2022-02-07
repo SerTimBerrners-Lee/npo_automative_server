@@ -43,10 +43,10 @@ export class DetalService {
     ) {} 
 
     async getAllDetals(light: string) {
-        if(light == 'false') return await this.detalReprository.findAll({include: {all: true}})
+        if(light == 'false') return await this.detalReprository.findAll({include: {all: true}, raw: true})
         return await this.detalReprository.findAll({ attributes: [
             'id', 'name', 'ban', 'articl', 'attention', 'createdAt', 'responsibleId'
-        ]})
+        ], raw: true})
     }
 
     async createNewDetal(dto: CreateDetalDto, files: any, authID: any) {
@@ -125,6 +125,7 @@ export class DetalService {
     }
 
     async updateDetal(dto: UpdateDetalDto, files: any, authID: any) {
+        console.log(dto)
         const detal = await this.detalReprository.findByPk(dto.id, {include: {all: true}})
         if(!detal)
             throw new HttpException('Не удалосьм обновить деталь', HttpStatus.BAD_REQUEST)
@@ -577,7 +578,9 @@ export class DetalService {
         return await this.typeOperationReprository.destroy({where: {id: TO.id}})
     }
 
-    async findByIdDetal(id: number) {
+    async findByIdDetal(id: number, light: string = 'false') {
+        if(light == 'true') return await this.detalReprository.findByPk(id)
+        
         return await this.detalReprository.findByPk(id, {include: [
             { all: true },
         ]})

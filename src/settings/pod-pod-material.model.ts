@@ -9,6 +9,7 @@ import { OperationMaterial } from "src/detal/operation-material.model";
 import { Operation } from "src/detal/operation.model";
 import { DocumentsMaterial } from "src/documents/documents-material.model";
 import { Documents } from "src/documents/documents.model";
+import { EZ_KOLVO } from "src/files/enums";
 import { ProductMaterial } from "src/product/product-material.model";
 import { Product } from "src/product/product.model";
 import { DeliveriesMaterial } from "src/provider/deliveries-material.model";
@@ -39,12 +40,16 @@ export class PodPodMaterial extends Model<PodPodMaterial, PodPodMaterialCreation
     @Column({type: DataType.INTEGER, defaultValue: 0})
     material_kolvo: number; 
 
+    @ApiProperty({example: 12, description: 'Минимальное количество'})
+    @Column({type: DataType.INTEGER, defaultValue: 0})
+    min_remaining: number; 
+
     @ApiProperty({example: 12, description: 'Количество материала необходимо'})
     @Column({type: DataType.INTEGER, defaultValue: 0})
     shipments_kolvo: number; 
  
     @ApiProperty({example: 12, description: 'Количество материала необходимо'})
-    @Column({type: DataType.TEXT, defaultValue: '{"c1_kolvo":{"material_kolvo":0,"shipments_kolvo":0},"c2_kolvo":{"material_kolvo":0,"shipments_kolvo":0},"c3_kolvo":{"material_kolvo":0,"shipments_kolvo":0},"c4_kolvo":{"material_kolvo":0,"shipments_kolvo":0},"c5_kolvo":{"material_kolvo":0,"shipments_kolvo":0}}'})
+    @Column({type: DataType.TEXT, defaultValue: EZ_KOLVO})
     ez_kolvo: any; 
     
     @ApiProperty({example: 12, description: 'Стоимость'})
@@ -60,7 +65,7 @@ export class PodPodMaterial extends Model<PodPodMaterial, PodPodMaterialCreation
     density: any
  
     @ApiProperty({example: '{edizmId: 10, znach: 2}', description: 'Срок поставки'})
-    @Column({type: DataType.TEXT, allowNull: true})
+    @Column({type: DataType.TEXT, defaultValue: '{"c1":false,"c2":false,"c3":false,"c4":true,"c5":false}'})
     kolvo: any; 
 
     @ApiProperty({example: 'материал железо', description: 'Описание материала'})

@@ -53,49 +53,13 @@ export class AssembleService {
 		if(cbed.shipments?.length) 
 			await this.shipmentsService.updateStatus(cbed.shipments, statusShipment.performed)
 
-		let differece = cbed.assemble_kolvo
 		assemble.cbed_id = cbed.id
 		assemble.kolvo_shipments = dto.my_kolvo
-		cbed.assemble_kolvo = cbed.assemble_kolvo + dto.my_kolvo
+		cbed.assemble_kolvo += + dto.my_kolvo
 		await assemble.save()
-
-		// shipments_kolvo -- сколько заказано в задачах на отгрузку (Дефицит)
-		// my_kolvo -- которое мы указали для производства
-		// assemble_kolvo -- всего заказано на производстве в СБОРКЕ
-			
-		const result = await this.middlewareUpdate(assemble, cbed, dto.my_kolvo, differece)
-		return result
-	}
-
-	private async middlewareUpdate(ass: Assemble, cbed: Cbed | Product, my_kolvo: number, differece: number) {
-		const all_kolvo_metal = await this.assembleReprository.findAll({attributes: ['cbed_id', 'kolvo_shipments', 'id'], where: {cbed_id: cbed.id}})
-		let count_ass = 0 // Количество уже заказанных
-		for(let item of all_kolvo_metal) {
-			count_ass  += item.kolvo_shipments 
-		}
-
-		if(count_ass < cbed.shipments_kolvo) { 
-			// Нудно учесть тот факт что удалении из дефицита заказанного после оно в дефицит не уйдет!!!
-			let num = 0
-			if(Number(my_kolvo) > cbed.shipments_kolvo) num = Number(my_kolvo) - cbed.shipments_kolvo
-			else if(count_ass + Number(my_kolvo) > cbed.shipments_kolvo)
-				num = (count_ass + Number(my_kolvo)) - cbed.shipments_kolvo
-
-			await this.countFunction(cbed, num)
-			await cbed.save()
-			await ass.save()
-			
-			return ass
-		} 
-		if(count_ass <= cbed.shipments_kolvo) return ass	 
-
-		let count = Number(cbed.assemble_kolvo) - differece == 0 ? -1 : Number(cbed.assemble_kolvo) - differece
-
-		await this.countFunction(cbed, count)
 		await cbed.save()
-		await ass.save()
-		
-		return ass
+
+		return assemble
 	}
 
 	async updateAssemble(dto: UpdateAssembleDto) {
@@ -105,81 +69,17 @@ export class AssembleService {
 			throw new HttpException('Не удалось найти Сборку или Сборочную Единицу', HttpStatus.BAD_REQUEST)
 
 		let differece = dto.kolvo_shipments - ass.kolvo_shipments 
-		let last_count = cbed.assemble_kolvo
-		if(differece < 0)  {
+		if(differece < 0)  
 			cbed.assemble_kolvo -= differece
-			await this.countFunction(cbed, -differece)
-		}
-		else if(differece > 0) {
+		else if(differece > 0) 
 			cbed.assemble_kolvo += differece
-			await this.middlewareUpdate(ass, cbed, differece, last_count)
-		}
-
+		
 		ass.description = dto.description
 		ass.kolvo_shipments = dto.kolvo_shipments
 
 		await ass.save()
 		await cbed.save()
 		return ass
-	}
-
-	private async countFunction(cbed: Cbed | Product, differenc: number) {
-		await this.shipmentsMaterialsForIzd(cbed, differenc)
-		if(cbed.listDetal)
-			await this.parseDetalJson(cbed.listDetal, differenc)
-		if(cbed.listCbed)
-			await this.parseCbedJson(cbed.listCbed, differenc)
-	}
-
-	// Промежуточная функция Проверка на покупные и просто материалы
-	async shipmentsMaterialsForIzd(izd: Cbed | Product, kolvo_all: any = 1) {
-		if(izd.materialList) 
-			await this.settingsService.formationDeficitMaterial(izd.materialList, kolvo_all)
-		if(izd.listPokDet) 
-			await this.settingsService.formationDeficitMaterial(izd.listPokDet, kolvo_all)
-	}
-
-	// Парсим Детали
-	async parseDetalJson(list_json_detal: string, kolvo_all: any = 1) {
-		try {
-			const pars_det = JSON.parse(list_json_detal)
-			if(pars_det.length) {
-				for(let detal of pars_det) {
-					let det_check = await this.detalService.findByIdDetal(detal.det.id)
-					if(det_check) {
-						let deficit = detal.kol * kolvo_all
-						det_check.shipments_kolvo = det_check.shipments_kolvo + deficit
-						await det_check.save()
-						await this.metaloworkingService.shipmentsMaterialsForDetal(det_check, deficit)
-					}
-				}
-			}
-		} catch(e) {
-			console.error(e)
-		}
-	}
-
-	// Парсим также Сборки
-	async parseCbedJson(list_json_cbed: string, kolvo_all: any = 1) {
-		try {
-			let pars_cbed = JSON.parse(list_json_cbed)
-			for(let cbed of pars_cbed) {
-				const cbed_check = await this.cbedService.findById(cbed.cb.id)
-				if(cbed_check) {
-					let deficit = cbed.kol * kolvo_all
-					cbed_check.shipments_kolvo = cbed_check.shipments_kolvo + deficit
-					await cbed_check.save()
-					
-					await this.shipmentsMaterialsForIzd(cbed_check, deficit)
-					if(cbed_check.listDetal)
-						await this.parseDetalJson(cbed_check.listDetal, deficit)
-					if(cbed_check.listCbed)
-						await this.parseCbedJson(cbed_check.listCbed, deficit)
-				}
-			}
-		} catch(e) {
-			console.error(e)
-		}
 	}
 
 	// Получаем все Сборки 
@@ -233,7 +133,6 @@ export class AssembleService {
 
 		const cbed = await this.cbedService.getOneCbedById(ass.cbed.id)
 		if(!cbed) return await this.assembleReprository.destroy({where: {id}}) // Если нет СБ удаляем сборку
-		await this.countFunction(cbed, -ass.kolvo_shipments)
 
 		cbed.assemble_kolvo = cbed.assemble_kolvo - ass.kolvo_shipments < 0 ? 0 : cbed.assemble_kolvo - ass.kolvo_shipments
 		await cbed.save()
