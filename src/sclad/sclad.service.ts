@@ -17,6 +17,7 @@ import { Product } from 'src/product/product.model';
 import { Material } from 'src/settings/material.model';
 import { PodMaterial } from 'src/settings/pod-material.model';
 import { PodPodMaterial } from 'src/settings/pod-pod-material.model';
+import { Shipments } from 'src/shipments/shipments.model';
 import { Deficit } from './deficit.model';
 import { UpdateDeficitDto } from './dto/create-deficite.dto';
 import { CreateMarkDto } from './dto/create-mark.dto';
@@ -356,69 +357,24 @@ export class ScladService {
 
     // Получаем все Объекты к которым принадлежит материал
     async getAllRemObjectForMat(mat_id: number) {
-        const include = [{
-            model: PodPodMaterial,
-            where: {id: mat_id},
-            attributes: ['id']
-        }]
-        const attrimbute = ['materialList', 'min_remaining', 'shipments_kolvo', 'min_remaining']
-        
-        const allProduct = await this.productReprository.findAll({include, 
-            attributes: ['listPokDet', ...attrimbute]
-        })
-        const allCbed = await this.cbedReprository.findAll({include, 
-            attributes: ['listPokDet', ...attrimbute]
-        })
-        const allDetal = await this.detalReprository.findAll({include, 
-            attributes: ['mat_zag', 'mat_zag_zam', ...attrimbute]
-        })
+        const allData = await this.getMaterialParents(mat_id);
 
-        let allData = JSON.parse(JSON.stringify([...allProduct, ...allCbed, ...allDetal]))
-        // Получили все обьекты в кот может быть материал
-
-        try {
-            for(const item of allData) {
-                if(item.materialList) 
-                    item.materialList = JSON.parse(item.materialList)
-                else item.materialList = []
-                if(item?.listPokDet && item.listPokDet)
-                    item.listPokDet = JSON.parse(item.listPokDet)
-                else item.listPokDet = []
-
-                if(item.mat_zag) item.materialList.push({
-                    mat: {id: item.mat_zag},
-                    kol: 1,
-                    ez: 1
-                })
-                if(item.mat_zag_zam) item.materialList.push({
-                    mat: {id: item.mat_zag_zam},
-                    kol: 1,
-                    ez: 1
-                })
-
-                item.materialList = [...item.materialList, ...item.listPokDet]
-                delete item.listPokDet
-
-                for(const mat of item.materialList) {
-                    if(!mat || !mat?.mat) continue;
-                    if(mat.mat.id == mat_id) {
-                        for(const res of item.materials) {
-                            const material = await this.material.findByPk(res.id, {
-                                attributes: ['ez_kolvo', 'id', 'shipments_kolvo', 'min_remaining', 'material_kolvo', 'kolvo']
-                            })
-                            let {min_remaining, shipments_kolvo} = item
-                            await this.formationDeficitMaterial(mat, {min_remaining, shipments_kolvo}, material)
-                        }
+        for(const item of allData) {
+            for(const mat of item.materialList) {
+                if(!mat || !mat?.mat) continue; 
+                if(mat.mat.id == mat_id) {
+                    for(const res of item.materials) {
+                        const material = await this.material.findByPk(res.id, {
+                            attributes: ['ez_kolvo', 'id', 'shipments_kolvo', 'min_remaining', 'material_kolvo', 'kolvo']
+                        })
+                        let {min_remaining, shipments_kolvo} = item
+                        await this.formationDeficitMaterial(mat, {min_remaining, shipments_kolvo}, material)
                     }
                 }
             }
-        } catch(err) {
-            console.error(err)
-            this.logger.error("Произошла ошибка при парсинге списка материалов в Объектах.")
         }
 
         return true
-
     }
     
      // Сохраняем количество для каждой ЕИ Материала
@@ -432,13 +388,15 @@ export class ScladService {
             ez_kolvo = JSON.parse(ez_kolvo)
             kolvo = JSON.parse(kolvo)
             
-            let shipments_kolvo = (Math.round(materialObj.kol) * Number(vars.min_remaining)) * 2
+            let shipments_kolvo = (Math.round(materialObj.kol) * Number(vars.shipments_kolvo)) * 2
             if(shipments_kolvo < 1) shipments_kolvo = 1
-            let min_remaining = (Math.round(materialObj.kol) * Number(vars.shipments_kolvo)) * 2
+            let min_remaining = (Math.round(materialObj.kol) * Number(vars.min_remaining)) * 2
             if(min_remaining < 1) min_remaining = 1
 
-            material.shipments_kolvo += (Math.round(materialObj.kol) * Number(vars.shipments_kolvo))
-            material.min_remaining += (Math.round(materialObj.kol) * Number(vars.min_remaining))
+            material.shipments_kolvo += shipments_kolvo
+            material.min_remaining += min_remaining
+
+            if(!shipments_kolvo && !min_remaining) return false;
 
             switch(Number(materialObj.ez)) {
                 case 1:
@@ -478,4 +436,95 @@ export class ScladService {
 
         await material.save()
 	}
+
+
+    /**
+     * Получаем родителей по принадлежности
+     * к материалам. 
+     */
+    async getMaterialParents(mat_id: number, includes: any = []) {
+        const include = [{
+            model: PodPodMaterial,
+            where: {id: mat_id},
+            attributes: ['id']
+        }]
+
+        if(includes.length) include.push(...includes)
+
+        const where = {ban: false} 
+        const attrimbute = [
+            'materialList', 
+            'min_remaining', 
+            'shipments_kolvo', 
+            'min_remaining', 
+            'name', 
+            'id'
+        ]
+        
+        const allProduct = await this.productReprository.findAll({include, 
+            attributes: ['listPokDet', ...attrimbute], where
+        })
+        const allCbed = await this.cbedReprository.findAll({include, 
+            attributes: ['listPokDet', ...attrimbute], where
+        })
+        const allDetal = await this.detalReprository.findAll({include, 
+            attributes: ['mat_zag', 'mat_zag_zam', ...attrimbute], where
+        })
+
+        let allData = []
+
+        try {
+            const prod = JSON.parse(JSON.stringify(allProduct))
+            const cbed = JSON.parse(JSON.stringify(allCbed))
+            const detal = JSON.parse(JSON.stringify(allDetal))
+
+            prod.forEach((el: any) => el['type'] = 'prod')
+            cbed.forEach((el: any) => el['type'] = 'cbed')
+            detal.forEach((el: any)=> el['type'] = 'detal')
+
+            allData = [...prod, ...cbed, ...detal];
+
+            for(const item of allData) {
+                if(item.materialList) 
+                    item.materialList = JSON.parse(item.materialList)
+                else item.materialList = []
+                if(item?.listPokDet && item.listPokDet)
+                    item.listPokDet = JSON.parse(item.listPokDet)
+                else item.listPokDet = []
+
+                if(item.mat_zag) item.materialList.push({
+                    mat: {id: item.mat_zag},
+                    kol: 1,
+                    ez: 1
+                })
+                if(item.mat_zag_zam) item.materialList.push({
+                    mat: {id: item.mat_zag_zam},
+                    kol: 1,
+                    ez: 1
+                })
+
+                item.materialList = [...item.materialList, ...item.listPokDet].filter((el: any) => {
+                    return el.mat && el.mat.id == mat_id
+                })
+                delete item.listPokDet
+
+            } 
+        } catch(e) {
+            console.error(e)
+            this.logger.error("Произошла ошибка service::getMaterialParents")
+        }
+       
+        return allData
+    }
+
+    // Сортировка материала по заказам 
+    // Получить Все Изделия, СБ, Д и найти для них заказы
+    async materialShipmentsToId(mat_id: number) {
+        const allData = await this.getMaterialParents(mat_id, {
+            model: Shipments
+        })
+        console.log(allData)
+
+        return allData
+    }
 }

@@ -44,6 +44,19 @@ export class ShipmentsController {
 		return this.shipmentsSettings.getAllShipments(light);
 	}
 
+	@ApiOperation({summary: 'Получить изделия для заказа'})
+  @Get('/one/izd/:id')
+	getShipmentsIzd(@Param('id') id: number) {
+		console.log('\n\n\n\n\ id', id)
+		return this.shipmentsSettings.getShipmentsIzd(id);
+	}
+
+	@ApiOperation({summary: 'Получить все заказы'})
+  @Get('/all/to/shipments/')
+	getAllShipmentsTo() {
+		return this.shipmentsSettings.getAllShipmentsTo();
+	}
+
 	@ApiOperation({summary: 'Получить все заказы в зависимости на складе или нет'})
   @Get('/sclad/:to_sclad')
 	getAllShipmentsSclad(@Param('to_sclad') to_sclad: boolean) {
@@ -63,9 +76,9 @@ export class ShipmentsController {
 	}
 
 	@ApiOperation({summary: 'Получить все заказы в сборке'})
-  @Get('/:id')
-	getAllShipmentsById(@Param('id') id: number) {
-		return this.shipmentsSettings.getAllShipmentsById(id);
+  @Get('/light/:id/:light')
+	getAllShipmentsById(@Param('id') id: number, @Param('light') light: 'string') {
+		return this.shipmentsSettings.getAllShipmentsById(id, light);
 	}
 
 	@ApiOperation({summary: 'Перемешаем заказ на склад или обратно'})

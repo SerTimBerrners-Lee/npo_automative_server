@@ -72,7 +72,9 @@ export class BuyerService {
         return buyer
     }
 
-    async getBuyers() {
+    async getBuyers(light: string = 'false') {
+        if(light == 'true') return await this.buyerReprository.findAll()
+
         const buyers = await this.buyerReprository.findAll({include: {all: true}})
         return buyers
     }

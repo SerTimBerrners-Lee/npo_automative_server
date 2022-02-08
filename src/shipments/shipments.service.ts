@@ -1,6 +1,7 @@
 import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
 import { InjectModel } from '@nestjs/sequelize';
 import { AssembleService } from 'src/assemble/assemble.service';
+import { Buyer } from 'src/buyer/buyer.model';
 import { BuyerService } from 'src/buyer/buyer.service';
 import { Cbed } from 'src/cbed/cbed.model';
 import { CbedService } from 'src/cbed/cbed.service';
@@ -10,6 +11,7 @@ import { DocumentsService } from 'src/documents/documents.service';
 import { DateMethods } from 'src/files/date.methods';
 import { statusShipment } from 'src/files/enums';
 import { MetaloworkingService } from 'src/metaloworking/metaloworking.service';
+import { Product } from 'src/product/product.model';
 import { ProductService } from 'src/product/product.service';
 import { UpCreateShipmentsDto } from './dto/up-create-shipments.dto';
 import { Shipments } from './shipments.model';
@@ -265,6 +267,30 @@ export class ShipmentsService {
 		if(light == 'true') return await this.shipmentsReprository.findAll({ attributes: ['id', 'number_order', 'date_shipments'] })
 	}
 
+	async getShipmentsIzd(id: number) {
+		return await this.shipmentsReprository.findByPk(id, {
+			include: [
+				{model: Detal},
+				{model: Cbed},
+				{model: Product}
+			]
+		})
+	}
+
+	async getAllShipmentsTo() {
+		const shipments = await this.shipmentsReprository.findAll({include: ['childrens', 
+		{
+			model: Product,
+			attributes: ['name', 'id', 'articl']
+		},
+		{
+			model: Buyer,
+			attributes: ['name']
+		}
+		]})
+		return shipments
+	}
+
 	async getAllShipmentsSclad(to_sclad: boolean) {
 		return await this.shipmentsReprository.findAll({where: {to_sklad: to_sclad}, include: {all: true}})
 	}
@@ -278,8 +304,9 @@ export class ShipmentsService {
 		}
 	}
 
-	async getById(id: number) {
-		return await this.shipmentsReprository.findByPk(id, {include: {all: true}})
+	async getById(id: number, light = 'false') {
+		if(light == 'false') return await this.shipmentsReprository.findByPk(id, {include: {all: true}})
+		return await this.shipmentsReprository.findByPk(id)
 	}
 
 	async getAllShipmentsAssemble(light: string = 'false') {
@@ -319,8 +346,8 @@ export class ShipmentsService {
 		return metaloworking
 	}
 
-	async getAllShipmentsById(id: number) {
-		return await this.shipmentsReprository.findByPk(id, {include:[
+	async getAllShipmentsById(id: number, light: string = 'false') {
+		if(light == 'false') return await this.shipmentsReprository.findByPk(id, {include:[
 			{all: true},
 			{
 				model: Cbed, 
@@ -330,6 +357,13 @@ export class ShipmentsService {
 				model: Detal, 
 				include: ['shipments']
 			}
+		]})
+
+		return await this.shipmentsReprository.findByPk(id, {include: [
+			{
+				model: Buyer,
+				attributes: ['id']
+			}, 'documents'
 		]})
 	}
 

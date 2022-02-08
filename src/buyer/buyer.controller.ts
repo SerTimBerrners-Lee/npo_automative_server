@@ -27,9 +27,9 @@ export class BuyerController {
     }
 
     @ApiOperation({summary: 'Получаем всех покупателей'})
-    @Get('/')
-    getBuyers() { 
-        return this.buyerService.getBuyers()
+    @Get('/light/:light')
+    getBuyers(@Param('light') light: string) { 
+        return this.buyerService.getBuyers(light)
     }
 
     @ApiOperation({summary: 'Перенести в архив покупателя'})

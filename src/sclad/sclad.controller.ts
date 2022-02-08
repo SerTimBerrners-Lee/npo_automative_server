@@ -1,4 +1,4 @@
-import { Body, Controller, Get, Post } from '@nestjs/common';
+import { Body, Controller, Get, Param, Post } from '@nestjs/common';
 import { ApiOperation } from '@nestjs/swagger';
 import {UpdateDeficitDto } from './dto/create-deficite.dto';
 import { CreateMarkDto } from './dto/create-mark.dto';
@@ -55,6 +55,12 @@ export class ScladController {
     @Get('/materialdeficit')
     getAllMaterialDeficit() {
         return this.scladService.getAllMaterialDeficit()
+    }
+
+    @ApiOperation({summary: 'Получаем Дефицит материала'})
+    @Get('/materialparents/:id')
+    getMaterialParents(@Param('id') id: number) {
+        return this.scladService.getMaterialParents(id)
     }
 }
     
