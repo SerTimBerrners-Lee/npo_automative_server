@@ -111,7 +111,11 @@ export class ScladService {
 
     async getAllDeficitProduct() {
         const products = await this.productReprository.findAll({
-            attributes: ['haracteriatic', 'id', 'product_kolvo', 'shipments_kolvo']
+            attributes: ['haracteriatic', 'id', 'product_kolvo', 'shipments_kolvo'],
+            include: [{
+                model: Shipments,
+                attributes: ['kol', 'id']
+            }]
         })
 
         let arrIdProducts = [];
@@ -119,10 +123,18 @@ export class ScladService {
         for(const item of products) {
             try {
                 const har = JSON.parse(item.haracteriatic)[1].znach
-                if(item.min_remaining != Number(har)) {
+                if(item.min_remaining != Number(har)) 
                     item.min_remaining = Number(har)
-                    await item.save()
+                    
+                item.shipments_kolvo = 0
+                if(item.shipments.length) {
+                    for(const sh of item.shipments) {
+                        item.shipments_kolvo += sh.kol
+                    }
                 }
+
+                await item.save()
+
                 if((item.product_kolvo - item.shipments_kolvo) < har) arrIdProducts.push(item.id)
             } catch(e) {console.error(e)}
         }
@@ -297,8 +309,8 @@ export class ScladService {
                 const haracteriatic = JSON.parse(item.haracteriatic)[1].znach
                 const listIzd = JSON.parse(item[listType])
                 for(const item of listIzd) {
-                    if(item[keyList].id == izd_id)
-                        remainder += Number(item.kol) * (haracteriatic || 1)
+                    if(item[keyList].id == izd_id && haracteriatic > 0)
+                        remainder += Number(item.kol) * Number(haracteriatic)
                 }
             } catch(e) {console.error(e)}
         }
@@ -314,15 +326,10 @@ export class ScladService {
         return undefined;	
     }
 
-
     // Deficit  materials
     async getAllMaterialDeficit() {
         await this.writtingDeficitMaterials()
         const materials = await this.material.findAll({
-            include: [
-                {model: Material},
-                {model: PodMaterial}
-            ],
             where: {
                 [Op.or]: [
                     Sequelize.where(
@@ -351,9 +358,10 @@ export class ScladService {
         for(const item of material) {
             item.shipments_kolvo = 0
             item.material_kolvo = 0
+            item.min_remaining = 0
             item.ez_kolvo = EZ_KOLVO
             await item.save()
- 
+
             await this.getAllRemObjectForMat(item.id)
         }
     }
@@ -383,7 +391,6 @@ export class ScladService {
      // Сохраняем количество для каждой ЕИ Материала
 	async formationDeficitMaterial(materialObj: any, vars: any, material: PodPodMaterial) {
         if(!materialObj) return false;
-        if(materialObj.ez != 1) console.log('ez\n\n\n', materialObj, '\n\n\n')
 
         let ez_kolvo = material.ez_kolvo;
         let kolvo = material.kolvo
@@ -396,10 +403,11 @@ export class ScladService {
             let min_remaining = (Math.round(materialObj.kol) * Number(vars.min_remaining)) * 2
             if(min_remaining < 1) min_remaining = 0
 
+            if(!shipments_kolvo && !min_remaining) return false;
+
             material.shipments_kolvo += shipments_kolvo
             material.min_remaining += min_remaining
 
-            if(!shipments_kolvo && !min_remaining) return false;
 
             switch(Number(materialObj.ez)) {
                 case 1:
