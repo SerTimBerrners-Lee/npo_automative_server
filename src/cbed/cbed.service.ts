@@ -252,6 +252,23 @@ export class CbedService {
         }
     }       
 
+    async getOneCbedBelongs(id: number) {
+        const cbed = await this.cbedReprository.findByPk(id, {
+            include: [
+                {
+                    model: Detal, 
+                    attributes: ['id', 'name']
+                },
+                {
+                    model: Product, 
+                    attributes: ['id', 'name']
+                }
+            ]
+        })
+
+        return cbed
+    }
+
     async getOneCbedById(id: number, light: boolean = false) {
         let result: Cbed
         if(light) result = await this.cbedReprository.findByPk(id)

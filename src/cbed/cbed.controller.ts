@@ -74,6 +74,12 @@ export class CbedController {
         return this.cbedService.getOneCbedById(id)
     }
 
+    @ApiOperation({summary: 'Получить Все что принадлежит сборочной единице'})
+    @Get('/belongs/:id')
+    getOneCbedBelongs(@Param('id') id: number) {
+        return this.cbedService.getOneCbedBelongs(id)
+    }
+
     @ApiOperation({summary: 'Открепляем документ от Сборочной единицы'})
     @Post('/removedocument/')
     removeDocumentCbed(@Body() dto: RemoveDocumentDto) {
