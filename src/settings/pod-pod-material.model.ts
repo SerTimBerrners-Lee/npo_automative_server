@@ -20,7 +20,7 @@ import { Material } from "./material.model";
 import { PodMaterial } from "./pod-material.model";
 interface PodPodMaterialCreationAttrs {
     name: string;
-}
+} 
 
 @Table({tableName: 'pod_pod_material'})
 export class PodPodMaterial extends Model<PodPodMaterial, PodPodMaterialCreationAttrs> {
@@ -43,6 +43,10 @@ export class PodPodMaterial extends Model<PodPodMaterial, PodPodMaterialCreation
     @ApiProperty({example: 12, description: 'Минимальное количество'})
     @Column({type: DataType.INTEGER, defaultValue: 0})
     min_remaining: number; 
+
+    @ApiProperty({example: 12, description: 'Заказаное количесвто'})
+    @Column({type: DataType.INTEGER, defaultValue: 0})
+    deliveries_kolvo: number; 
 
     @ApiProperty({example: 12, description: 'Количество материала необходимо'})
     @Column({type: DataType.INTEGER, defaultValue: 0})

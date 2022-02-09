@@ -14,10 +14,12 @@ import { EZ_KOLVO, StatusAssemble, StatusMetaloworking } from 'src/files/enums';
 import { Metaloworking } from 'src/metaloworking/metaloworking.model';
 import { MetaloworkingService } from 'src/metaloworking/metaloworking.service';
 import { Product } from 'src/product/product.model';
+import { Providers } from 'src/provider/provider.model';
 import { Material } from 'src/settings/material.model';
 import { PodMaterial } from 'src/settings/pod-material.model';
 import { PodPodMaterial } from 'src/settings/pod-pod-material.model';
 import { Shipments } from 'src/shipments/shipments.model';
+import { User } from 'src/users/users.model';
 import { Deficit } from './deficit.model';
 import { UpdateDeficitDto } from './dto/create-deficite.dto';
 import { CreateMarkDto } from './dto/create-mark.dto';
@@ -31,6 +33,7 @@ export class ScladService {
         @InjectModel(Product) private productReprository: typeof Product,
         @InjectModel(Cbed) private cbedReprository: typeof Cbed,
         @InjectModel(Detal) private detalReprository: typeof Detal,
+        @InjectModel(Providers) private providerReprository: typeof Providers,
         @InjectModel(PodPodMaterial) private material: typeof PodPodMaterial,
         private assembleService: AssembleService,
         private metaloworkingService: MetaloworkingService,
@@ -389,9 +392,9 @@ export class ScladService {
             kolvo = JSON.parse(kolvo)
             
             let shipments_kolvo = (Math.round(materialObj.kol) * Number(vars.shipments_kolvo)) * 2
-            if(shipments_kolvo < 1) shipments_kolvo = 1
+            if(shipments_kolvo < 1) shipments_kolvo = 0
             let min_remaining = (Math.round(materialObj.kol) * Number(vars.min_remaining)) * 2
-            if(min_remaining < 1) min_remaining = 1
+            if(min_remaining < 1) min_remaining = 0
 
             material.shipments_kolvo += shipments_kolvo
             material.min_remaining += min_remaining
@@ -437,19 +440,47 @@ export class ScladService {
         await material.save()
 	}
 
+    /**
+     * 
+     * @param mat_id 
+
+     */
+    async getMaterialParentsDeficit(mat_id: number) {
+        const provider = await this.providerReprository.count({
+            include: [{
+                model: PodPodMaterial,
+                where: {id: mat_id}
+            }],
+        });
+
+        let allData = await this.getMaterialParents(mat_id, [{
+            model: Product,
+            attributes: ['id', 'name']
+        }], true)
+
+        let arr: any = []
+        for(const item of allData) {
+            if(item.products && !item.products.length) continue;
+            arr.push(item)
+        }
+
+        allData.unshift({type: 'provider', count: provider})
+
+        return allData
+    }
+
 
     /**
      * Получаем родителей по принадлежности
      * к материалам. 
-     */
-    async getMaterialParents(mat_id: number, includes: any = []) {
+     */ 
+    async getMaterialParents(mat_id: number, includes: any = [], includesNoProduct: boolean = false) {
         const include = [{
             model: PodPodMaterial,
             where: {id: mat_id},
             attributes: ['id']
         }]
-
-        if(includes.length) include.push(...includes)
+        if(includes.length && !includesNoProduct) include.push(...includes)
 
         const where = {ban: false} 
         const attrimbute = [
@@ -464,14 +495,38 @@ export class ScladService {
         const allProduct = await this.productReprository.findAll({include, 
             attributes: ['listPokDet', ...attrimbute], where
         })
+        if(includes.length, includesNoProduct) include.push(...includes)
         const allCbed = await this.cbedReprository.findAll({include, 
             attributes: ['listPokDet', ...attrimbute], where
         })
         const allDetal = await this.detalReprository.findAll({include, 
-            attributes: ['mat_zag', 'mat_zag_zam', ...attrimbute], where
+            attributes: ['mat_zag', 'mat_zag_zam', 'massZag', 'lengt', ...attrimbute], where
         })
 
         let allData = []
+
+        function returnObjMat(item: any, zag: any) {
+            if(!zag) return item;
+            item.materialList.push({
+                mat: {id: zag},
+                kol: 1,
+                ez: 1
+            })
+            if(item.massZag)
+                item.materialList.push({
+                    mat: {id: zag},
+                    kol: Math.round(item.massZag),
+                    ez: 3
+                })
+            if(item.lengt) {
+                item.materialList.push({
+                    mat: {id: zag},
+                    kol: Math.round(item.lengt),
+                    ez: 2
+                })
+            }
+            return item
+        }
 
         try {
             const prod = JSON.parse(JSON.stringify(allProduct))
@@ -484,7 +539,7 @@ export class ScladService {
 
             allData = [...prod, ...cbed, ...detal];
 
-            for(const item of allData) {
+            for(let item of allData) {
                 if(item.materialList) 
                     item.materialList = JSON.parse(item.materialList)
                 else item.materialList = []
@@ -492,16 +547,8 @@ export class ScladService {
                     item.listPokDet = JSON.parse(item.listPokDet)
                 else item.listPokDet = []
 
-                if(item.mat_zag) item.materialList.push({
-                    mat: {id: item.mat_zag},
-                    kol: 1,
-                    ez: 1
-                })
-                if(item.mat_zag_zam) item.materialList.push({
-                    mat: {id: item.mat_zag_zam},
-                    kol: 1,
-                    ez: 1
-                })
+                item = returnObjMat(item, item?.mat_zag)
+                item = returnObjMat(item, item?.mat_zag_zam)
 
                 item.materialList = [...item.materialList, ...item.listPokDet].filter((el: any) => {
                     return el.mat && el.mat.id == mat_id
@@ -523,7 +570,6 @@ export class ScladService {
         const allData = await this.getMaterialParents(mat_id, {
             model: Shipments
         })
-        console.log(allData)
 
         return allData
     }

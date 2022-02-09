@@ -79,31 +79,31 @@ export class Detal extends Model<Detal, DetalCreationAttrs> {
     @Column({type: DataType.STRING, allowNull: true})
     DxL: any;
 
-    @ApiProperty({example: 12, description: 'Параметры заготовки'})
+    @ApiProperty({example: 12, description: 'Диаметр'})
     @Column({type: DataType.STRING, allowNull: true, defaultValue: undefined})
     diametr: any;
 
-    @ApiProperty({example: 12, description: 'Параметры заготовки'})
+    @ApiProperty({example: 12, description: 'Длина'})
     @Column({type: DataType.STRING, allowNull: true, defaultValue: undefined})
     lengt: any;
 
-    @ApiProperty({example: 12, description: 'Параметры заготовки'})
+    @ApiProperty({example: 12, description: 'Высота'})
     @Column({type: DataType.STRING, allowNull: true, defaultValue: undefined})
     height: any;
 
-    @ApiProperty({example: 12, description: 'Параметры заготовки'})
+    @ApiProperty({example: 12, description: 'Толщина'})
     @Column({type: DataType.STRING, allowNull: true, defaultValue: undefined})
     thickness: any;
 
-    @ApiProperty({example: 12, description: 'Параметры заготовки'})
+    @ApiProperty({example: 12, description: 'Толщина стенки'})
     @Column({type: DataType.STRING, allowNull: true, defaultValue: undefined})
     wallThickness: any;
 
-    @ApiProperty({example: 12, description: 'Параметры заготовки'})
+    @ApiProperty({example: 12, description: 'Ширина'})
     @Column({type: DataType.STRING, allowNull: true, defaultValue: undefined})
     width: any;
 
-    @ApiProperty({example: 12, description: 'Параметры заготовки'})
+    @ApiProperty({example: 12, description: 'Наружный диаметр'})
     @Column({type: DataType.STRING, allowNull: true, defaultValue: undefined})
     areaCS: any;
 
@@ -141,7 +141,7 @@ export class Detal extends Model<Detal, DetalCreationAttrs> {
     @ForeignKey(() => User)
     @Column({type: DataType.INTEGER})
     responsibleId: number;
-
+ 
     @BelongsTo(() => User)
     user: User;
 
