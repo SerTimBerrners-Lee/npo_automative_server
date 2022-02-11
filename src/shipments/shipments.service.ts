@@ -120,10 +120,10 @@ export class ShipmentsService {
 						for(let upl_izd of parsCurList) {
 							if(upl_izd.type == izd.type && upl_izd.obj.id == izd.obj.id) {
 								if(Number(izd.kol) > Number(upl_izd.kol)) {
-									izd.kol = Number(izd.kol) - Number(upl_izd.kol)
+									izd.kol = Math.round(Number(izd.kol) - Number(upl_izd.kol))
 									continue
 								}
-								if(Number(izd.kol) < Number(upl_izd.kol)) izd.kol = Number(izd.kol) - Number(upl_izd.kol)
+								if(Number(izd.kol) < Number(upl_izd.kol)) izd.kol = Math.round(Number(izd.kol) - Number(upl_izd.kol))
 								else check = false
 							}
 						}
@@ -166,7 +166,7 @@ export class ShipmentsService {
 		if(data.product && !data.is_not_product) {
 			const product = await this.productService.getById(data.product.id)
 			if(product) {
-				product.shipments_kolvo += data.kol
+				product.shipments_kolvo += Number(data.kol)
 				shipment.productId = product.id
 				await product.save()
 				await shipment.save()
@@ -238,25 +238,17 @@ export class ShipmentsService {
 		if(izd.type == 'cbed') {
 			let izdels = await this.cbedService.findById(izd.obj.id, 'true') 
 			if(izdels) {
-				if(action == 'increment') {
-					izdels.shipments_kolvo = izdels.shipments_kolvo + Number(izd.kol)
-					shipment.$add('cbeds', izdels.id)
-				} else {
-					izdels.shipments_kolvo = izdels.shipments_kolvo - Number(izd.kol)
-					shipment.$remove('cbeds', izdels.id)
-				}
+				if(action == 'increment') shipment.$add('cbeds', izdels.id)
+				else shipment.$remove('cbeds', izdels.id)
+				
 				await izdels.save()
 			}
 		} else if(izd.type == 'detal') {
 				let izdels = await this.detalService.findByIdDetal(izd.obj.id, 'true')
 				if(izdels) {
-					if(action == 'increment') {
-						izdels.shipments_kolvo = izdels.shipments_kolvo + Number(izd.kol)
-						shipment.$add('detals', izdels.id)
-					} else {
-						izdels.shipments_kolvo = izdels.shipments_kolvo - Number(izd.kol)
-						shipment.$remove('detals', izdels.id)
-					}
+					if(action == 'increment') shipment.$add('detals', izdels.id)
+					else shipment.$remove('detals', izdels.id)
+
 					await izdels.save()
 				}
 		}

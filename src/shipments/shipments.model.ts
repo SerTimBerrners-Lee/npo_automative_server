@@ -57,11 +57,11 @@ export class Shipments extends Model<Shipments, ShipmentsAttrCreate> {
     to_sklad: boolean;
     
 		@ApiProperty({example: '1', description: 'Список сборок и деталей'})
-    @Column({type: DataType.TEXT})
+    @Column({type: DataType.TEXT,  defaultValue: '[]'})
     list_cbed_detal: string;
 
     @ApiProperty({example: '1', description: 'Список сборок и деталей входящих в основные сборки'})
-    @Column({type: DataType.TEXT})
+    @Column({type: DataType.TEXT, defaultValue: '[]'})
     list_hidden_cbed_detal: string;
 
 		@ApiProperty({example: '1', description: 'Примечание к заказу'})

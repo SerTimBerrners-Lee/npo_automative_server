@@ -8,6 +8,7 @@ import { MetaloworkingModule } from 'src/metaloworking/metaloworking.module';
 import { Product } from 'src/product/product.model';
 import { Providers } from 'src/provider/provider.model';
 import { PodPodMaterial } from 'src/settings/pod-pod-material.model';
+import { Shipments } from 'src/shipments/shipments.model';
 import { Deficit } from './deficit.model';
 import { Marks } from './marks.model';
 import { ScladController } from './sclad.controller';
@@ -24,7 +25,8 @@ import { ScladService } from './sclad.service';
             Cbed,
             Product,
             PodPodMaterial,
-            Providers
+            Providers,
+            Shipments
         ]),
         AssembleModule,
         DetalModule,

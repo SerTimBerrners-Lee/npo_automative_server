@@ -1,5 +1,6 @@
 import { HttpException, HttpStatus, Injectable, Logger } from '@nestjs/common';
 import { InjectModel } from '@nestjs/sequelize';
+import process from 'process';
 import { Op } from 'sequelize';
 import { Sequelize } from 'sequelize';
 import { Where } from 'sequelize/types/lib/utils';
@@ -35,6 +36,7 @@ export class ScladService {
         @InjectModel(Detal) private detalReprository: typeof Detal,
         @InjectModel(Providers) private providerReprository: typeof Providers,
         @InjectModel(PodPodMaterial) private material: typeof PodPodMaterial,
+        @InjectModel(Shipments) private shipmentsReprository: typeof Shipments,
         private assembleService: AssembleService,
         private metaloworkingService: MetaloworkingService,
         ) {
@@ -129,7 +131,7 @@ export class ScladService {
                 item.shipments_kolvo = 0
                 if(item.shipments.length) {
                     for(const sh of item.shipments) {
-                        item.shipments_kolvo += sh.kol
+                        item.shipments_kolvo += Number(sh.kol)
                     }
                 }
 
@@ -154,12 +156,19 @@ export class ScladService {
 
     async getAllDeficitCbed() {
 		const cbeds = await this.cbedReprository.findAll({
-            attributes: {exclude: ['attention', 'haracteriatic', 'parametrs', 'description']}
+            attributes: {exclude: ['attention', 'haracteriatic', 'parametrs', 'description']},
+            include: {
+                model: Shipments,
+                attributes: ['id', 'list_cbed_detal', 'list_hidden_cbed_detal']
+            }
         })
 
         for(let inx in cbeds) {
             const remaining = await this.minRemainder(cbeds[inx], 'cbed')
+            let shipments_kolvo = await this.getIzdInShipmentsList(cbeds[inx].shipments, cbeds[inx].id, 'cbed');
+
             cbeds[inx].min_remaining = remaining
+            cbeds[inx].shipments_kolvo = shipments_kolvo
             await cbeds[inx].save() 
         }
 
@@ -190,12 +199,19 @@ export class ScladService {
 
     async getAllDeficitDetal() {
         const detals = await this.detalReprository.findAll({
-            attributes: {exclude: ['attention', 'haracteriatic', 'parametrs', 'description']}
-        })
+            attributes: {exclude: ['attention', 'haracteriatic', 'parametrs', 'description']},
+            include: {
+                model: Shipments,
+                attributes: ['id', 'list_cbed_detal', 'list_hidden_cbed_detal']
+            }
+        }) 
 
         for(let inx in detals) {
             const remaining = await this.minRemainder(detals[inx], 'detal')
-            detals[inx].min_remaining = remaining 
+            let shipments_kolvo = await this.getIzdInShipmentsList(detals[inx].shipments, detals[inx].id, 'detal');
+            
+            detals[inx].min_remaining = remaining
+            detals[inx].shipments_kolvo = shipments_kolvo;
             await detals[inx].save()
         }
 
@@ -233,6 +249,23 @@ export class ScladService {
 
         return deficitDetal
 	}
+
+    async getIzdInShipmentsList(shipments: any, izd_id: number, type: string) {
+        let shipments_kolvo = 0
+
+        for(const item of shipments) {
+            let arr = [];
+            if(item.list_cbed_detal) arr = JSON.parse(item.list_cbed_detal) 
+            if(item.list_hidden_cbed_detal) arr = arr.concat(JSON.parse(item.list_hidden_cbed_detal))
+
+            for(const izd of arr) {
+                if(izd['obj'].id == izd_id && izd['type'] == type) {
+                    shipments_kolvo += Number(izd['kol'])
+                }
+            }
+        }
+        return shipments_kolvo
+    }
 
     async minRemainder(izd: Cbed | Detal, type: string): Promise<number> {
         let remainder = 0;
@@ -275,7 +308,7 @@ export class ScladService {
                 }
             } catch(err) {this.logger.error("\n\n\nISERROR\n\n\n", err)}
         }
-        return remainder
+        return remainder 
         
     }
 
