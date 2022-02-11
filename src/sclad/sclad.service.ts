@@ -431,9 +431,9 @@ export class ScladService {
             ez_kolvo = JSON.parse(ez_kolvo)
             kolvo = JSON.parse(kolvo)
             
-            let shipments_kolvo = (Math.round(materialObj.kol) * Number(vars.shipments_kolvo)) * 2
+            let shipments_kolvo = (Math.round(materialObj.kol) * Number(vars.shipments_kolvo))
             if(shipments_kolvo < 1) shipments_kolvo = 0
-            let min_remaining = (Math.round(materialObj.kol) * Number(vars.min_remaining)) * 2
+            let min_remaining = (Math.round(materialObj.kol) * Number(vars.min_remaining))
             if(min_remaining < 1) min_remaining = 0
 
             if(!shipments_kolvo && !min_remaining) return false;
