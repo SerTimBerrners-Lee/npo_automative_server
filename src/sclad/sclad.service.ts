@@ -113,31 +113,27 @@ export class ScladService {
 
     async getAllDeficitProduct() {
         const products = await this.productReprository.findAll({
-            attributes: ['haracteriatic', 'id', 'product_kolvo', 'shipments_kolvo'],
+            attributes: ['haracteriatic', 'id', 'product_kolvo', 'shipments_kolvo', 'min_remaining'],
             include: [{
                 model: Shipments,
                 attributes: ['kol', 'id']
             }]
         })
 
-        let arrIdProducts = [];
-
         for(const item of products) {
             try {
                 const har = JSON.parse(item.haracteriatic)[1].znach
                 item.min_remaining = Number(har)
-                    
+                
                 item.shipments_kolvo = 0
                 if(item.shipments.length) {
                     for(const sh of item.shipments) {
                         item.shipments_kolvo += Number(sh.kol)
                     }
                 }
-
+                console.log('\n\n\n', item.shipments, '\n\n\n')
                 await item.save()
-
-                if((item.product_kolvo - item.shipments_kolvo) < item.min_remaining) arrIdProducts.push(item.id)
-            } catch(e) {console.error(e)}
+            } catch(err) {console.error(err)}
         }
 
         return await this.productReprository.findAll({
@@ -148,7 +144,14 @@ export class ScladService {
                 'shipments' 
             ],
             where: {
-                id: arrIdProducts
+                [Op.or]: [
+                    Sequelize.where(
+                        Sequelize.col('product_kolvo'), '<', Sequelize.col('min_remaining')
+                    ),
+                    Sequelize.where(
+                        Sequelize.col('min_remaining'), '<', Sequelize.col('shipments_kolvo') 
+                    )
+                ]
             }
         })
     }
