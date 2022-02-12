@@ -125,7 +125,7 @@ export class ScladService {
         for(const item of products) {
             try {
                 const har = JSON.parse(item.haracteriatic)[1].znach
-                if(item.min_remaining != Number(har)) 
+                if(item.min_remaining == Number(har)) 
                     item.min_remaining = Number(har)
                     
                 item.shipments_kolvo = 0
@@ -137,7 +137,7 @@ export class ScladService {
 
                 await item.save()
 
-                if((item.product_kolvo - item.shipments_kolvo) < har) arrIdProducts.push(item.id)
+                if((item.product_kolvo - item.shipments_kolvo) < item.min_remaining) arrIdProducts.push(item.id)
             } catch(e) {console.error(e)}
         }
 
