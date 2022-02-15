@@ -285,12 +285,12 @@ export class ScladService {
             }]
         }
         if(type == 'cbed') {
-            query['where'] = { id: list_id_arr }
             try {
                 const cbeds = JSON.parse(izd.cbed)
                 for(const cb of cbeds) {
                     list_id_arr.push(cb.id)
                 }
+                query['where'] = { id: list_id_arr }
             } catch(err) {console.error(err)}   
         }
 
@@ -304,13 +304,15 @@ export class ScladService {
                 if(!cb[listType]) continue;
                 const listIzd = JSON.parse(cb[listType])
                 for(const item of listIzd) {
-                    if(item[keyList].id == izd.id && Number(item.kol)) 
-                        remainder += Number(item.kol) * await this.getMinProductRemain(cb.id, 0, 'listCbed', 'cbed', 'cb')
+                    const parent_kol = Number(item.kol);
+                    if(item[keyList].id == izd.id && parent_kol) {
+                        const min_of_parent = await this.getMinProductRemain(cb.id, 0, 'listCbed', 'cbed', 'cb')
+                        remainder += (parent_kol * min_of_parent)
+                    }
                 }
             } catch(err) {this.logger.error("\n\n\nISERROR\n\n\n", err)}
         }
-        return remainder 
-        
+        return remainder;
     }
 
     /**
@@ -340,11 +342,11 @@ export class ScladService {
 
         for(const item of product) {
             try {
-                const haracteriatic = JSON.parse(item.haracteriatic)[1].znach
+                const haracteriatic = Number(JSON.parse(item.haracteriatic)[1].znach);
                 const listIzd = JSON.parse(item[listType])
                 for(const item of listIzd) {
                     if(item[keyList].id == izd_id && haracteriatic > 0)
-                        remainder += Number(item.kol) * Number(haracteriatic)
+                        remainder += (Number(item.kol) * haracteriatic)
                 }
             } catch(e) {console.error(e)}
         }
