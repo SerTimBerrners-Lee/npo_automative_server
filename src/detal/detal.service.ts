@@ -39,6 +39,7 @@ export class DetalService {
         @InjectModel(Actions) private actionsReprository: typeof Actions,
         @InjectModel(TypeOperation) private typeOperationReprository: typeof TypeOperation,
         @InjectModel(Product) private productReprository: typeof Product,
+        @InjectModel(Cbed) private cbedReprository: typeof Cbed,
         private documentsService: DocumentsService
     ) {} 
 
@@ -304,16 +305,11 @@ export class DetalService {
     private async upAndCreateOperation(dto: UpCreateOperationDto, files: any, operation: any) {
         if(dto.description != 'null')
             operation.description = dto.description
-            else
-                operation.description = ''
-        if(dto.preTime)
-            operation.preTime = dto.preTime
-        if(dto.helperTime)
-            operation.helperTime = dto.helperTime
-        if(dto.mainTime)
-            operation.mainTime = dto.mainTime
-        if(dto.generalCountTime)
-            operation.generalCountTime = dto.generalCountTime
+            else operation.description = ''
+        if(dto.preTime) operation.preTime = dto.preTime
+        if(dto.helperTime) operation.helperTime = dto.helperTime
+        if(dto.mainTime) operation.mainTime = dto.mainTime
+        if(dto.generalCountTime) operation.generalCountTime = dto.generalCountTime
 
         if(operation.name && !operation.tOperationId) {
             const tp = await this.typeOperationReprository.findByPk(operation.name)
@@ -455,14 +451,26 @@ export class DetalService {
             description = 'Добавил технический процесс'
         } 
 
+        console.log(dto);
+        if(dto.izd_id && Number(dto.izd_id) && dto.izd_type && dto.izd_type !== 'null') {
+            let izd: any;
+            if(dto.izd_type == 'detal') izd = await this.detalReprository.findByPk(dto.izd_id)
+            if(dto.izd_type == 'cbed') izd = await this.cbedReprository.findByPk(dto.izd_id)
+            if(dto.izd_type == 'product') izd = await this.productReprository.findByPk(dto.izd_id)
+
+            if(!izd) 
+                throw new HttpException('Не удалось создать Технологический процесс', HttpStatus.BAD_REQUEST)
+            tp[`${dto.izd_type}Id`] = izd.id;
+            await tp.save()
+        }
+
         const action = await this.actionsReprository.create({action: description})
         let user: any
         if(dto.responsibleActionId)
             user = await this.userRepository.findByPk(dto.responsibleActionId)
         if(action) {
             action.techProcessId = tp.id
-            if(user)
-                action.user = user.id
+            if(user) action.user = user.id
             await action.save()
         }
 

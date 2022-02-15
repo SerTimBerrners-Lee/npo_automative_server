@@ -62,5 +62,11 @@ export class ScladController {
     getMaterialParents(@Param('id') id: number) {
         return this.scladService.getMaterialParentsDeficit(id)
     }
+
+    @ApiOperation({summary: 'Получаем Дефицит материала'})
+    @Get('/materialonecshipments/:id')
+    getMaterialShipmentsAttations(@Param('id') id: number) {
+        return this.scladService.getMaterialShipmentsAttations(id)
+    }
 }
     

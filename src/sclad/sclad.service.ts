@@ -217,7 +217,6 @@ export class ScladService {
             await detals[inx].save()
         }
 
-
 		const deficitDetal = await this.detalReprository.findAll({include: [
             {
                 model: TechProcess, 
@@ -512,12 +511,73 @@ export class ScladService {
         return allData
     }
 
-
     /**
-     * Получаем родителей по принадлежности
-     * к материалам. 
-     */ 
-    async getMaterialParents(mat_id: number, includes: any = [], includesNoProduct: boolean = false) {
+     * 
+     * @param mat_id 
+     */
+     async getMaterialShipmentsAttations(mat_id: number) {
+        // 1. Получить количество к каждому заказу [+]
+        // 2. Отсортировать по заказам [+] Нужно умножать количество материала к Обекту на количество объектов к заказу
+        // 3. Отправить массив заказов
+        const includes = [{
+            model: Shipments,
+            attributes: ['list_cbed_detal', 'list_hidden_cbed_detal', 'kol', 'id', 'date_shipments', 'number_order', 'date_order']
+        }];
+
+        try {
+            const allArr: any = await this.getMaterialParents(mat_id, includes, false);
+            let allData = [];
+            for(let item of allArr) {
+                if(!item || !item.shipments) continue;
+                if(item.shipments.length) allData.push(item) 
+            }
+
+            for(let item of allData) {
+                for(const sh of item.shipments) {
+                    sh.shipments_parents = 0;
+                    sh.shipments_material = 0;
+                    // Получаем количество 
+                    if(item.type == 'prod') {
+                        sh.shipments_parents = Number(sh.kol || 0) 
+                    }
+                    if(item.type == 'detal' || item.type == 'cbed') {
+                        const shData = this.returnObjForListShipments(item.type, item.id, sh);
+                        for(const sd of shData) {
+                            sh.shipments_parents = Number(sd.kol || 0) 
+                        }
+                    }
+                    // Получаем количество материалов
+                    for(let material of item.materialList) {
+                        sh.shipments_material += (material.kol * sh.shipments_parents)
+                    }
+                }
+            }
+
+            // Сортируем заказы (чтобы не повторялись).
+            let shipments = [];
+            for(const item of allData) {
+                for(const sh of item.shipments) {
+                    let exist = false
+                    for(const sh_new of shipments) {
+                        if(sh.id == sh_new.id) {
+                            sh_new.shipments_parents += Number(sh.shipments_parents)
+                            sh_new.shipments_material +=Number(sh.shipments_material)
+                            exist = true
+                        }
+                    }
+
+                    if(!exist) shipments.push(sh);
+                    exist = false;
+                }
+            }
+
+            return shipments;
+        } catch(err) { console.error(err) }
+
+        return [];
+    }
+
+    private async findParentsComplectMaterial(mat_id: number, includes: any = [], includesNoProduct: boolean = false) {
         const include = [{
             model: PodPodMaterial,
             where: {id: mat_id},
@@ -546,6 +606,40 @@ export class ScladService {
             attributes: ['mat_zag', 'mat_zag_zam', 'massZag', 'lengt', ...attrimbute], where
         })
 
+        const prod = JSON.parse(JSON.stringify(allProduct))
+        const cbed = JSON.parse(JSON.stringify(allCbed))
+        const detal = JSON.parse(JSON.stringify(allDetal))
+
+        prod.forEach((el: any) => el['type'] = 'prod')
+        cbed.forEach((el: any) => el['type'] = 'cbed')
+        detal.forEach((el: any)=> el['type'] = 'detal')
+
+        return { prod, cbed, detal }
+    }
+
+    private returnObjForListShipments(type: string, _id: number, sh: Shipments) {
+        try {
+            let arr = [];
+            if(sh.list_cbed_detal) arr = JSON.parse(sh.list_cbed_detal);
+            if(sh.list_hidden_cbed_detal) arr = arr.concat(JSON.parse(sh.list_hidden_cbed_detal));
+            
+            let objData = [];
+            for(const item of arr) {
+                if(item.type == type && _id == item.obj.id) objData.push(item)
+            }
+
+            return objData;
+        } catch(err) {console.error(err)}
+    }
+
+    /**
+     * Получаем родителей по принадлежности
+     * к материалам. 
+     */ 
+    async getMaterialParents(mat_id: number, includes: any = [], includesNoProduct: boolean = false) {
+        
+        const { prod, cbed, detal }: any = await this.findParentsComplectMaterial(mat_id, includes, includesNoProduct);
+
         let allData = []
 
         function returnObjMat(item: any, zag: any) {
@@ -572,14 +666,6 @@ export class ScladService {
         }
 
         try {
-            const prod = JSON.parse(JSON.stringify(allProduct))
-            const cbed = JSON.parse(JSON.stringify(allCbed))
-            const detal = JSON.parse(JSON.stringify(allDetal))
-
-            prod.forEach((el: any) => el['type'] = 'prod')
-            cbed.forEach((el: any) => el['type'] = 'cbed')
-            detal.forEach((el: any)=> el['type'] = 'detal')
-
             allData = [...prod, ...cbed, ...detal];
 
             for(let item of allData) {

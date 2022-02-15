@@ -72,7 +72,7 @@ export class Shipments extends Model<Shipments, ShipmentsAttrCreate> {
     @Column({type: DataType.INTEGER})
     productId: number;
 
-    @BelongsTo(() =>Product)
+    @BelongsTo(() => Product)
     product: Product;
 
 		@ForeignKey(() => Buyer)

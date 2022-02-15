@@ -17,6 +17,7 @@ import { TechProcess } from './tech-process.model';
 import { ActionsModule } from 'src/actions/actions.module';
 import { TypeOperation } from './type-operation.model';
 import { Product } from 'src/product/product.model';
+import { Cbed } from 'src/cbed/cbed.model';
 
 @Module({
     controllers: [DetalController],
@@ -35,7 +36,8 @@ import { Product } from 'src/product/product.model';
             User,
             Actions,
             TypeOperation,
-            Product
+            Product,
+            Cbed
         ]),
         DocumentsModule,
         ActionsModule
