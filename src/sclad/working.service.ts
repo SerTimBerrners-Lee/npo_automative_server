@@ -1,8 +1,13 @@
 import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
 import { InjectModel } from '@nestjs/sequelize';
+import { Assemble } from 'src/assemble/assemble.model';
 import { AssembleService } from 'src/assemble/assemble.service';
+import { Cbed } from 'src/cbed/cbed.model';
+import { Detal } from 'src/detal/detal.model';
 import { WorkingType } from 'src/files/enums';
+import { Metaloworking } from 'src/metaloworking/metaloworking.model';
 import { MetaloworkingService } from 'src/metaloworking/metaloworking.service';
+import { Product } from 'src/product/product.model';
 import { CreateWorkingDto } from './dto/create-working.dto';
 import { Working } from './working.model';
 
@@ -19,7 +24,26 @@ export class WorkingService {
   }
 
   async getAllWorking() {
-    const workings = await this.workingReprository.findAll({include: { all:true }, where: { ban: false }});
+    const workings = await this.workingReprository.findAll({include: [
+      {
+        model: Assemble,
+        include: [
+          {
+            model: Cbed,
+            attributes: ['id', 'articl', 'name']
+          }
+        ]
+      },
+      {
+        model: Metaloworking,
+        include: [
+          {
+            model: Detal,
+            attributes: ['id', 'articl', 'name']
+          }
+        ]
+      }
+    ], where: { ban: false }});
     if(!workings)
       throw new HttpException("Произошла ощибка с получением рабочих кластеров", HttpStatus.BAD_REQUEST)
     return workings;
