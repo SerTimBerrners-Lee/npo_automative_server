@@ -114,6 +114,9 @@ import { MovingModule } from './moving/moving.module';
 import { Moving } from "./moving/moving.model";
 import { DocumentsMoving } from "./documents/documents-moving.model";
 import { DeliveriesInventary } from "./provider/deliveries-inventary.model";
+import { Working } from "./sclad/working.model";
+import { WorkingAssemble } from "./sclad/working-assemble.model";
+import { WorkingMetall } from "./sclad/working-metall.model";
 @Module({
     controllers: [],
     providers: [],
@@ -218,7 +221,10 @@ import { DeliveriesInventary } from "./provider/deliveries-inventary.model";
                 Links,
                 LinksUser,
                 Moving,
-                DeliveriesInventary
+                DeliveriesInventary,
+                Working,
+                WorkingAssemble,
+                WorkingMetall
             ],
             autoLoadModels: true,
           }),

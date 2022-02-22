@@ -31,7 +31,7 @@ export class MetaloworkingService {
 		if(!metaloworking)
 			throw new HttpException('Не удалось отправить в производство', HttpStatus.BAD_GATEWAY)
 
-		metaloworking.number_order = String(metaloworking.id) + dto.number_order.trim()
+		metaloworking.number_order = dto.number_order.trim() + "_" + String(metaloworking.id);
 		if(!dto.date_order) metaloworking.date_order = new Date().toLocaleString('ru-RU').split(',')[0]
 
 		await metaloworking.save()
@@ -45,7 +45,7 @@ export class MetaloworkingService {
 
 		metaloworking.detal_id = detal.id
 		metaloworking.kolvo_shipments = dto.my_kolvo
-		detal.metalloworking_kolvo = detal.metalloworking_kolvo + dto.my_kolvo
+		detal.metalloworking_kolvo += dto.my_kolvo
 		await metaloworking.save()
 
 		return metaloworking

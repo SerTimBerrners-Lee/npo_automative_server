@@ -13,10 +13,13 @@ import { Deficit } from './deficit.model';
 import { Marks } from './marks.model';
 import { ScladController } from './sclad.controller';
 import { ScladService } from './sclad.service';
+import { WorkingController } from './working.controller';
+import { Working } from './working.model';
+import { WorkingService } from './working.service';
 
 @Module({
-    controllers: [ScladController],
-    providers: [ScladService],
+    controllers: [ScladController, WorkingController],
+    providers: [ScladService, WorkingService],
     imports: [
         SequelizeModule.forFeature([
             Deficit,
@@ -26,7 +29,8 @@ import { ScladService } from './sclad.service';
             Product,
             PodPodMaterial,
             Providers,
-            Shipments
+            Shipments,
+            Working
         ]),
         AssembleModule,
         DetalModule,

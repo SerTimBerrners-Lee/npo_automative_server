@@ -9,25 +9,25 @@ import { UpdateAssembleDto } from './dto/update-assemble.dto';
 export class AssembleController {
 	constructor(private assembleService: AssembleService) {}
 
-	@ApiOperation({summary: 'Создаем Сборочную единицу'})
+	@ApiOperation({summary: 'Создаем Сборку'})
 	@Post('/')
 	createAssemble(@Body() dto: CreateAssembleDto) {
 		return this.assembleService.createAssemble(dto)
 	}
 
-	@ApiOperation({summary: 'Обнвляем Сборочную единицу'})
+	@ApiOperation({summary: 'Обнвляем Сборку'})
 	@Put('/')
 	updateAssemble(@Body() dto: UpdateAssembleDto) {
 		return this.assembleService.updateAssemble(dto)
 	}
 
-	@ApiOperation({summary: 'Получить все сборочные единицы'})
+	@ApiOperation({summary: 'Получить все Сборки'})
 	@Get('/all/:isBan')
 	getAllAssemble(@Param('isBan') isBan: boolean = false) {
 			return this.assembleService.getAllAssemble(isBan)
 	}
 
-	@ApiOperation({summary: 'Получить Сборочную единицу'})
+	@ApiOperation({summary: 'Получить Сборку'})
 	@Get('/:id')
 	getAssembleById(@Param('id') id: number) {
 			return this.assembleService.getAssembleById(id)

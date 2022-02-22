@@ -37,8 +37,7 @@ export class AssembleService {
 		if(!assemble)
 			throw new HttpException('Не удалось отправить в производство', HttpStatus.BAD_GATEWAY)
 		
-
-		assemble.number_order = String(assemble.id) + dto.number_order.trim()
+		assemble.number_order = dto.number_order.trim() + "_" + String(assemble.id);
 		if(!dto.date_order) assemble.date_order = new Date().toLocaleString('ru-RU').split(',')[0]
 
 		await assemble.save()
@@ -55,7 +54,7 @@ export class AssembleService {
 
 		assemble.cbed_id = cbed.id
 		assemble.kolvo_shipments = dto.my_kolvo
-		cbed.assemble_kolvo += + dto.my_kolvo
+		cbed.assemble_kolvo += dto.my_kolvo
 		await assemble.save()
 		await cbed.save()
 
