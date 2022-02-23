@@ -1,7 +1,6 @@
 import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
 import { InjectModel } from '@nestjs/sequelize';
 import { isArray } from 'lodash';
-import { Op } from 'sequelize';
 import { Actions } from 'src/actions/actions.model';
 import { Cbed } from 'src/cbed/cbed.model';
 import { Documents } from 'src/documents/documents.model';
@@ -9,10 +8,8 @@ import { DocumentsService } from 'src/documents/documents.service';
 import { Equipment } from 'src/equipment/equipment.model';
 import { RemoveDocumentDto } from 'src/files/dto/remove-document.dto';
 import { NameInstrument } from 'src/instrument/name-instrument.model';
-import { Metaloworking } from 'src/metaloworking/metaloworking.model';
 import { Product } from 'src/product/product.model';
 import { PodPodMaterial } from 'src/settings/pod-pod-material.model';
-import { Shipments } from 'src/shipments/shipments.model';
 import { User } from 'src/users/users.model';
 import { Detal } from './detal.model';
 import { CreateDetalDto } from './dto/create-detal.dto';

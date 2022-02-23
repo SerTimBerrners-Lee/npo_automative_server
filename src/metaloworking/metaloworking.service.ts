@@ -79,24 +79,29 @@ export class MetaloworkingService {
 
 	// Delete Metalloworking
 	async deleteMetolloworking(id: number) {
-		const metalloworking = await this.metaloworkingReprositroy.findByPk(id)
-		if(!metalloworking) throw new HttpException('Не удалось удалить металообработки', HttpStatus.BAD_REQUEST)
+		const metalloworking = await this.metaloworkingReprositroy.findByPk(id, {include: {all: true}})
+		if(!metalloworking) throw new HttpException('Не удалось получить металообработки', HttpStatus.BAD_REQUEST);
+		if(!metalloworking.detal) throw new HttpException('Нет детали у металообработки', HttpStatus.BAD_REQUEST);
+
+		const detal = await this.detalService.findByIdDetal(metalloworking.detal.id, 'true')
+		if(!detal) throw new HttpException('Не удалось получить деталь у металлообработки', HttpStatus.BAD_REQUEST);
+
+		metalloworking.ban = !metalloworking.ban;
 		if(!metalloworking.ban) {
-			metalloworking.ban = true
-			metalloworking.status = StatusMetaloworking.ban
-			await	metalloworking.save()
-			return id
+			metalloworking.status = StatusMetaloworking.ban;
+
+			detal.metalloworking_kolvo = detal.metalloworking_kolvo - metalloworking.kolvo_shipments < 0 
+			? 0 : detal.metalloworking_kolvo - metalloworking.kolvo_shipments;
 		}
-		if(!metalloworking.detal) return await this.metaloworkingReprositroy.destroy({where: {id}})
+		else {
+			metalloworking.status = StatusMetaloworking.performed; // Сделать проверку на просрочку!
+			detal.metalloworking_kolvo += metalloworking.kolvo_shipments;
+		}
 
-		const detal = await this.detalService.findByIdDetal(metalloworking.detal.id)
-		if(!detal) return await this.metaloworkingReprositroy.destroy({where: {id}})
-
-		detal.metalloworking_kolvo = detal.metalloworking_kolvo - metalloworking.kolvo_shipments < 0 
-			? 0 : detal.metalloworking_kolvo - metalloworking.kolvo_shipments
-		await detal.save()
+		await detal.save();
+		await metalloworking.save();
 		
-		return await this.metaloworkingReprositroy.destroy({where: {id}})
+		return metalloworking;
 	}
 
 	async combackMetolloworking(id: number) {

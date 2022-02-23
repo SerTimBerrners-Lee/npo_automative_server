@@ -27,9 +27,9 @@ export class WorkingController {
     }
 
     @ApiOperation({summary: 'Получить все Рабочие зоны'})
-    @Get('/')
-    getAllWorking() {
-        return this.workindService.getAllWorking()
+    @Get('/all/:archive')
+    getAllWorking(@Param('archive') archive: string) {
+        return this.workindService.getAllWorking(archive)
     }
 
     @ApiOperation({summary: 'Создаем Новую рабочую зону'})

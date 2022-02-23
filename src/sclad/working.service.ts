@@ -7,7 +7,6 @@ import { Detal } from 'src/detal/detal.model';
 import { WorkingType } from 'src/files/enums';
 import { Metaloworking } from 'src/metaloworking/metaloworking.model';
 import { MetaloworkingService } from 'src/metaloworking/metaloworking.service';
-import { Product } from 'src/product/product.model';
 import { CreateWorkingDto } from './dto/create-working.dto';
 import { Working } from './working.model';
 
@@ -24,11 +23,21 @@ export class WorkingService {
   }
 
   async bannedOneWorking(id: number) {
-    const working = await this.workingReprository.findByPk(id);
+    const working = await this.workingReprository.findByPk(id, {include: { all:true }});
     if(!working) 
       throw new HttpException('Не удалось найти Рабочий сектор', HttpStatus.BAD_GATEWAY);
 
     working.ban = !working.ban;
+    if(working.type == WorkingType.ass) {
+      for(const item of working.assemble) {
+        await this.assembleService.deleteAssembly(item.id);
+      }
+    } else if(working.type == WorkingType.metall) {
+      for(const item of working.metall) {
+        await this.metaloworkingService.deleteMetolloworking(item.id);
+      }
+    }
+
     await working.save();
     return working;
   }
@@ -60,7 +69,7 @@ export class WorkingService {
     return working;
   }
 
-  async getAllWorking() {
+  async getAllWorking(archive: string) {
     const workings = await this.workingReprository.findAll({include: [
       {
         model: Assemble,
@@ -80,7 +89,7 @@ export class WorkingService {
           }
         ]
       }
-    ], where: { ban: false }});
+    ], where: { ban: archive }});
     if(!workings)
       throw new HttpException("Произошла ощибка с получением рабочих кластеров", HttpStatus.BAD_REQUEST)
     return workings;
@@ -92,8 +101,6 @@ export class WorkingService {
 
     if(!workers_complect.length)
       throw new HttpException("Нет заказов", HttpStatus.BAD_REQUEST);
-
-    console.log(dto);
 
     const workers = await this.workingReprository.create();
     if(!workers)
