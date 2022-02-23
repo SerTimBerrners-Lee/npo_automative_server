@@ -24,7 +24,7 @@ export class Assemble extends Model<Assemble, AssembleAttrCreate> {
   @Column({type: DataType.STRING})
   date_order: string;
 
-  @ApiProperty({example: '1', description: 'Сборка или продукция'})
+  @ApiProperty({example: 'prod | cbed', description: 'Сборка или продукция'})
   @Column({type: DataType.STRING})
   type_izd: string;
 

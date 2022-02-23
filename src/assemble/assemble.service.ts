@@ -35,50 +35,59 @@ export class AssembleService {
 				type_izd: dto.type
 			})
 		if(!assemble)
-			throw new HttpException('Не удалось отправить в производство', HttpStatus.BAD_GATEWAY)
+			throw new HttpException('Не удалось отправить в производство', HttpStatus.BAD_GATEWAY);
 		
 		assemble.number_order = dto.number_order.trim() + "_" + String(assemble.id);
-		if(!dto.date_order) assemble.date_order = new Date().toLocaleString('ru-RU').split(',')[0]
+		if(!dto.date_order) assemble.date_order = new Date().toLocaleString('ru-RU').split(',')[0];
 
-		await assemble.save()
+		await assemble.save();
 
-		if(!dto.cbed_id) return assemble
+		if(!dto.cbed_id) return assemble;
 		let cbed: Cbed | Product;
 		if(dto.type == 'prod') 
-			cbed = await this.productReprostory.findByPk(dto.cbed_id, {include: ['shipments']})
-		else cbed = await this.cbedService.findById(dto.cbed_id, 'true')	
-		if(!cbed) return assemble
+			cbed = await this.productReprostory.findByPk(dto.cbed_id, {include: ['shipments']});
+		else cbed = await this.cbedService.findById(dto.cbed_id, 'true')	;
+		if(!cbed) return assemble;
 
 		if(cbed.shipments?.length) 
-			await this.shipmentsService.updateStatus(cbed.shipments, statusShipment.performed)
+			await this.shipmentsService.updateStatus(cbed.shipments, statusShipment.performed);
 
-		assemble.cbed_id = cbed.id
-		assemble.kolvo_shipments = dto.my_kolvo
-		cbed.assemble_kolvo += dto.my_kolvo
-		await assemble.save()
-		await cbed.save()
+		assemble.cbed_id = cbed.id;
+		assemble.kolvo_shipments = dto.my_kolvo;
+		cbed.assemble_kolvo += dto.my_kolvo;
+		await assemble.save();
+		await cbed.save();
 
-		return assemble
+		return assemble;
 	}
 
 	async updateAssemble(dto: UpdateAssembleDto) {
-		const ass = await this.assembleReprository.findByPk(dto.ass_id)
-		const cbed = await this.cbedService.getOneCbedById(dto.cbed_id, true)
-		if(!ass || !cbed) 
-			throw new HttpException('Не удалось найти Сборку или Сборочную Единицу', HttpStatus.BAD_REQUEST)
-
-		let differece = dto.kolvo_shipments - ass.kolvo_shipments 
-		if(differece < 0)  
-			cbed.assemble_kolvo -= differece
-		else if(differece > 0) 
-			cbed.assemble_kolvo += differece
+		console.log(dto);
 		
-		ass.description = dto.description
-		ass.kolvo_shipments = dto.kolvo_shipments
+		const ass = await this.assembleReprository.findByPk(dto.ass_id);
+		let izd: Cbed | Product;
+		if(dto.ass_type == 'prod')
+			izd = await this.productReprostory.findByPk(dto.cbed_id);
+		else izd = await this.cbedService.findById(dto.cbed_id, 'true');
 
-		await ass.save()
-		await cbed.save()
-		return ass
+		if(!ass || !izd) 
+			throw new HttpException('Не удалось найти Сборку или Сборочную Единицу', HttpStatus.BAD_REQUEST);
+
+		const differece = Number(dto.kolvo_shipments) - ass.kolvo_shipments;
+		if(differece < 0) {
+			if(izd.assemble_kolvo - differece < 0)
+				izd.assemble_kolvo = 0;
+			else izd.assemble_kolvo -= differece;
+		}  
+		if(differece > 0) 
+			izd.assemble_kolvo += differece;
+		
+		ass.description = dto.description;
+		ass.kolvo_shipments = dto.kolvo_shipments;
+
+		await ass.save();
+		await izd.save();
+		return ass;
 	}
 
 	// Получаем все Сборки 

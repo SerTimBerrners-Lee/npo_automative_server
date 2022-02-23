@@ -1,4 +1,4 @@
-import { Body, Controller, Get, Post } from '@nestjs/common';
+import { Body, Controller, Delete, Get, Param, Post } from '@nestjs/common';
 import { ApiOperation } from '@nestjs/swagger';
 import { CreateWorkingDto } from './dto/create-working.dto';
 import { WorkingService } from './working.service';
@@ -8,6 +8,18 @@ export class WorkingController {
 
     constructor(private workindService: WorkingService) {}
 
+    @ApiOperation({summary: 'Получить все Рабочие зоны'})
+    @Get('/one/:id')
+    getOneWorking(@Param('id') id: number) {
+        return this.workindService.getOneWorking(id);
+    }
+
+    @ApiOperation({summary: 'Кидаем или заюираем из Архива'})
+    @Delete('/banned/:id')
+    bannedOneWorking(@Param('id') id: number) {
+        return this.workindService.bannedOneWorking(id);
+    }
+
     @ApiOperation({summary: 'Получить Количество Рабочих зон'})
     @Get('/count')
     getCountWorking() {
@@ -16,7 +28,7 @@ export class WorkingController {
 
     @ApiOperation({summary: 'Получить все Рабочие зоны'})
     @Get('/')
-    getMarks() {
+    getAllWorking() {
         return this.workindService.getAllWorking()
     }
 

@@ -23,6 +23,43 @@ export class WorkingService {
       return await this.workingReprository.findAndCountAll()
   }
 
+  async bannedOneWorking(id: number) {
+    const working = await this.workingReprository.findByPk(id);
+    if(!working) 
+      throw new HttpException('Не удалось найти Рабочий сектор', HttpStatus.BAD_GATEWAY);
+
+    working.ban = !working.ban;
+    await working.save();
+    return working;
+  }
+
+  async getOneWorking(id: number) {
+    const working = await this.workingReprository.findByPk(id, {include: [
+      {
+        model: Assemble,
+        include: [
+          {
+            model: Cbed,
+            attributes: ['id', 'articl', 'name']
+          }
+        ]
+      },
+      {
+        model: Metaloworking,
+        include: [
+          {
+            model: Detal,
+            attributes: ['id', 'articl', 'name']
+          }
+        ]
+      }
+    ]});
+    if(!working) 
+      throw new HttpException('Не удалось найти Рабочий сектор', HttpStatus.BAD_GATEWAY);
+
+    return working;
+  }
+
   async getAllWorking() {
     const workings = await this.workingReprository.findAll({include: [
       {

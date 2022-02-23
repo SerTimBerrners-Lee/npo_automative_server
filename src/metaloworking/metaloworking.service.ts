@@ -52,25 +52,29 @@ export class MetaloworkingService {
 	}
 
 	async updateMetaloworking(dto: UpdateMetaloworkingDto) {
-		const metal = await this.metaloworkingReprositroy.findByPk(dto.metal_id)
-		const detal = await this.detalService.findByIdDetal(dto.detal_id)
-		if(!metal || !detal) 
-			throw new HttpException('Не удалось найти Деталь или металлообработку', HttpStatus.BAD_REQUEST)
+		console.log(dto);
+		
+		const metal = await this.metaloworkingReprositroy.findByPk(dto.metal_id);
+		const detal = await this.detalService.findByIdDetal(dto.detal_id, 'true');
+		if(!metal || !detal)  
+			throw new HttpException('Не удалось найти Деталь или металлообработку', HttpStatus.BAD_REQUEST);
 
-		let differece = dto.kolvo_shipments - metal.kolvo_shipments 
+		let differece = dto.kolvo_shipments - metal.kolvo_shipments ;
 		if(differece < 0)  {
-			detal.metalloworking_kolvo -= differece
+			if(detal.metalloworking_kolvo - differece < 0)
+				detal.metalloworking_kolvo = 0;
+			else detal.metalloworking_kolvo -= differece;
 		}
-		else if(differece > 0) {
-			detal.metalloworking_kolvo += differece
-		}
+		if(differece > 0) 
+			detal.metalloworking_kolvo += differece;
+		
 
-		metal.description = dto.description
-		metal.kolvo_shipments = dto.kolvo_shipments
+		metal.description = dto.description;
+		metal.kolvo_shipments = dto.kolvo_shipments;
 
-		await metal.save()
-		await detal.save()
-		return metal
+		await metal.save();
+		await detal.save();
+		return metal;
 	}
 
 	// Delete Metalloworking
