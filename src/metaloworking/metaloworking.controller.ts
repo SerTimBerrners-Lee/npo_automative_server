@@ -15,6 +15,12 @@ export class MetaloworkingController {
 			return this.metaloworkingService.createMetaloworking(dto)
 	}
 
+	@ApiOperation({summary: 'Создаем заявку'})
+	@Post('/shapebid/')
+	createShapeBid(@Body() dto: Array<{name: string, id: number, kolvo: number}>) {
+			return this.metaloworkingService.createShapeBid(dto)
+	}
+
 	@ApiOperation({summary: 'Обновляем Металообработку'})
 	@Put('/')
 	updateMetaloworking(@Body() dto: UpdateMetaloworkingDto) {

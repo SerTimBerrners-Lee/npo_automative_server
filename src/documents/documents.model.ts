@@ -53,7 +53,7 @@ export class Documents extends Model<Documents, DocumentsCreationAttrs> {
 
     @ApiProperty({example: 'p', description: 'Принадлежит к таблице пользователей'})
     @Column({type: DataType.STRING, allowNull: true})
-    nameInstans : string; 
+    nameInstans : string;  
 
     @ApiProperty({example: 'Что-то', description: 'Описание'})
     @Column({type: DataType.STRING, allowNull: true})

@@ -7,6 +7,7 @@ import { DateMethods } from 'src/files/date.methods';
 const util = require('util');
 const exec = util.promisify(require('child_process').exec);
 import { parse } from 'node-html-parser';
+const archiver = require('archiver');
 
 interface AttrFilesReturn {
     readonly name: string;
@@ -149,6 +150,25 @@ export class FilesService {
             }
         } catch(e) {
             throw new HttpException('Произошла ошибка Файла не найдено', HttpStatus.INTERNAL_SERVER_ERROR)
+        }
+    }
+
+    async createZipper(type: string = 'zip', z_lvl: number = 9) {
+        const pathName = (new DateMethods().date() + '__+__') + uuid.v4() +'.'+ type;
+		const filePath = path.resolve(__dirname, '..', `static/${type}`);
+        if(!fs.existsSync(filePath)) 
+			fs.mkdirSync(filePath,  {recursive: true});
+
+        const nameZip = filePath +'/' + pathName;
+        const output = fs.createWriteStream(nameZip);
+        const archive = archiver('zip', {
+			zlib: { level: z_lvl }
+		});
+
+        archive.pipe(output);
+
+        return {
+            archive, nameZip: 'zip/' + pathName
         }
     }
 }

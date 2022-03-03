@@ -8,6 +8,7 @@ import { ChangeTypeDto } from './dto/change-type.dto';
 import CreateDocumentsDto from './dto/create-documents.dto';
 import { UpdateDocumentDto } from './dto/update-document.dto';
 import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
+import { DateMethods } from 'src/files/date.methods';
 @Injectable()
 export class DocumentsService {
     constructor(@InjectModel(Documents)
@@ -76,7 +77,7 @@ export class DocumentsService {
             for (let typ of imageTypes) 
                 if (typ == fileType) folderToSave = 'image'
             
-            const pathName = (origName + '__+__') + uuid.v4() +'.'+ fileType
+            const pathName = (origName + '__+__') + uuid.v4() +'.'+ fileType;
             const filePath = path.resolve(__dirname, '..', `static/${folderToSave}`)
             if(!fs.existsSync(filePath)) {
                 fs.mkdirSync(filePath,  {recursive: true})
@@ -106,6 +107,22 @@ export class DocumentsService {
             return document
         } catch(e) {
             throw new HttpException('Произошла ошибка при записи файла', HttpStatus.INTERNAL_SERVER_ERROR)
+        }
+    }
+
+    async createZipper(buffer: any, type: string = 'zip') {
+        try {
+            const pathName = (new DateMethods().date + '__+__') + uuid.v4() +'.'+ type;
+            const filePath = path.resolve(__dirname, '..', `static/${'zip'}`);
+            if(!fs.existsSync(filePath)) {
+                fs.mkdirSync(filePath,  {recursive: true});
+            }
+    
+            fs.writeFileSync(path.join(filePath, pathName), buffer);
+
+            return true;
+        } catch (e) {
+            return e;
         }
     }
 

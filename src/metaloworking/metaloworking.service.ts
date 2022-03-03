@@ -6,21 +6,27 @@ import { Operation } from 'src/detal/operation.model';
 import { TechProcess } from 'src/detal/tech-process.model';
 import { StatusMetaloworking, statusShipment } from 'src/files/enums';
 import { PodPodMaterial } from 'src/settings/pod-pod-material.model';
-import { SettingsService } from 'src/settings/settings.service';
 import { Shipments } from 'src/shipments/shipments.model';
 import { ShipmentsService } from 'src/shipments/shipments.service';
 import { CreateMetaloworkingDto } from './dto/create-metaloworking.dto';
 import { UpdateMetaloworkingDto } from './dto/update-metalloworking.dto';
 import { Metaloworking } from './metaloworking.model';
+import { FilesService } from 'src/files/files.service';
+import { DateMethods } from 'src/files/date.methods';
+const xlsx = require('node-xlsx').default;
+import * as path from 'path';
+import * as fs from 'fs';
 
 @Injectable()
 export class MetaloworkingService {
 	constructor(
+		@InjectModel(Detal) private detalReprository: typeof Detal,
+		@InjectModel(PodPodMaterial) private materialReprository: typeof PodPodMaterial,
 		@InjectModel(Metaloworking) private metaloworkingReprositroy: typeof Metaloworking, 
 		@Inject(forwardRef(()=> ShipmentsService))
 		private shipmentsService: ShipmentsService, 
-		private detalService: DetalService,
-		private settingsService: SettingsService) {}
+		private filesService: FilesService,
+		private detalService: DetalService) {}
 
 	async createMetaloworking(dto: CreateMetaloworkingDto) {
 		const metaloworking = await this.metaloworkingReprositroy
@@ -183,5 +189,63 @@ export class MetaloworkingService {
 		}	
 
 		return arr
+	}
+
+	/**
+	 * Create Shape Bid
+	*/
+
+	async createShapeBid(dto: Array<{name: string, id: number, kolvo: number}>) {
+		
+		if(!dto || !dto.length) 
+			throw new HttpException('Переданный массив пустой', HttpStatus.BAD_GATEWAY);
+		
+		let detals: Array<Object> = [];
+		const {archive, nameZip} = await this.filesService.createZipper();
+		let sheetsData: any = [
+			['Наименование', 'Номер чертежа', 'Имя чертежа', 'Материал', 'Толщина', 'Маршрут', 'Количество']
+		];
+		const sheetOptions = {'!cols': [
+			{wch: 30}, {wch: 10}, {wch: 40}, {wch: 30}
+		]};
+
+		for(const item of dto) {
+			if(!item.id) continue;
+
+			const detal = await this.detalReprository.findByPk(item.id, {
+				include: ['documents'],
+				attributes: ['mat_zag', 'mat_zag_zam', 'thickness', 'DxL']
+			});
+			if(!detal)
+				throw new HttpException('Переданный массив пустой', HttpStatus.BAD_GATEWAY);
+
+			const material = await this.materialReprository.findByPk(detal.mat_zag, {attributes: ['name']});
+			
+			let documents = detal.documents.filter(doc => (!doc.banned && doc.type.toLocaleUpperCase() == 'DXF'));
+			if(!documents.length)
+				documents = detal.documents.filter(doc => (!doc.banned && doc.type.toLocaleUpperCase() == 'ЧЖ'));
+
+			documents = documents.sort((a, b) => a.version - b.version); // Сортируем по версии.
+			if(!documents.length) continue;
+	
+			const file = path.resolve(__dirname, '..', `static/${documents[0].path}`);
+			
+			if(!fs.existsSync(file)) continue; // Проверяем что файл существует.
+			await archive.append(fs.createReadStream(file), { name: documents[0].name });
+			
+			sheetsData.push([
+				item.name, documents[0].version, documents[0].name, 
+				material?.name || '-',
+				detal.thickness, '', item.kolvo 
+			]);
+			detals.push({detal, material});
+		}
+
+		const buffer = await xlsx.build([{name: 'mySheetName', data: sheetsData}], {sheetOptions});
+
+		await archive.append(buffer, {name: 'Заявка от ' + new DateMethods().date() + '.xlsx'})
+		await archive.finalize();
+
+		return { pathZip: nameZip };
 	}
 }
