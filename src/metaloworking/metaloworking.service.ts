@@ -225,7 +225,7 @@ export class MetaloworkingService {
 			if(!documents.length)
 				documents = detal.documents.filter(doc => (!doc.banned && doc.type.toLocaleUpperCase() == 'ЧЖ'));
 
-			documents = documents.sort((a, b) => a.version - b.version); // Сортируем по версии.
+			documents = documents.sort((a, b) => b.version - a.version); // Сортируем по версии.
 			if(!documents.length) continue;
 	
 			const file = path.resolve(__dirname, '..', `static/${documents[0].path}`);

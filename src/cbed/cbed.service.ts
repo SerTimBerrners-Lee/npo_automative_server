@@ -6,6 +6,7 @@ import { Op } from 'sequelize';
 import { Assemble } from 'src/assemble/assemble.model';
 import { Detal } from 'src/detal/detal.model';
 import { TechProcess } from 'src/detal/tech-process.model';
+import { Documents } from 'src/documents/documents.model';
 import { DocumentsService } from 'src/documents/documents.service';
 import { RemoveDocumentDto } from 'src/files/dto/remove-document.dto';
 import { Product } from 'src/product/product.model';
@@ -37,11 +38,15 @@ export class CbedService {
     async updateCbed(dto: CreateCbedDto, files: any) {
         if(!Number(dto.id))
             throw new HttpException('Запись не найдена', HttpStatus.BAD_REQUEST)
-        const cbed = await this.cbedReprository.findByPk(dto.id, {include: {all: true}})
+        const cbed = await this.cbedReprository.findByPk(dto.id, {include: [
+            {model: PodPodMaterial, attributes: ['id']},
+            {model: Detal, attributes: ['id']},
+            {model: Documents, attributes: ['id']}
+        ]});
         if(!cbed)
             throw new HttpException('Запись не найдена', HttpStatus.BAD_REQUEST)
         cbed.name = dto.name
-        await cbed.save() 
+        await cbed.save()
 
         return this.upCreateCbed(dto, files, cbed)
     }

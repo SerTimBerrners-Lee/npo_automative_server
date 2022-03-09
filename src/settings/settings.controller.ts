@@ -108,6 +108,12 @@ export class SettingsController {
         return this.settingsService.getAllPodTypeMaterial(instans)
     }
 
+    @ApiOperation({summary: 'Получить один тип'})
+    @Get('/materials/one/:id')
+    getOneTypeMaterial(@Param('id') id: number) {
+        return this.settingsService.getOneMaterial(id);
+    }
+
     @ApiOperation({summary: 'get all pod typeMaterials'})
     @Get('/materials/podtypematerial')
     getPodPodMaterial() {

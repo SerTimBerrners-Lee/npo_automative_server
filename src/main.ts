@@ -5,7 +5,7 @@ import { AppModule } from "./app.module";
 (async function start (){
     const PORT = process.env.PORT || 5000;
     const app = await NestFactory.create(AppModule, { 
-        cors: true,
+        cors: process.env.APPLICATION_TYPE == 'PRODUCTION' ? false : true,
         logger: ['verbose']
     })
     app.setGlobalPrefix('api');
@@ -21,5 +21,7 @@ import { AppModule } from "./app.module";
         SwaggerModule.setup('/api/docs/', app, document)
     }
 
-    await app.listen(PORT, () => console.log(`Server running on port: ${PORT}`))
+    await app.listen(PORT, () => console.log(`
+        '${process.env.APPLICATION_TYPE}...' 
+        Server running on port: ${PORT}`))
 })()
