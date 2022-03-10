@@ -33,6 +33,12 @@ export class ScladController {
         return this.scladService.createMark(dto)
     }
 
+    @ApiOperation({summary: 'Получить все марки по операции.'})
+    @Get('/marks/byoperation/:_id')
+    getMarksByOperation(@Param('_id') id: number) {
+        return this.scladService.getMarksByOperation(id);
+    }
+
     @ApiOperation({summary: 'Получаем все дифицитные детали'})
     @Get('/deficit/detal')
     getAllDeficitDetal() {

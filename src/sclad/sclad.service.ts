@@ -31,7 +31,6 @@ export class ScladService {
         @InjectModel(Detal) private detalReprository: typeof Detal,
         @InjectModel(Providers) private providerReprository: typeof Providers,
         @InjectModel(PodPodMaterial) private material: typeof PodPodMaterial,
-        @InjectModel(Shipments) private shipmentsReprository: typeof Shipments,
         private assembleService: AssembleService,
         private metaloworkingService: MetaloworkingService,
         ) {
@@ -67,9 +66,20 @@ export class ScladService {
         return await this.marksReprository.findAll({include: {all: true}})
     }
 
+    async getMarksByOperation(id: number) {
+        const operations = await this.marksReprository.findAll({ where: { oper_id: id } });
+        if(!operations)
+            throw new HttpException('Не удалось получить Марки по операции', HttpStatus.BAD_GATEWAY);
+
+        console.log(operations, id);
+
+        return operations;
+    }
+
     private async checkStatusProcess(dto: CreateMarkDto) {
         let objects: any;
-        let tp: TechProcess
+        let tp: TechProcess;
+        console.log(dto);
         if(dto.assemble_id) objects = await this.assembleService.getAssembleById(dto.assemble_id)
         if(dto.metaloworking_id) objects = await this.metaloworkingService.getOneMetaloworkingById(dto.metaloworking_id)
         if(!objects) 

@@ -4,12 +4,8 @@ import { ApiOperation, ApiTags } from '@nestjs/swagger';
 import { RemoveDocumentDto } from 'src/files/dto/remove-document.dto';
 import { DetalService } from './detal.service';
 import { CreateDetalDto } from './dto/create-detal.dto';
-import { CreateTypeOperation } from './dto/create-type-operation.dto';
 import { UpCreateTechProcessDto } from './dto/up-create-tech-process.dto';
-import { UpCreateOperationDto } from './dto/update-create-operation.dto';
 import { UpdateDetalDto } from './dto/update-detal.dto';
-import { UpOperationTechDto } from './dto/update-operation-tech.dto';
-import { UpdateTypeOperation } from './dto/update-type-operation.dto';
 
 @ApiTags('Детали')
 @Controller('detal')
@@ -73,12 +69,6 @@ export class DetalController {
         return this.detalService.removeDeleteById(id, authHeader)
     }
 
-    @ApiOperation({summary: 'Получить все типы операций'})
-    @Get('/typeoperation')
-    getAllTypeOperation() {
-        return this.detalService.getAllTypeOperation()
-    }
-
     @ApiOperation({summary: 'Get detal by id '})
     @Get('/one/:id')
     getDeleteById(@Param('id') id: number) {
@@ -89,50 +79,6 @@ export class DetalController {
     @Get('/:light')
     getAllDetals(@Param('light') light: string) {
         return this.detalService.getAllDetals(light)
-    }
-
-    @ApiOperation({summary: 'Создаем операцию'})
-    @UseInterceptors(FileFieldsInterceptor([
-        {name: 'document', maxCount: 40}
-    ]))
-    @Post('/operation')
-    createNewOperation(@Body() dto: UpCreateOperationDto, 
-        @UploadedFiles() files: { document?: Express.Multer.File[]} ) {
-        return this.detalService.createNewOperation(dto, files)
-    }
-
-    @ApiOperation({summary: 'Обновляем операцию'})
-    @UseInterceptors(FileFieldsInterceptor([
-        {name: 'document', maxCount: 40}
-    ]))
-    @Post('/operation/update')
-    updateOperation(@Body() dto: UpCreateOperationDto, 
-        @UploadedFiles() files: { document?: Express.Multer.File[]} ) {
-        return this.detalService.updateOperation(dto, files)
-    }
-
-    @ApiOperation({summary: 'Получаем операцию по ID'})
-    @Get('/operation/get/:id')
-    getOneOperationById(@Param('id') id: number) {
-        return this.detalService.getOneOperationById(id)
-    }
-
-    @ApiOperation({summary: 'Получаем все операции'})
-    @Get('/operation/get/')
-    getAllOperation() {
-        return this.detalService.getAllOperation()
-    }
-
-    @ApiOperation({summary: 'Обновляем основной инструмент и оборудование'})
-    @Post('/operation/up/tech')
-    updateOperationTech(@Body() dto: UpOperationTechDto) {
-        return this.detalService.updateOperationTech(dto)
-    }
-
-    @ApiOperation({summary: 'Добавляем в бан операцию'})
-    @Delete('/operation/:id')
-    banOperation(@Param('id') id: number) {
-        return this.detalService.banOperation(id)
     }
 
     @ApiOperation({summary: 'Создаем Технический процесс'})
@@ -149,24 +95,6 @@ export class DetalController {
     @Get('/techprocess/:id') 
     getTechProcessById(@Param('id') id: number){
         return this.detalService.getTechProcessById(id)
-    }
-
-    @ApiOperation({summary: 'Создать новый тип операции'})
-    @Post('/typeoperation')
-    createNewTypeOperation(@Body() dto: CreateTypeOperation) {
-        return this.detalService.createNewTypeOperation(dto)
-    }
-
-    @ApiOperation({summary: 'Создать новый тип операции'})
-    @Post('/typeoperation/update')
-    updateTypeOperation(@Body() dto: UpdateTypeOperation) {
-        return this.detalService.updateTypeOperation(dto)
-    }
-
-    @ApiOperation({summary: 'Удалить тип операции'})
-    @Delete('/typeoperation/:id')
-    deleteTypeOperationById(@Param() id: any) {
-        return this.detalService.deleteTypeOperationById(id)
     }
     
     @ApiOperation({summary: 'Открепляем документ от Детали'})

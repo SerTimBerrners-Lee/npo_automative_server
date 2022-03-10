@@ -18,10 +18,12 @@ import { ActionsModule } from 'src/actions/actions.module';
 import { TypeOperation } from './type-operation.model';
 import { Product } from 'src/product/product.model';
 import { Cbed } from 'src/cbed/cbed.model';
+import { OperationService } from './operation.service';
+import { OperationController } from './operation.controller';
 
 @Module({
-    controllers: [DetalController],
-    providers: [DetalService],
+    controllers: [DetalController, OperationController],
+    providers: [DetalService, OperationService],
     imports: [
         SequelizeModule.forFeature([
             Detal,
