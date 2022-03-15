@@ -282,7 +282,19 @@ export class DetalService {
             description = 'Добавил технический процесс'
         } 
 
-        console.log(dto);
+        if(dto.operationList) {
+            const OL = JSON.parse(dto.operationList);
+            if(OL && OL.length) {
+                for(const oper of OL) {
+                    const o = await this.operationReprository.findByPk(oper.id, { attributes: ['id'] });
+                    if(o) await tp.$add('operations', o.id);
+                }
+            }
+            else tp.operations = [];
+        } else tp.operations = [];
+        await tp.save()
+
+        console.log('\n\n\n CREATE TECH PROCESS: ', dto, '\n\n\n');
         if(dto.izd_id && Number(dto.izd_id) && dto.izd_type && dto.izd_type !== 'null') {
             let izd: any;
             if(dto.izd_type == 'detal') izd = await this.detalReprository.findByPk(dto.izd_id)
@@ -309,21 +321,7 @@ export class DetalService {
             throw new HttpException('Не удалось создать операцию', HttpStatus.BAD_REQUEST)
 
         if(dto.description)
-            tp.description = dto.description
-
-        tp.operations = []
-        if(dto.operationList) {
-            let OL = JSON.parse(dto.operationList)
-            if(OL && OL.length) {
-                for(let oper of OL) {
-                    let o = await this.operationReprository.findByPk(oper.id)
-                    if(o) {
-                        await tp.$add('operations', o.id)
-                        await tp.save()
-                    }
-                }
-            }
-        }
+            tp.description = dto.description;
 
         if(dto.docs) {
             let docs: any = Object.values(JSON.parse(dto.docs))
@@ -361,6 +359,7 @@ export class DetalService {
             throw new HttpException('Не удалось создать операцию', HttpStatus.BAD_REQUEST)
         if(tp.operations.length) {
             for(let inx = 0; inx < tp.operations.length; inx++) {
+                console.log('\n\n', tp.operations[inx].full_name, 'NAME\n');
                 if(tp.operations[inx].ban)
                     tp.operations.splice(inx, 1)
             }
