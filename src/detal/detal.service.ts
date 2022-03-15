@@ -157,13 +157,14 @@ export class DetalService {
             detal.DxL = dto.DxL
             else detal.DxL = 0
         console.log(dto)
+        // Haracteristics zag
         if(dto.diametr && dto.diametr != 'null')
             detal.diametr = dto.diametr
             else detal.diametr = undefined
         if(dto.lengt && dto.lengt != 'null')
             detal.lengt = dto.lengt
             else detal.lengt = undefined
-        if(dto.diheightametr && dto.diheightametr != 'null')
+        if(dto.height && dto.height != 'null')
             detal.height = dto.height
             else detal.height = undefined
         if(dto.thickness && dto.thickness != 'null')
