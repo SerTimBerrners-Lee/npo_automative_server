@@ -54,15 +54,16 @@ export class DocumentsService {
     async attachDocumentForObject(obj: any, dto: any, files: any) {
         const arrDocuments = await this.createArrDocuments(dto, files)
         if(arrDocuments && arrDocuments.length) {
-            const obj_documents = await obj.$get('documents')
-            for(let doc of arrDocuments) {
-                let check = true
+            const obj_documents = await obj.$get('documents');
+            for(const doc of arrDocuments) {
+                let check = true;
                 if(obj_documents && obj_documents.length) {
-                    for(let have_doc of obj_documents) {
-                        if(doc && have_doc.id == doc.id) check = false
+                    for(const have_doc of obj_documents) {
+                        if(doc && have_doc.id == doc.id) check = false;
                     }
                 }
-                if(doc && doc.id && check) await obj.$add('documents', doc.id)
+                if(doc && doc.id && check) await obj.$add('documents', doc.id);
+                else check = true;
             }
         }
     }

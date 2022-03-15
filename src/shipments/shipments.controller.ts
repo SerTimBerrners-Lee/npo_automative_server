@@ -86,5 +86,11 @@ export class ShipmentsController {
 	changeShipmentToSclad(@Param('id') id: number) {
 		return this.shipmentsSettings.changeShipmentToSclad(id)
 	}
+
+	@ApiOperation({summary: 'Получает все документы заказа'})
+  @Get('/documents/:id')
+	returnDoucments(@Param('id') id: number) {
+		return this.shipmentsSettings.returnDoucments(id)
+	}
 }
  

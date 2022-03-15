@@ -1,6 +1,5 @@
 import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
 import { InjectModel } from '@nestjs/sequelize';
-import { AssembleService } from 'src/assemble/assemble.service';
 import { Buyer } from 'src/buyer/buyer.model';
 import { BuyerService } from 'src/buyer/buyer.service';
 import { Cbed } from 'src/cbed/cbed.model';
@@ -10,7 +9,6 @@ import { DetalService } from 'src/detal/detal.service';
 import { DocumentsService } from 'src/documents/documents.service';
 import { DateMethods } from 'src/files/date.methods';
 import { statusShipment } from 'src/files/enums';
-import { MetaloworkingService } from 'src/metaloworking/metaloworking.service';
 import { Product } from 'src/product/product.model';
 import { ProductService } from 'src/product/product.service';
 import { UpCreateShipmentsDto } from './dto/up-create-shipments.dto';
@@ -18,7 +16,7 @@ import { Shipments } from './shipments.model';
 
 @Injectable()
 export class ShipmentsService {
-	constructor(@InjectModel(Shipments) private shipmentsReprository: typeof Shipments,
+	constructor(@InjectModel(Shipments) private shipmentsReprository: typeof Shipments,	
 		private buyerService: BuyerService, 
 		private productService: ProductService,
 		private cbedService: CbedService,
@@ -85,25 +83,23 @@ export class ShipmentsService {
 	}
 
 	private async upCreateShipments(data: any, shipment: Shipments, files: any) {
-		shipment.date_order = data.date_order
-		shipment.date_shipments = data.date_shipments
-		shipment.kol = data.kol
-		shipment.bron = data.bron
-		shipment.base = data.base
-		shipment.to_sklad = data.to_sklad
+		shipment.date_order = data.date_order;
+		shipment.date_shipments = data.date_shipments;
+		shipment.kol = data.kol;
+		shipment.bron = data.bron;
+		shipment.base = data.base;
+		shipment.to_sklad = data.to_sklad;
 		if(data.description != 'null')
-			shipment.description = data.description
-			else shipment.description = ''
-
+			shipment.description = data.description;
+			else shipment.description = '';
 
 		if(data.documentsData) {
 			try {
-				const pars_id_documents = JSON.parse(data.documentsData)
+				const pars_id_documents = JSON.parse(data.documentsData);	
 				for(let doc of pars_id_documents) {
-					const docs = await this.documentsService.getFileById(doc)
-					if(docs) {
-						await shipment.$add('documents', docs.id)
-					}
+					const docs = await this.documentsService.getFileById(doc);
+					if(docs) 
+						await shipment.$add('documents', docs.id);
 				}
 			} catch(e) {console.error(e)}
 		}
@@ -173,26 +169,16 @@ export class ShipmentsService {
 			}
 		}
 
-		if(data.docs) {
-			let docs: any = Object.values(JSON.parse(data.docs))
-			let i = 0
-			for(let document of files.document) {
-				let res = await this.documentsService.saveDocument(
-					document, 
-					'p', 
-					docs[i].type,
-					docs[i].version,
-					docs[i].description,
-					docs[i].name,
-					docs[i].newVersion
-				)
-				if(res && res.id) {
-					const docId = await this.documentsService.getFileById(res.id)
-					if(docId) await shipment.$add('documents', docId.id)
-				}
-				i++
-			}
-	}
+		if(data.docs, files.document) {
+			console.log(data.docs, typeof data.docs);
+			if(typeof data.docs == 'object' && data.docs?.length) 
+				data.docs = JSON.stringify(data.docs.map((el: any) => JSON.parse(el)));
+
+			console.log(data.docs, 'data.docs parse \n\n\n');
+
+
+			await this.documentsService.attachDocumentForObject(shipment, data, files);
+		}
 
 		await shipment.save()
 		return shipment
@@ -294,6 +280,11 @@ export class ShipmentsService {
 			await shipments.save()
 			return shipments
 		}
+	}
+
+	async returnDoucments(id: number) {
+		const documents = await this.shipmentsReprository.findByPk(id, {include: ['documents'], attributes: ['id']});
+		return documents;
 	}
 
 	async getById(id: number, light = 'false') {
