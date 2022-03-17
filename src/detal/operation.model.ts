@@ -22,6 +22,10 @@ export class Operation extends Model<Operation, OperationCreationAttrs> {
     @Column({type: DataType.INTEGER, unique: true, autoIncrement: true, primaryKey: true})
     id: number;
 
+    @ApiProperty({example: '0', description: 'Очередность операций'})
+    @Column({type: DataType.INTEGER, defaultValue: 0})
+    idx: number;
+
     @ApiProperty({example: 1, description: 'id Тип операции'})
     @Column({type: DataType.INTEGER, allowNull: false})
     name: number; 

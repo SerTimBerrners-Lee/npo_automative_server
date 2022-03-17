@@ -67,10 +67,6 @@ export class Detal extends Model<Detal, DetalCreationAttrs> {
     @Column({type: DataType.TEXT, allowNull: true})
     parametrs: any; 
 
-    @ApiProperty({example: 12, description: 'Переменные значения заготовки'})
-    @Column({type: DataType.TEXT, allowNull: true})
-    variables_znach: any; 
-
     @ApiProperty({example: 12, description: 'Характеристики детали'})
     @Column({type: DataType.TEXT, allowNull: true})
     haracteriatic: any;

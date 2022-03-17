@@ -23,7 +23,6 @@ export class CreateDetalDto {
     readonly techProcessID:     number;
     readonly file_base:         any;
     readonly attention:         boolean;
-    readonly variables_znach:   any;
     
     readonly responsibleActionId:       string;
 }

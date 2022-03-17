@@ -47,9 +47,6 @@ export class TechProcess extends Model<TechProcess> {
     @BelongsTo(() => Cbed)
     cbed: Cbed;
 
-    @HasMany(() => Actions)
-    actions: Actions[];
-
     @ForeignKey(() => Product)
     @Column({type: DataType.INTEGER})
     productId: number;

@@ -4,9 +4,7 @@ import { Actions } from 'src/actions/actions.model';
 import { Cbed } from 'src/cbed/cbed.model';
 import { Documents } from 'src/documents/documents.model';
 import { DocumentsService } from 'src/documents/documents.service';
-import { Equipment } from 'src/equipment/equipment.model';
 import { RemoveDocumentDto } from 'src/files/dto/remove-document.dto';
-import { NameInstrument } from 'src/instrument/name-instrument.model';
 import { Product } from 'src/product/product.model';
 import { PodPodMaterial } from 'src/settings/pod-pod-material.model';
 import { User } from 'src/users/users.model';
@@ -16,7 +14,6 @@ import { UpCreateTechProcessDto } from './dto/up-create-tech-process.dto';
 import { UpdateDetalDto } from './dto/update-detal.dto';
 import { Operation } from './operation.model';
 import { TechProcess } from './tech-process.model';
-import { TypeOperation } from './type-operation.model';
 
 @Injectable()
 export class DetalService {
@@ -24,12 +21,9 @@ export class DetalService {
         @InjectModel(Documents) private documentsReprository: typeof Documents,
         @InjectModel(PodPodMaterial) private podPodMaterialReprository: typeof PodPodMaterial,
         @InjectModel(Operation) private operationReprository: typeof Operation,
-        @InjectModel(NameInstrument) private nInstrumentReprository: typeof NameInstrument,
-        @InjectModel(Equipment) private equipmentReprository: typeof Equipment,
         @InjectModel(TechProcess) private techProcessReprository: typeof TechProcess,
         @InjectModel(User) private userRepository: typeof User,
         @InjectModel(Actions) private actionsReprository: typeof Actions,
-        @InjectModel(TypeOperation) private typeOperationReprository: typeof TypeOperation,
         @InjectModel(Product) private productReprository: typeof Product,
         @InjectModel(Cbed) private cbedReprository: typeof Cbed,
         private documentsService: DocumentsService
@@ -151,41 +145,48 @@ export class DetalService {
             detal.parametrs = dto.parametrs
         if(dto.haracteriatic)
             detal.haracteriatic = dto.haracteriatic
-        if(dto.variables_znach)
-            detal.variables_znach = dto.variables_znach
         if(dto.DxL != 'null')
             detal.DxL = dto.DxL
             else detal.DxL = 0
-        console.log(dto)
         // Haracteristics zag
         if(dto.diametr && dto.diametr != 'null')
             detal.diametr = dto.diametr
-            else detal.diametr = undefined
+        else detal.diametr = ''
+
         if(dto.lengt && dto.lengt != 'null')
             detal.lengt = dto.lengt
-            else detal.lengt = undefined
+        else detal.lengt = ''
+
         if(dto.height && dto.height != 'null')
             detal.height = dto.height
-            else detal.height = undefined
+        else detal.height = ''   
+
         if(dto.thickness && dto.thickness != 'null')
             detal.thickness = dto.thickness
-            else detal.thickness = undefined
+        else detal.thickness = ''
+
         if(dto.wallThickness && dto.wallThickness != 'null')
             detal.wallThickness = dto.wallThickness
-            else detal.wallThickness = undefined
+        else detal.wallThickness = ''
+
         if(dto.width && dto.width != 'null')
             detal.width = dto.width
-            else detal.width = undefined
+        else detal.width = ''
+
         if(dto.areaCS && dto.areaCS != 'null')
             detal.areaCS = dto.areaCS
-            else detal.areaCS = undefined
+        else detal.areaCS = ''
+
         if(dto.massZag != 'null')
             detal.massZag = dto.massZag
-            else detal.massZag = 0
+        else detal.massZag = 0
+
         if(dto.trash != 'null')
             detal.trash = dto.trash
-            else detal.trash = 0
+        else detal.trash = 0
         detal.attention = dto.attention
+
+        console.log(dto);
 
         await detal.save()
         if(detal.materials && detal.materials.length) {
@@ -200,23 +201,25 @@ export class DetalService {
                 detal.responsibleId = user.id
         }
 
+        detal.mat_zag = null;
         if(Number(dto.mat_zag)) {
-            detal.mat_zag = dto.mat_zag
-            let material = await this.podPodMaterialReprository.findByPk(dto.mat_zag)
+            detal.mat_zag = dto.mat_zag;
+            let material = await this.podPodMaterialReprository.findByPk(dto.mat_zag);
             if(material) {
-                await detal.$add('materials', material.id)
-                detal.mat_zag = dto.mat_zag
-                await detal.save()
+                await detal.$add('materials', material.id);
+                detal.mat_zag = dto.mat_zag;
+                await detal.save();
             }
         }
 
+        detal.mat_zag_zam = null;
         if(Number(dto.mat_zag_zam)) {
-            detal.mat_zag_zam = dto.mat_zag_zam
-            let material = await this.podPodMaterialReprository.findByPk(dto.mat_zag_zam)
+            detal.mat_zag_zam = dto.mat_zag_zam;
+            let material = await this.podPodMaterialReprository.findByPk(dto.mat_zag_zam);
             if(material) {
-                await detal.$add('materials', material.id)
-                detal.mat_zag_zam = dto.mat_zag_zam
-                await detal.save()
+                await detal.$add('materials', material.id);
+                detal.mat_zag_zam = dto.mat_zag_zam;
+                await detal.save();
             }
         }
 
@@ -275,51 +278,54 @@ export class DetalService {
         let [tp, description]: any[] = [];
 
         if(Number(dto.id)) {
-            tp = await this.techProcessReprository.findByPk(dto.id, {include: {all: true}})
-            description = 'Изменил технический процесс'
+            tp = await this.techProcessReprository.findByPk(dto.id, {include: {all: true}});
+            description = 'Изменил технический процесс';
         }   else {
-            let new_tp = await this.techProcessReprository.create()
-            tp = await this.techProcessReprository.findByPk(new_tp.id, {include: {all: true}})
-            description = 'Добавил технический процесс'
-        } 
+            let new_tp = await this.techProcessReprository.create();
+            tp = await this.techProcessReprository.findByPk(new_tp.id, {include: {all: true}});
+            description = 'Добавил технический процесс';
+        }
 
+        tp.operations = [];
         if(dto.operationList) {
             const OL = JSON.parse(dto.operationList);
             if(OL && OL.length) {
-                for(const oper of OL) {
-                    const o = await this.operationReprository.findByPk(oper.id, { attributes: ['id'] });
-                    if(o) await tp.$add('operations', o.id);
+                for(const oper in OL) {
+                    const o = await this.operationReprository.findByPk(OL[oper].id, { attributes: ['id'] });
+                    if(o) {
+                        o.idx = Number(oper) + 1;
+                        await o.save();
+                        await tp.$add('operations', o.id);
+                    }
                 }
             }
-            else tp.operations = [];
-        } else tp.operations = [];
-        await tp.save()
+        }
+        await tp.save();
 
-        console.log('\n\n\n CREATE TECH PROCESS: ', dto, '\n\n\n');
         if(dto.izd_id && Number(dto.izd_id) && dto.izd_type && dto.izd_type !== 'null') {
             let izd: any;
-            if(dto.izd_type == 'detal') izd = await this.detalReprository.findByPk(dto.izd_id)
-            if(dto.izd_type == 'cbed') izd = await this.cbedReprository.findByPk(dto.izd_id)
-            if(dto.izd_type == 'product') izd = await this.productReprository.findByPk(dto.izd_id)
+            if(dto.izd_type == 'detal') izd = await this.detalReprository.findByPk(dto.izd_id);
+            if(dto.izd_type == 'cbed') izd = await this.cbedReprository.findByPk(dto.izd_id);
+            if(dto.izd_type == 'product') izd = await this.productReprository.findByPk(dto.izd_id);
 
             if(!izd) 
-                throw new HttpException('Не удалось создать Технологический процесс', HttpStatus.BAD_REQUEST)
+                throw new HttpException('Не удалось создать Технологический процесс', HttpStatus.BAD_REQUEST);
             tp[`${dto.izd_type}Id`] = izd.id;
-            await tp.save()
+            await tp.save();
         }
 
-        const action = await this.actionsReprository.create({action: description})
-        let user: any
+        const action = await this.actionsReprository.create({action: description});
+        let user: any;
         if(dto.responsibleActionId)
-            user = await this.userRepository.findByPk(dto.responsibleActionId)
+            user = await this.userRepository.findByPk(dto.responsibleActionId);
         if(action) {
-            action.techProcessId = tp.id
-            if(user) action.user = user.id
-            await action.save()
+            action.techProcessId = tp.id;
+            if(user) action.user = user.id;
+            await action.save();
         }
 
         if(!tp)
-            throw new HttpException('Не удалось создать операцию', HttpStatus.BAD_REQUEST)
+            throw new HttpException('Не удалось создать операцию', HttpStatus.BAD_REQUEST);
 
         if(dto.description)
             tp.description = dto.description;
@@ -349,23 +355,21 @@ export class DetalService {
     }
 
     async getTechProcessById(id: number) {
-        const tp = await this.techProcessReprository.findByPk(id, {include: [
-            {all: true},
+        const tp: any = (await this.techProcessReprository.findByPk(id, {include: [
             {model: Detal, include: ['documents']},
             {model: Cbed, include: ['documents']},
-            {model: Product, include: ['documents']}
-        ]})
+            {model: Product, include: ['documents']},
+            {all: true}
+        ]})).toJSON();
 
         if(!tp)
-            throw new HttpException('Не удалось создать операцию', HttpStatus.BAD_REQUEST)
+            throw new HttpException('Не удалось создать операцию', HttpStatus.BAD_REQUEST);
         if(tp.operations.length) {
-            for(let inx = 0; inx < tp.operations.length; inx++) {
-                console.log('\n\n', tp.operations[inx].full_name, 'NAME\n');
-                if(tp.operations[inx].ban)
-                    tp.operations.splice(inx, 1)
-            }
+            tp.operations = tp.operations.filter((el: Operation) => !el.ban);
+            tp.operations = tp.operations.sort((a: Operation, b: Operation) => a.idx - b.idx);
         }
-        return tp
+        
+        return tp;
     }
 
     async findByIdDetal(id: number, light: string = 'false') {
