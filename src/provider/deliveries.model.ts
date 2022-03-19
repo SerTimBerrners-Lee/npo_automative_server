@@ -2,8 +2,14 @@ import { ApiProperty } from "@nestjs/swagger";
 import { Model, Column, DataType, Table, HasOne, BelongsToMany, ForeignKey, BelongsTo } from "sequelize-typescript";
 import { DocumentsDeliveries } from "src/documents/documents-deliveries.model";
 import { Documents } from "src/documents/documents.model";
+import { Equipment } from "src/equipment/equipment.model";
 import { statusDelivery } from "src/files/enums";
+import { NameInstrument } from "src/instrument/name-instrument.model";
+import { Inventary } from "src/inventary/inventary.model";
 import { PodPodMaterial } from "src/settings/pod-pod-material.model";
+import { DeliveriesEquipments } from "./deliveries-equipments.model";
+import { DeliveriesInstrument } from "./deliveries-instrument.model";
+import { DeliveriesInventary } from "./deliveries-inventary.model";
 import { DeliveriesMaterial } from "./deliveries-material.model";
 import { Providers } from "./provider.model";
 
@@ -59,5 +65,15 @@ export class Deliveries extends Model<Deliveries, AttrDeliveriesCreate> {
 
     @BelongsToMany(() => PodPodMaterial, () => DeliveriesMaterial)
     materials: PodPodMaterial[]
+    
+    @BelongsToMany(() => NameInstrument, () => DeliveriesInstrument)
+    tools: NameInstrument[]
+    
+    @BelongsToMany(() => Equipment, () => DeliveriesEquipments)
+    equipments: Equipment[]
+    
+    @BelongsToMany(() => Inventary, () => DeliveriesInventary)
+    inventary: Inventary[]
+
                                     
 }    

@@ -66,25 +66,8 @@ export class ProviderService {
         await providers.save()
         providers.attention = dto.attention
         
-        if(dto.docs) {
-            let docs: any = Object.values(JSON.parse(dto.docs))
-            let i = 0
-            for(let document of files.document) {
-                let res = await this.documentService.saveDocument(
-                    document, 
-                    'p', 
-                    docs[i].type,
-                    docs[i].version,
-                    docs[i].description,
-                    docs[i].name
-                )
-                if(res && res.id) {
-                    const docId = await this.documentsReprository.findByPk(res.id)
-                    if(docId) await providers.$add('documents', docId.id)
-                }
-                i++
-            }
-        }
+        if(dto.docs, files.document) 
+            await this.documentService.attachDocumentForObject(providers, dto, files);
 
         if(providers.equipments && providers.equipments.length) {
             for(let eq of providers.equipments) {
@@ -138,90 +121,93 @@ export class ProviderService {
     }
 
     async createDeliveries(dto: CreateDeliveriesDto, files: any) {
+        console.log(dto, files);
         const end_deliveries = await this.deliveriesReprository.findOne(
 			{
 				order: [
 					['id', 'DESC']
 				], limit: 1
-			})
+			});
 		const numberEndDeliveries = end_deliveries && end_deliveries.id ?  
-            end_deliveries.id + 1 : 1
-        const dm = new DateMethods().date()
+            end_deliveries.id + 1 : 1;
+        const dm = new DateMethods().date();
 
-        if(!dto.number_check || !dto.provider_id || !dto.material_lists) 
-            throw new HttpException('Пустое тело запроса', HttpStatus.BAD_REQUEST) 
+        if(!dto.number_check || !dto.provider_id || !dto.position_lists) 
+            throw new HttpException('Пустое тело запроса', HttpStatus.BAD_REQUEST);
 
-        let deliveries = await this.deliveriesReprository.create({name: numberEndDeliveries, date_create: dm})
-        deliveries = await this.deliveriesReprository.findByPk(deliveries.id, {include: {all:true}})
+        let deliveries = await this.deliveriesReprository.create({name: numberEndDeliveries, date_create: dm});
+        deliveries = await this.deliveriesReprository.findByPk(deliveries.id, {include: {all:true}});
 
-        return await this.upCreateDeliveries(dto, files, deliveries)
-        
+        return await this.upCreateDeliveries(dto, files, deliveries);
     }
 
     async updateDeliveries(dto: CreateDeliveriesDto, files: any) {
-        const deliveries = await this.deliveriesReprository.findByPk(dto.id, {include: {all: true}})
+        const deliveries = await this.deliveriesReprository.findByPk(dto.id, {include: {all: true}});
         if(!deliveries)
-            throw new HttpException('Записб не найдена', HttpStatus.BAD_REQUEST)
+            throw new HttpException('Записб не найдена', HttpStatus.BAD_REQUEST);
 
-        return await this.upCreateDeliveries(dto, files, deliveries)
+        return await this.upCreateDeliveries(dto, files, deliveries);
     }
 
+    /**
+     * Обновление заказа
+     * @param dto 
+     * @param files 
+     * @param deliveries 
+     * @returns 
+     */
     private async upCreateDeliveries(dto: CreateDeliveriesDto, files: any, deliveries: Deliveries) {
-        deliveries.number_check = dto.number_check
-        deliveries.count = dto.count
-        deliveries.nds = dto.nds
-        deliveries.product = dto.material_lists
-        deliveries.date_shipments = dto.date_shipments
+        deliveries.number_check = dto.number_check;
+        deliveries.count = dto.count;
+        deliveries.nds = dto.nds;
+        deliveries.product = dto.position_lists;
+        deliveries.date_shipments = dto.date_shipments;
         
-        if(dto.description !== 'null') deliveries.description = dto.description
-        else deliveries.description = ''
+        if(dto.description !== 'null') deliveries.description = dto.description;
+        else deliveries.description = '';
 
-        const provider = await this.providersReprository.findByPk(dto.provider_id)
+        const provider = await this.providersReprository.findByPk(dto.provider_id);
         if(provider) {
-            deliveries.provider_id = provider.id
-            await deliveries.save()
+            deliveries.provider_id = provider.id;
+            await deliveries.save();
         }
 
         if(deliveries.materials && deliveries.materials.length) {
             for(let mat of deliveries.materials) {
-                deliveries.$remove('materials', mat.id)
+                deliveries.$remove('materials', mat.id);
             }
         }
-
-        if(dto.material_lists) {
-            let mat = JSON.parse(dto.material_lists)
-            if(mat.length) {
-                for(let m of mat) {
-                    let check = await this.podPodMaterialReprository.findByPk(m.id)
-                    if(check) 
-                        await deliveries.$add('materials', check.id)
+ 
+        if(dto.position_lists) {
+            const positions = JSON.parse(dto.position_lists);
+            if(positions.length) {
+                for(let pos of positions) {
+                    switch (positions.type) {
+                        case 'mat':
+                            const mat = await this.podPodMaterialReprository.findByPk(pos.id);
+                            if(mat) await deliveries.$add('materials', mat.id);
+                        case 'tools':
+                            const tools = await this.podPodMaterialReprository.findByPk(pos.id);
+                            if(tools) await deliveries.$add('tools', tools.id);
+                        case 'eq':
+                            const eq = await this.podPodMaterialReprository.findByPk(pos.id);
+                            if(eq) await deliveries.$add('equipments', eq.id);
+                        case 'inventary':
+                            const inventary = await this.podPodMaterialReprository.findByPk(pos.id);
+                            if(inventary) await deliveries.$add('inventary', inventary.id);
+                        default:
+                            const matt = await this.podPodMaterialReprository.findByPk(pos.id);
+                            if(matt) await deliveries.$add('materials', matt.id);
+                    }
                 }
             }
         } 
 
-        if(dto.docs) {
-            let docs: any = Object.values(JSON.parse(dto.docs))
-            let i = 0
-            for(let document of files.document) {
-                let res = await this.documentService.saveDocument(
-                    document, 
-                    'p', 
-                    docs[i].type,
-                    docs[i].version,
-                    docs[i].description,
-                    docs[i].name
-                )
-                if(res && res.id) {
-                    const docId = await this.documentsReprository.findByPk(res.id)
-                    if(docId) await deliveries.$add('documents', docId.id)
-                }
-                i++
-            }
-        }
+        if(dto.docs, files.document) 
+            await this.documentService.attachDocumentForObject(deliveries, dto, files);
 
-        await deliveries.save()
-
-        return deliveries
+        await deliveries.save();
+        return deliveries;
     }
 
     async getProviders() {
@@ -282,28 +268,34 @@ export class ProviderService {
         }
     }
 
+    /**
+     * Потход от поставщика / склада
+     * @param dto 
+     * @param files 
+     * @returns 
+     */
     async createWaybill(dto: CreateWaybillDto, files: any) {
-        const dm = new DateMethods()
+        const dm = new DateMethods();
 		const endShipments = await this.waybillReprository.findOne(
 			{
 				order: [
 					['id', 'DESC']
 				],
 				limit: 1
-			})
+			});
 		const numberEndShipments = endShipments && endShipments.id ?  
-			`№ ${endShipments.id + 1} от ${dm.date()}` : `№ 1 от ${dm.date()}`
+			`№ ${endShipments.id + 1} от ${dm.date()}` : `№ 1 от ${dm.date()}`;
 
         if(!dto.product_list) 
-            throw new HttpException('Пустое тело запроса', HttpStatus.BAD_REQUEST) 
+            throw new HttpException('Пустое тело запроса', HttpStatus.BAD_REQUEST) ;
 
-        const waybill = await this.waybillReprository.create({name: numberEndShipments})
+        const waybill = await this.waybillReprository.create({name: numberEndShipments});
 
         if(dto.product_list) {
-            const comings = await this.getAllDeliveriedComing()
+            const comings = await this.getAllDeliveriedComing();
             try {
-                let pars = JSON.parse(dto.product_list)
-                waybill.product = dto.product_list
+                const pars = JSON.parse(dto.product_list);
+                waybill.product = dto.product_list;
                 for(let product of pars) {
                     this.checkDeliveroedComing(product, comings)
                     let object: any
@@ -348,8 +340,8 @@ export class ProviderService {
                     }
                 }
             } catch (e) { console.error(e) }
-            await waybill.save()
-            return waybill
+            await waybill.save();
+            return waybill;
         }
 
         if(dto.provider_id) {
@@ -365,25 +357,8 @@ export class ProviderService {
             else 
                 waybill.description = ''
 
-        if(dto.docs) {
-            let docs: any = Object.values(JSON.parse(dto.docs))
-            let i = 0
-            for(let document of files.document) {
-                let res = await this.documentService.saveDocument(
-                    document, 
-                    'p', 
-                    docs[i].type,
-                    docs[i].version,
-                    docs[i].description,
-                    docs[i].name
-                )
-                if(res && res.id) {
-                    const docId = await this.documentsReprository.findByPk(res.id)
-                    if(docId) await waybill.$add('documents', docId.id)
-                }
-                i++
-            }
-        }
+        if(dto.docs, files.document) 
+            await this.documentService.attachDocumentForObject(waybill, dto, files);
 
 
         await waybill.save()
@@ -395,11 +370,11 @@ export class ProviderService {
     }
 
     async attachFileToProvider(provider_id: number, file_id: number) {
-        const provider = await this.providersReprository.findByPk(provider_id)
-        const file = await this.documentService.getFileById(file_id)
+        const provider = await this.providersReprository.findByPk(provider_id);
+        const file = await this.documentService.getFileById(file_id);
 
         if(provider && file) 
-            provider.$add('documents', file.id)
+            provider.$add('documents', file.id);
 
         return file
     }

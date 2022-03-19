@@ -117,6 +117,7 @@ import { DeliveriesInventary } from "./provider/deliveries-inventary.model";
 import { Working } from "./sclad/working.model";
 import { WorkingAssemble } from "./sclad/working-assemble.model";
 import { WorkingMetall } from "./sclad/working-metall.model";
+import { DeliveriesEquipments } from "./provider/deliveries-equipments.model";
 @Module({
     controllers: [],
     providers: [],
@@ -191,6 +192,8 @@ import { WorkingMetall } from "./sclad/working-metall.model";
                 Deliveries,
                 DeliveriesMaterial,
                 DeliveriesInstrument,
+                DeliveriesEquipments,
+                DeliveriesInventary,
                 Cbed,
                 Product,
                 Buyer,

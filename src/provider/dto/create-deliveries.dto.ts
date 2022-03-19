@@ -4,8 +4,8 @@ export class CreateDeliveriesDto {
   readonly number_check:    string;
   readonly nds:             number;    
   readonly count:           number;
-  readonly material_lists:  any;
+  readonly position_lists:  any;
   readonly docs:            string;
   readonly date_shipments:  string;
-  readonly description:     string;
+  readonly description:     string; 
 }

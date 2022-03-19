@@ -174,9 +174,6 @@ export class ShipmentsService {
 			if(typeof data.docs == 'object' && data.docs?.length) 
 				data.docs = JSON.stringify(data.docs.map((el: any) => JSON.parse(el)));
 
-			console.log(data.docs, 'data.docs parse \n\n\n');
-
-
 			await this.documentsService.attachDocumentForObject(shipment, data, files);
 		}
 

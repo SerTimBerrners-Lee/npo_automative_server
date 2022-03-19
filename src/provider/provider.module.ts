@@ -8,6 +8,8 @@ import { InstrumentModule } from 'src/instrument/instrument.module';
 import { InventaryModule } from 'src/inventary/inventary.module';
 import { PodPodMaterial } from 'src/settings/pod-pod-material.model';
 import { SettingsModule } from 'src/settings/settings.module';
+import { DeliveriesEquipments } from './deliveries-equipments.model';
+import { DeliveriesInventary } from './deliveries-inventary.model';
 import { Deliveries } from './deliveries.model';
 import { ProvidersInstrument } from './provider-instrument.dto';
 import { ProvidersMaterial } from './provider-material.model';
@@ -27,6 +29,8 @@ import { Waybill } from './waybill.model';
             ProvidersInstrument,
             ProvidersMaterial,
             ProvidersEquipment,
+            DeliveriesInventary,
+            DeliveriesEquipments,
             PodPodMaterial,
             Deliveries,
             Waybill

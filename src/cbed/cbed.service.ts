@@ -1,9 +1,6 @@
 
 import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
 import { InjectModel } from '@nestjs/sequelize';
-import { Sequelize } from 'sequelize';
-import { Op } from 'sequelize';
-import { Assemble } from 'src/assemble/assemble.model';
 import { Detal } from 'src/detal/detal.model';
 import { TechProcess } from 'src/detal/tech-process.model';
 import { Documents } from 'src/documents/documents.model';
@@ -22,7 +19,6 @@ export class CbedService {
         @InjectModel(TechProcess) private techProcessReprository: typeof TechProcess,
         @InjectModel(PodPodMaterial) private podPodMaterialReprository: typeof PodPodMaterial,
         @InjectModel(Detal) private detalReprository: typeof Detal,
-        @InjectModel(Product) private productReprository: typeof Product,
         private documentsService: DocumentsService) {}
 
 
