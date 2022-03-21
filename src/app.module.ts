@@ -118,6 +118,8 @@ import { Working } from "./sclad/working.model";
 import { WorkingAssemble } from "./sclad/working-assemble.model";
 import { WorkingMetall } from "./sclad/working-metall.model";
 import { DeliveriesEquipments } from "./provider/deliveries-equipments.model";
+import { ShComplit } from "./shipments/sh-complit.model";
+import { DocumentsShComplit } from "./documents/documents-sh-complit.model";
 @Module({
     controllers: [],
     providers: [],
@@ -159,6 +161,7 @@ import { DeliveriesEquipments } from "./provider/deliveries-equipments.model";
                 DocumentsLinks, 
                 DocumentsShipments,
                 DocumentsMoving,
+                DocumentsShComplit,
                 PodPodMaterial,
                 PodMaterial,
                 Edizm,
@@ -204,6 +207,7 @@ import { DeliveriesEquipments } from "./provider/deliveries-equipments.model";
                 ShipmentsDetal,
                 ShipmentsCbed,
                 ShipmentsMaterial,
+                ShComplit,
                 CbedMaterial,
                 ProductMaterial,
                 ProductCbed,
@@ -227,7 +231,7 @@ import { DeliveriesEquipments } from "./provider/deliveries-equipments.model";
                 DeliveriesInventary,
                 Working,
                 WorkingAssemble,
-                WorkingMetall
+                WorkingMetall,
             ],
             autoLoadModels: true,
           }),

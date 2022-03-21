@@ -2,9 +2,12 @@ import { forwardRef, HttpException, HttpStatus, Inject, Injectable } from '@nest
 import { InjectModel } from '@nestjs/sequelize';
 import { Documents } from 'src/documents/documents.model';
 import { DocumentsService } from 'src/documents/documents.service';
+import { Equipment } from 'src/equipment/equipment.model';
 import { EquipmentService } from 'src/equipment/equipment.service';
 import { DateMethods } from 'src/files/date.methods';
 import { InstrumentService } from 'src/instrument/instrument.service';
+import { NameInstrument } from 'src/instrument/name-instrument.model';
+import { Inventary } from 'src/inventary/inventary.model';
 import { InventaryService } from 'src/inventary/inventary.service';
 import { PodPodMaterial } from 'src/settings/pod-pod-material.model';
 import { SettingsService } from 'src/settings/settings.service';
@@ -20,6 +23,9 @@ export class ProviderService {
     constructor(@InjectModel(Providers) private providersReprository: typeof Providers,
             @InjectModel(Documents) private documentsReprository: typeof Documents,
             @InjectModel(PodPodMaterial) private podPodMaterialReprository: typeof PodPodMaterial,
+            @InjectModel(NameInstrument) private instrumentReprository: typeof NameInstrument,
+            @InjectModel(Equipment) private equipmentReprository: typeof Equipment,
+            @InjectModel(Inventary) private inventaryReprository: typeof Inventary,
             @InjectModel(Deliveries) private deliveriesReprository: typeof Deliveries,
             @InjectModel(Waybill) private waybillReprository: typeof Waybill,
             private settingsService: SettingsService,
@@ -44,34 +50,34 @@ export class ProviderService {
         providers.name = dto.name
         
         if(dto.rekvisit != 'null') 
-            providers.rekvisit = dto.rekvisit
+            providers.rekvisit = dto.rekvisit;
         else
-            providers.rekvisit =''
+            providers.rekvisit = ''
         if(dto.contacts != 'null') 
-            providers.contacts = dto.contacts
+            providers.contacts = dto.contacts;
         else
-            providers.contacts =''
+            providers.contacts = '';
         if(dto.inn != 'null') 
-            providers.inn = dto.inn
+            providers.inn = dto.inn;
         else
             providers.inn =''
         if(dto.cpp != 'null') 
-            providers.cpp = dto.cpp 
+            providers.cpp = dto.cpp;
         else
-            providers.cpp =''
+            providers.cpp = '';
         if(dto.description != 'null') 
             providers.description = dto.description 
         else
-            providers.description =''
-        await providers.save()
-        providers.attention = dto.attention
+            providers.description = '';
+        await providers.save();
+        providers.attention = dto.attention;
         
         if(dto.docs, files.document) 
             await this.documentService.attachDocumentForObject(providers, dto, files);
 
         if(providers.equipments && providers.equipments.length) {
             for(let eq of providers.equipments) {
-                providers.$remove('equipments', eq.id)
+                providers.$remove('equipments', eq.id);
             }
         }
 
@@ -121,7 +127,6 @@ export class ProviderService {
     }
 
     async createDeliveries(dto: CreateDeliveriesDto, files: any) {
-        console.log(dto, files);
         const end_deliveries = await this.deliveriesReprository.findOne(
 			{
 				order: [
@@ -146,7 +151,7 @@ export class ProviderService {
         if(!deliveries)
             throw new HttpException('Записб не найдена', HttpStatus.BAD_REQUEST);
 
-        return await this.upCreateDeliveries(dto, files, deliveries);
+        return await this.upCreateDeliveries(dto, files, deliveries, true);
     }
 
     /**
@@ -156,7 +161,12 @@ export class ProviderService {
      * @param deliveries 
      * @returns 
      */
-    private async upCreateDeliveries(dto: CreateDeliveriesDto, files: any, deliveries: Deliveries) {
+    private async upCreateDeliveries(
+            dto: CreateDeliveriesDto, 
+            files: any, 
+            deliveries: Deliveries,
+            is_update: boolean = false) {
+
         deliveries.number_check = dto.number_check;
         deliveries.count = dto.count;
         deliveries.nds = dto.nds;
@@ -181,33 +191,84 @@ export class ProviderService {
         if(dto.position_lists) {
             const positions = JSON.parse(dto.position_lists);
             if(positions.length) {
+                const include = [{
+                    model: Deliveries
+                }];
+
                 for(let pos of positions) {
+                    let object: PodPodMaterial | Inventary | Equipment | NameInstrument;
+                    const pos_obj = { id: pos, type: pos.type };
+
                     switch (positions.type) {
                         case 'mat':
-                            const mat = await this.podPodMaterialReprository.findByPk(pos.id);
-                            if(mat) await deliveries.$add('materials', mat.id);
+                            object = await this.podPodMaterialReprository.findByPk(pos.id, { include: include });
+                            if(object) {
+                                if (is_update && dto.id)
+                                    pos = countUp(object.deliveries, pos_obj, dto.id, pos);
+                                
+                                const ez_position = this.parseMaterialEz(pos.ez);
+                                await this.editPositionEz(object, ez_position, pos.kol, 5);
+                                await deliveries.$add('materials', object.id);
+                                object.material_kolvo += pos;
+                                await object.save();
+                            }
                         case 'tools':
-                            const tools = await this.podPodMaterialReprository.findByPk(pos.id);
-                            if(tools) await deliveries.$add('tools', tools.id);
+                            object = await this.instrumentReprository.findByPk(pos.id, { include: include });
+                            if(object) {
+                                if(is_update && dto.id) pos = countUp(object.deliveries, pos_obj, dto.id, pos);
+                                await deliveries.$add('tools', object.id);
+                                object.instrument_kolvo += pos;
+                                await object.save();
+                            }
                         case 'eq':
-                            const eq = await this.podPodMaterialReprository.findByPk(pos.id);
-                            if(eq) await deliveries.$add('equipments', eq.id);
+                            object = await this.equipmentReprository.findByPk(pos.id, { include: include });
+                            if(object) {
+                                if(is_update && dto.id) pos = countUp(object.deliveries, pos_obj, dto.id, pos);
+                                await deliveries.$add('equipments', object.id);
+                                object.equipment_kolvo += pos;
+                                await object.save();
+                            }
                         case 'inventary':
-                            const inventary = await this.podPodMaterialReprository.findByPk(pos.id);
-                            if(inventary) await deliveries.$add('inventary', inventary.id);
-                        default:
-                            const matt = await this.podPodMaterialReprository.findByPk(pos.id);
-                            if(matt) await deliveries.$add('materials', matt.id);
+                            object = await this.inventaryReprository.findByPk(pos.id, { include: include });
+                            if(object) {
+                                if(is_update && dto.id) pos = countUp(object.deliveries, pos_obj, dto.id, pos);
+                                await deliveries.$add('inventary', object.id);
+                                object.inventary_kolvo += pos;
+                                await object.save();
+                            }
                     }
                 }
             }
         } 
+
+        function countUp(delivs: any, pos_obj: any, id: number, pos: any) {
+            const last = this.returnPosInProductList(delivs, pos_obj, dto.id);
+            if(last && last < Number(pos.kol)) pos.kol = Number(pos.kol) - last;
+            if(last && last > Number(pos.kol)) pos.kol = last - Number(pos.kol);
+
+            return pos;
+        }
 
         if(dto.docs, files.document) 
             await this.documentService.attachDocumentForObject(deliveries, dto, files);
 
         await deliveries.save();
         return deliveries;
+    }
+
+    private returnPosInProductList(deliv: Array<Deliveries>, prod: {id: number, type: string}, dev_id: number): number {
+        try {
+            for(const dev of deliv) {
+                const pars = JSON.parse(dev.product);
+                for(const item of pars) {
+                    if(dev_id == dev.id && prod.id == item.id && prod.type == item.type)
+                        return Number(item.kol);
+                }
+            }
+            if(!deliv.length) return 0;
+        }catch(err) {
+            console.error(err)
+        }
     }
 
     async getProviders() {
@@ -297,44 +358,32 @@ export class ProviderService {
                 const pars = JSON.parse(dto.product_list);
                 waybill.product = dto.product_list;
                 for(let product of pars) {
-                    this.checkDeliveroedComing(product, comings)
+                    this.checkDeliveroedComing(product, comings);
                     let object: any
                     if(product.type == 'mat')
-                        object = await this.settingsService.getOnePPT(product.id)
-                    if(product.type == 'tools')
-                        object = await this.instrumentService.getNameInstrument(product.id)
+                        object = await this.settingsService.getOnePPT(product.id);
+                    if(product.type == 'tools') 
+                        object = await this.instrumentService.getNameInstrument(product.id);
                     if(product.type == 'eq')
-                        object = await this.equipmentService.getOneEquipment(product.id)
+                        object = await this.equipmentService.getOneEquipment(product.id);
                     if(product.type == 'inventary')
-                        object = await this.inventaryService.getInventaryById(product.id)
+                        object = await this.inventaryService.getInventaryById(product.id);
                     if(object) {
                         object.shipments_kolvo - product.kol <= 0 ? object.shipments_kolvo = 0 :
-                            object.shipments_kolvo  = object.shipments_kolvo - product.kol
-                        if(product.type == 'mat')
-                            object.material_kolvo = object.material_kolvo + product.kol
+                            object.shipments_kolvo  = object.shipments_kolvo - product.kol;
                         if(product.type == 'tools')
-                            object.material_kolvo = object.instrument_kolvo + product.kol
+                            object.material_kolvo = object.instrument_kolvo + product.kol;
                         if(product.type == 'eq')
-                            object.material_kolvo = object.equipment_kolvo + product.kol
+                            object.material_kolvo = object.equipment_kolvo + product.kol;
                         if(product.type == 'inventary')
-                            object.material_kolvo = object.inventary_kolvo + product.kol
+                            object.material_kolvo = object.inventary_kolvo + product.kol;
                         object.price = product.sum ? product.sum : 0
 
                         if(product.type == 'mat') {
-                            try {
-                                const pars_ez: any = JSON.parse(object.ez_kolvo)
-                                if(pars_ez) {
-                                    const edit_ez:any = Object.values(pars_ez)[Number(product.ez) ? Number(product.ez) - 1 : 0]
-
-                                    edit_ez.material_kolvo = edit_ez.material_kolvo  +  product.kol
-                                    edit_ez.shipments_kolvo - product.kol <= 0 ? object.shipments_kolvo = 0 :
-                                    object.shipments_kolvo  = object.shipments_kolvo - product.kol
-
-                                    Object.values(pars_ez)[Number(product.ez) ? Number(product.ez) - 1 : 0] = edit_ez
-                                    console.log('edit_ez', edit_ez)
-                                    object.ez_kolvo = JSON.stringify(pars_ez)
-                                }
-                            } catch(e) {console.error(e)}
+                            object.material_kolvo = object.material_kolvo + product.kol;
+                            const ez_pos = this.parseMaterialEz(product.ez);
+                            await this.editPositionEz(object, ez_pos, product.kol, 1);
+                            await this.editPositionEz(object, ez_pos, product.kol, 4);
                         }
                         await object.save()
                     }
@@ -347,15 +396,14 @@ export class ProviderService {
         if(dto.provider_id) {
             const provider = await this.providersReprository.findByPk(dto.provider_id)
             if(provider) {
-                waybill.provider_id = provider.id
-                await waybill.save()
+                waybill.provider_id = provider.id;
+                await waybill.save();
             }
         }
 
         if(dto.description != 'null')
-            waybill.description = dto.description
-            else 
-                waybill.description = ''
+            waybill.description = dto.description;
+            else waybill.description = '';
 
         if(dto.docs, files.document) 
             await this.documentService.attachDocumentForObject(waybill, dto, files);
@@ -363,6 +411,51 @@ export class ProviderService {
 
         await waybill.save()
         return waybill
+    }
+
+    // Возвращаем в строке позицию матерала
+    private parseMaterialEz(ez: number): string {
+        switch (Number(ez)) {
+            case 1:
+                return 'c1_kolvo';
+            case 2:
+                return 'c2_kolvo';
+            case 3:
+                return 'c3_kolvo';
+            case 4:
+                return 'c4_kolvo';
+            case 5:
+                return 'c5_kolvo';
+            default:
+                return 'c1_kolvo';
+        }
+    }
+    // меняем ez у элемента 
+    /**
+     * 
+     * @param material 
+     * @param str_pos 
+     * @param kol 
+     * @param to_field 1..5
+     */
+    private async editPositionEz(material: PodPodMaterial, str_pos: string, kol: number, to_field: number): Promise<void> {
+        try {
+            const pars = JSON.parse(material.ez_kolvo);
+
+            if (to_field == 1)
+                pars[str_pos].material_kolvo += Number(kol);
+            else if (to_field == 2)
+                pars[str_pos].shipments_kolvo += Number(kol);
+            else if (to_field == 3)
+                pars[str_pos].min_remaining += Number(kol);
+            else if (to_field == 4)
+                pars[str_pos].price = Number(kol);
+            else if (to_field == 5)
+                pars[str_pos].deliveries_kolvo += Number(kol);
+
+            material.ez_kolvo = JSON.stringify(pars);
+            await material.save();
+        } catch(e) { console.error(e) }
     }
 
     async getAllWaybill() {

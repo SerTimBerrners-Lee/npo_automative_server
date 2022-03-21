@@ -170,7 +170,6 @@ export class ShipmentsService {
 		}
 
 		if(data.docs, files.document) {
-			console.log(data.docs, typeof data.docs);
 			if(typeof data.docs == 'object' && data.docs?.length) 
 				data.docs = JSON.stringify(data.docs.map((el: any) => JSON.parse(el)));
 
@@ -256,7 +255,7 @@ export class ShipmentsService {
 		const shipments = await this.shipmentsReprository.findAll({include: ['childrens', 
 		{
 			model: Product,
-			attributes: ['name', 'id', 'articl']
+			attributes: ['name', 'id', 'articl', 'fabricNumber']
 		},
 		{
 			model: Buyer,

@@ -9,6 +9,7 @@ import { DateMethods } from "src/files/date.methods";
 import { statusShipment } from "src/files/enums";
 import { Product } from "src/product/product.model";
 import { PodPodMaterial } from "src/settings/pod-pod-material.model";
+import { ShComplit } from "./sh-complit.model";
 import { ShipmentsCbed } from "./shipments-cbed.model";
 import { ShipmentsDetal } from "./shipments-detal.model";
 import { ShipmentsMaterial } from "./shipments-material.model";
@@ -79,7 +80,7 @@ export class Shipments extends Model<Shipments, ShipmentsAttrCreate> {
     @Column({type: DataType.INTEGER})
     buyerId: number;
     
-    @BelongsTo(() =>Buyer)
+    @BelongsTo(() => Buyer)
     buyer: Buyer;
 
     @ApiProperty({example: '1', description: 'Статус заказа'})
@@ -104,6 +105,13 @@ export class Shipments extends Model<Shipments, ShipmentsAttrCreate> {
 
     @BelongsToMany(() => Documents, () => DocumentsShipments)
     documents: DocumentsShipments[];
+
+    @ForeignKey(() => ShComplit)
+    @Column({type: DataType.INTEGER})
+    sh_complit_id: number;
+    
+    @BelongsTo(() => ShComplit)
+    sh_complit: ShComplit;
 
     @AfterFind
     static async checkOverbye(shipment: Array<Shipments>) {

@@ -16,7 +16,7 @@ export enum statusShipment {
 	order = 'Заказано',
 	ban = 'Удалено',
 	performed = 'Выполняется',
-	done = 'Выполнено',
+	done = 'Отгружено',
   overbue = 'Просрочено' 
 }
 

@@ -8,15 +8,17 @@ import { DocumentsModule } from 'src/documents/documents.module';
 import { MetaloworkingModule } from 'src/metaloworking/metaloworking.module';
 import { ProductModule } from 'src/product/product.module';
 import { SettingsModule } from 'src/settings/settings.module';
+import { ShComplit } from './sh-complit.model';
+import { ShComplitService } from './sh-complite.service';
 import { ShipmentsController } from './shipments.controller';
 import { Shipments } from './shipments.model';
 import { ShipmentsService } from './shipments.service';
 
 @Module({
-	providers: [ShipmentsService],
+	providers: [ShipmentsService, ShComplitService],
 	controllers: [ShipmentsController],
 	imports: [
-		SequelizeModule.forFeature([Shipments]),
+		SequelizeModule.forFeature([Shipments, ShComplit]),
 		BuyerModule,
 		ProductModule,
 		CbedModule,

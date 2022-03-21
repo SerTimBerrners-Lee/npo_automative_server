@@ -7,6 +7,8 @@ import { DocumentsEquipment } from "src/documents/documents-equipment";
 import { Documents } from "src/documents/documents.model";
 import { InstrumentEquipment } from "src/instrument/instrument-equipment.model";
 import { NameInstrument } from "src/instrument/name-instrument.model";
+import { DeliveriesEquipments } from "src/provider/deliveries-equipments.model";
+import { Deliveries } from "src/provider/deliveries.model";
 import { Providers } from "src/provider/provider.model";
 import { ProvidersEquipment } from "src/provider/providers-equipment.model";
 import { User } from "src/users/users.model";
@@ -81,11 +83,14 @@ export class Equipment extends Model<Equipment, EquipmentCreationAttrs> {
     rootParentId: number;
 
     //  Привязка к типу
-    @BelongsTo(() => EquipmentType)
+    @BelongsTo(() => EquipmentType) 
     equipmentType: EquipmentType;    
 
     @BelongsToMany(() => Operation, () => OperationEq)
-    operation: Operation[]
+    operation: Operation[];
+
+    @BelongsToMany(() => Deliveries, () => DeliveriesEquipments)
+    deliveries: Deliveries[];
 
     @ForeignKey(() => User)
     @Column({type: DataType.INTEGER})

@@ -1,14 +1,17 @@
 import { Body, Controller, Delete, Get, Param, Post, Put, UploadedFiles, UseInterceptors } from '@nestjs/common';
 import { FileFieldsInterceptor } from '@nestjs/platform-express';
 import { ApiOperation, ApiTags } from '@nestjs/swagger';
+import { ShCheckDto } from './dto/sh-check.dto';
 import { UpCreateShipmentsDto } from './dto/up-create-shipments.dto';
+import { ShComplitService } from './sh-complite.service';
 import { ShipmentsService } from './shipments.service';
 
 
 @ApiTags('Задачи на отгрузку') 
 @Controller('shipments')
 export class ShipmentsController {
-	constructor(private shipmentsSettings: ShipmentsService) {}
+	constructor(private shipmentsSettings: ShipmentsService,
+		private shComplitSettings: ShComplitService) {}
 
 	@ApiOperation({summary: 'Создание заказа'})
 	@UseInterceptors(FileFieldsInterceptor([
@@ -19,6 +22,17 @@ export class ShipmentsController {
 		@Body() dto: UpCreateShipmentsDto, 
 		@UploadedFiles() files: { document?: Express.Multer.File[]} ) {
 		return this.shipmentsSettings.createShipments(dto, files);
+	}
+
+	@ApiOperation({summary: 'Отгрузка заказа'})
+	@UseInterceptors(FileFieldsInterceptor([
+			{name: 'document', maxCount: 40}
+	]))
+  @Post('/shcheck')
+	shComplitCreate(
+		@Body() dto: ShCheckDto, 
+		@UploadedFiles() files: { document?: Express.Multer.File[]} ) {
+		return this.shComplitSettings.shComplitCreate(dto, files);
 	}
 
 	@ApiOperation({summary: 'Обновлние заказа'})

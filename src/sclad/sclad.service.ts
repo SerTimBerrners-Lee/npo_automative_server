@@ -430,24 +430,29 @@ export class ScladService {
     }
     
      // Сохраняем количество для каждой ЕИ Материала
+     /**
+      * 
+      * @param materialObj { kol: number, ez: number }
+      * @param vars { min_remaining: number, shipments_kolvo: number }
+      * @param material: PodPodMaterial
+      * @returns 
+      */
 	async formationDeficitMaterial(materialObj: any, vars: any, material: PodPodMaterial) {
         if(!materialObj) return false;
 
-        let ez_kolvo = material.ez_kolvo;
-        let kolvo = material.kolvo
         try {
-            ez_kolvo = JSON.parse(ez_kolvo)
-            kolvo = JSON.parse(kolvo)
+            const ez_kolvo = JSON.parse(material.ez_kolvo);
+            const kolvo = JSON.parse(material.kolvo);
             
-            let shipments_kolvo = (Math.round(materialObj.kol) * Number(vars.shipments_kolvo))
-            if(shipments_kolvo < 1) shipments_kolvo = 0
-            let min_remaining = (Math.round(materialObj.kol) * Number(vars.min_remaining))
-            if(min_remaining < 1) min_remaining = 0
+            let shipments_kolvo = (Math.round(materialObj.kol) * Number(vars.shipments_kolvo));
+            if(shipments_kolvo < 1) shipments_kolvo = 0;
+            let min_remaining = (Math.round(materialObj.kol) * Number(vars.min_remaining));
+            if(min_remaining < 1) min_remaining = 0;
 
             if(!shipments_kolvo && !min_remaining) return false;
 
-            material.shipments_kolvo += shipments_kolvo
-            material.min_remaining += min_remaining
+            material.shipments_kolvo += shipments_kolvo;
+            material.min_remaining += min_remaining;
 
 
             switch(Number(materialObj.ez)) {
