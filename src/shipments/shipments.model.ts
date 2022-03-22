@@ -123,9 +123,9 @@ export class Shipments extends Model<Shipments, ShipmentsAttrCreate> {
         if(
           !item.ban &&
           dt.dateDifference(undefined, item.date_shipments) < 1 &&
-          item.status != statusShipment.overbue) {
-          item.status = statusShipment.overbue
-          await item.save()
+          item.status != statusShipment.overbue && item.status != statusShipment.done) {
+          item.status = statusShipment.overbue;
+          await item.save();
         }
       }
   }
