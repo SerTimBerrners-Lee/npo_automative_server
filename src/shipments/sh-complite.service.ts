@@ -1,11 +1,8 @@
 import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
 import { InjectModel } from '@nestjs/sequelize';
-import { BuyerService } from 'src/buyer/buyer.service';
-import { CbedService } from 'src/cbed/cbed.service';
-import { DetalService } from 'src/detal/detal.service';
 import { DocumentsService } from 'src/documents/documents.service';
 import { statusShipment } from 'src/files/enums';
-import { ProductService } from 'src/product/product.service';
+import { User } from 'src/users/users.model';
 import { ShCheckDto } from './dto/sh-check.dto';
 import { ShComplit } from './sh-complit.model';
 import { Shipments } from './shipments.model';
@@ -14,9 +11,10 @@ import { Shipments } from './shipments.model';
 export class ShComplitService {
 	constructor(@InjectModel(Shipments) private shipmentsReprository: typeof Shipments,
     @InjectModel(ShComplit) private shComplitReprository: typeof ShComplit,
+    @InjectModel(User) private userReprository: typeof User,
 		private documentsService: DocumentsService) {}
 
-    async shComplitCreate(dto: ShCheckDto, files: any) {
+    async create(dto: ShCheckDto, files: any) {
       console.log(dto)
       const sh_complit = await this.shComplitReprository.create({ shipments_id: dto.shipments_id });
       if(!sh_complit) throw new HttpException('Не удолось создать отгрузку', HttpStatus.BAD_REQUEST);
@@ -28,6 +26,22 @@ export class ShComplitService {
       sh_complit.fabric_number = dto.fabric_number;
       sh_complit.name_check = dto.name_check;
 
+      if(dto.responsible_user_id && dto.responsible_user_id != 'null') {
+        const user = await this.userReprository.findByPk(dto.responsible_user_id);
+        if(user) {
+          sh_complit.responsible_user_id = user.id;
+          sh_complit.$add('users', user.id);
+        }
+      }
+      
+      if(dto.creater_user_id && dto.creater_user_id != 'null') {
+        const user = await this.userReprository.findByPk(dto.creater_user_id);
+        if(user) {
+          sh_complit.creater_user_id = user.id;
+          sh_complit.$add('users', user.id);
+        }
+      }
+
       const shipments = await this.shipmentsReprository.findByPk(dto.shipments_id);
       if(shipments) {
         shipments.status = statusShipment.done;
@@ -38,6 +52,20 @@ export class ShComplitService {
             await this.documentsService.attachDocumentForObject(sh_complit, dto, files);
       
       await sh_complit.save();
+      return sh_complit;
+    }
+
+    async getAll() {
+        const sh_complits = await this.shComplitReprository.findAll({include: { all: true }});
+        if(!sh_complits) throw new HttpException('Не удалось получить список отгрузок', HttpStatus.BAD_REQUEST);
+
+        return sh_complits;
+    }
+
+    async getById(id: number) {
+      const sh_complit = await this.shComplitReprository.findByPk(id, {include: { all: true }});
+      if(!sh_complit) throw new HttpException('Не удалось получить список отгрузок', HttpStatus.BAD_REQUEST);
+
       return sh_complit;
     }
 }

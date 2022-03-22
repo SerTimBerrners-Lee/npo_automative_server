@@ -2,6 +2,8 @@ import { ApiProperty } from "@nestjs/swagger";
 import { Model, Column, DataType, Table, ForeignKey, BelongsTo, BelongsToMany, HasOne} from "sequelize-typescript";
 import { DocumentsShComplit } from "src/documents/documents-sh-complit.model";
 import { Documents } from "src/documents/documents.model";
+import { User } from "src/users/users.model";
+import { ShComplitUsers } from "./sh-complit-user.model";
 import { Shipments } from "./shipments.model";
 
 interface ShComplitAttrCreate {
@@ -51,10 +53,21 @@ export class ShComplit extends Model<ShComplit, ShComplitAttrCreate> {
     @Column({type: DataType.STRING})
     description: string;
 
+    @ApiProperty({example: '1', description: 'Ответственный'})
+    @Column({type: DataType.INTEGER})
+    responsible_user_id: number;
+
+    @ApiProperty({example: '1', description: 'Исполняющий'})
+    @Column({type: DataType.INTEGER})
+    creater_user_id: number;
+
     @HasOne(() => Shipments)
     shipments: Shipments;
     
     @BelongsToMany(() => Documents, () => DocumentsShComplit)
     documents: DocumentsShComplit[];
+
+    @BelongsToMany(() => User, () => ShComplitUsers)
+    users: ShComplitUsers[];
 
 }  

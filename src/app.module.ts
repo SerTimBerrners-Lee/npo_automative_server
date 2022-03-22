@@ -120,6 +120,8 @@ import { WorkingMetall } from "./sclad/working-metall.model";
 import { DeliveriesEquipments } from "./provider/deliveries-equipments.model";
 import { ShComplit } from "./shipments/sh-complit.model";
 import { DocumentsShComplit } from "./documents/documents-sh-complit.model";
+import { ShComplitUsers } from "./shipments/sh-complit-user.model";
+
 @Module({
     controllers: [],
     providers: [],
@@ -208,6 +210,7 @@ import { DocumentsShComplit } from "./documents/documents-sh-complit.model";
                 ShipmentsCbed,
                 ShipmentsMaterial,
                 ShComplit,
+                ShComplitUsers,
                 CbedMaterial,
                 ProductMaterial,
                 ProductCbed,

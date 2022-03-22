@@ -32,7 +32,13 @@ export class ShipmentsController {
 	shComplitCreate(
 		@Body() dto: ShCheckDto, 
 		@UploadedFiles() files: { document?: Express.Multer.File[]} ) {
-		return this.shComplitSettings.shComplitCreate(dto, files);
+		return this.shComplitSettings.create(dto, files);
+	}
+
+	@ApiOperation({summary: 'Получает все отметки отгрузки'})
+  @Get('/shcheck')
+	getAllShComplit() {
+		return this.shComplitSettings.getAll();
 	}
 
 	@ApiOperation({summary: 'Обновлние заказа'})
