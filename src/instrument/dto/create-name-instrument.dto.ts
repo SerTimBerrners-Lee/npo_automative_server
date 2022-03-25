@@ -11,5 +11,5 @@ export class CreateNameInstrumentDto {
 
     readonly providers: string;
     readonly rootParentId: number;
-
+    readonly documents_base: any;
 }

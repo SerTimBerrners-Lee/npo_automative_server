@@ -357,50 +357,24 @@ export class SettingsService {
 
         if(dto.providers) {
             podPodMaterial.providers = []
-            let providers = JSON.parse(dto.providers)
-            for(let prx of providers) {
-                let res = await this.providersReprository.findByPk(prx.id)
-                if(res) 
-                    podPodMaterial.$add('providers', res.id)
+            const providers = JSON.parse(dto.providers)
+            for(const prx of providers) {
+                const res = await this.providersReprository.findByPk(prx.id)
+                if(res) podPodMaterial.$add('providers', res.id)
             }
         }
 
         if(podPodMaterial.documents) {
-            for(let doc of podPodMaterial.documents) {
+            for(const doc of podPodMaterial.documents) {
                 podPodMaterial.$remove('documents', doc.id)
             }
         }
         
-        if(dto.file_base && dto.file_base != '[]') {
-            try {
-                let pars = JSON.parse(dto.file_base)
-                for(let file of pars) {
-                    const check_files = await this.documentsService.getFileById(file)
-                    if(check_files)
-                        await podPodMaterial.$add('documents', check_files)
-                }
-            }   catch(e) { console.error(e) }
-        }
+        await this.documentsService.attachDocumentFrorObjectJSON(podPodMaterial, dto.file_base);
 
-        if(dto.docs) {
-            let docs: any = Object.values(JSON.parse(dto.docs))
-            let i = 0
-            for(let document of files.document) {
-                let res = await this.documentsService.saveDocument(
-                    document, 
-                    'p', 
-                    docs[i].type,
-                    docs[i].version,
-                    docs[i].description,
-                    docs[i].name
-                )
-                if(res && res.id) {
-                    const docId = await this.documentsReprository.findByPk(res.id)
-                    if(docId) await podPodMaterial.$add('documents', docId.id)
-                }
-                i++
-            }
-        }
+        if(dto.docs, files.document) 
+            await this.documentsService.attachDocumentForObject(podPodMaterial, dto, files);
+
         await podPodMaterial.save()
         return podPodMaterial
     }

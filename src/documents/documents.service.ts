@@ -68,6 +68,22 @@ export class DocumentsService {
         }
     }
 
+    /**
+     * 
+     * @param obj 
+     * @param json_id: '[{34}, {1}, {32}]' 
+     */
+    async attachDocumentFrorObjectJSON(obj: any, json_id: string) {
+        try {
+            if(!json_id || json_id == '[]' || json_id == '' || !obj) return false;
+            const pars = JSON.parse(json_id);
+            for(const item of pars) {
+                const file = await this.getFileById(item, true);
+                if(file) await obj.$add('documents', file.id);
+            }
+        } catch(err) {console.error(err)}
+    }
+
     async saveDocument(file: any, nameInstans = '', type = '', version = 1, description = '', name = '', newVersion = false) {
         const imageTypes = ['bmp', 'gif', 'jpg', 'png', 'pds', 'tif', 'odg', 'jpeg', 'eps', 'pict', 'pcx', 'ico', 'svg', 'webp', 'avif']
         let folderToSave = 'doc';
@@ -208,10 +224,14 @@ export class DocumentsService {
         return await this.documentReprository.findAll({attributes: ['name']})
     }
 
-    async getFileById(id:number) {
-        return await this.documentReprository.findByPk(id, {
-            include: {all: true}
-        })
+    async getFileById(id: number, light: any = false) {
+        if(!light || light == 'false') {
+            return await this.documentReprository.findByPk(id, {
+                include: { all: true }
+            });
+        }
+
+        return await this.documentReprository.findByPk(id);
     }
  
     async banFile(id: number) {

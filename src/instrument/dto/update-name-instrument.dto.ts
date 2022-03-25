@@ -9,4 +9,5 @@ export class UpdateNameInstrumentDto {
     readonly attention: boolean;
 
     readonly providers: any;
+    readonly documents_base: any;
 }

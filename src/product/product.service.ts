@@ -255,9 +255,10 @@ export class ProductService {
             include: [{all: true}]
         }]})
         
-        let new_arr = []
+        const new_arr = []
         for(let prod of product) {
-            if(!prod.techProcesses || prod.techProcesses.operations.length == 0) new_arr.push(prod.id)
+            if(!prod.techProcesses || prod.techProcesses.operations.length == 0) 
+            new_arr.push(prod.id)
         }
 
         return new_arr

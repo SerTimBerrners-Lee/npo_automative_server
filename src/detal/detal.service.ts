@@ -249,15 +249,15 @@ export class DetalService {
         }
 
         if(detal.documents) {
-            for(let doc of detal.documents) {
+            for(const doc of detal.documents) {
                 detal.$remove('documents', doc.id)
             }
         }
         
         if(dto.file_base && dto.file_base != '[]') {
             try {
-                let pars = JSON.parse(dto.file_base)
-                for(let file of pars) {
+                const pars = JSON.parse(dto.file_base)
+                for(const file of pars) {
                     const check_files = await this.documentsService.getFileById(file)
                     if(check_files)
                         await detal.$add('documents', check_files)
@@ -281,7 +281,7 @@ export class DetalService {
             tp = await this.techProcessReprository.findByPk(dto.id, {include: {all: true}});
             description = 'Изменил технический процесс';
         }   else {
-            let new_tp = await this.techProcessReprository.create();
+            const new_tp = await this.techProcessReprository.create();
             tp = await this.techProcessReprository.findByPk(new_tp.id, {include: {all: true}});
             description = 'Добавил технический процесс';
         }
@@ -393,7 +393,7 @@ export class DetalService {
 
     async getDetalIncludeOperation() {
         const detal = await this.detalReprository.findAll({include: [{
-            model: TechProcess, 
+            model: TechProcess,
             include: [{all: true}]
         }]})
         

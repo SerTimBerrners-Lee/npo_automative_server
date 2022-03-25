@@ -15,7 +15,7 @@ import { Instrument } from './instrument.model';
 import { NameInstrument } from './name-instrument.model';
 import { PInstrument } from './pt-instrument.model';
  
-@Injectable()
+@Injectable() 
 export class InstrumentService {
     constructor(@InjectModel(Instrument) private instrReprository: typeof Instrument,
         @InjectModel(PInstrument) private pIReorository: typeof PInstrument, 
@@ -149,34 +149,21 @@ export class InstrumentService {
                 await nameInstrument.save()
             }
         }
+        console.log(dto);
 
-        if(dto.docs) {
-            let docs: any = Object.values(JSON.parse(dto.docs))
-            let i = 0
-            for(let document of files.document) {
-                let res = await this.documentsService.saveDocument(
-                    document, 
-                    'p', 
-                    docs[i].type,
-                    docs[i].version,
-                    docs[i].description,
-                    docs[i].name
-                )
-                if(res && res.id) {
-                    const docId = await this.documentsReprository.findByPk(res.id)
-                    if(docId) await nameInstrument.$add('documents', docId.id)
-                }
-                i++
-            }
-        }
 
-        await nameInstrument.save()
+        await this.documentsService.attachDocumentFrorObjectJSON(nameInstrument, dto.documents_base);
 
-        return nameInstrument
+        if(dto.docs, files.document) 
+            await this.documentsService.attachDocumentForObject(nameInstrument, dto, files);
+
+        await nameInstrument.save();
+        return nameInstrument;
     }
 
     async updateNameInstrument(dto: UpdateNameInstrumentDto, files: any) {
-        const nameInstrument = await this.nameInastrumentReprository.findByPk(dto.id)
+        const nameInstrument = await this.nameInastrumentReprository.findByPk(dto.id);
+        console.log(dto, 'updateNameInstrumentx');
 
         if(!nameInstrument)
             throw new HttpException('Произошла ошибка при добавлении', HttpStatus.BAD_REQUEST)
@@ -211,29 +198,13 @@ export class InstrumentService {
             }
         }
 
-        if(dto.docs) {
-            let docs: any = Object.values(JSON.parse(dto.docs))
-            let i = 0
-            for(let document of files.document) {
-                let res = await this.documentsService.saveDocument(
-                    document, 
-                    'p', 
-                    docs[i].type,
-                    docs[i].version,
-                    docs[i].description,
-                    docs[i].name
-                )
-                if(res && res.id) {
-                    const docId = await this.documentsReprository.findByPk(res.id)
-                    if(docId) await nameInstrument.$add('documents', docId.id)
-                }
-                i++
-            }
-        }
+        await this.documentsService.attachDocumentFrorObjectJSON(nameInstrument, dto.documents_base);
 
-        await nameInstrument.save()
+        if(dto.docs, files.document) 
+            await this.documentsService.attachDocumentForObject(nameInstrument, dto, files);
 
-        return nameInstrument
+        await nameInstrument.save();
+        return nameInstrument;
     }
 
     async getNameInstrument(id: number) {
