@@ -31,6 +31,7 @@ export class ScladService {
         @InjectModel(Detal) private detalReprository: typeof Detal,
         @InjectModel(Providers) private providerReprository: typeof Providers,
         @InjectModel(PodPodMaterial) private material: typeof PodPodMaterial,
+        @InjectModel(Shipments) private shipments: typeof Shipments,
         private assembleService: AssembleService,
         private metaloworkingService: MetaloworkingService,
         ) {
@@ -387,6 +388,20 @@ export class ScladService {
             throw new HttpException('Произошла ошибка при получении дефицита. ', HttpStatus.BAD_REQUEST)
 
         return materials
+    }
+
+    // Сортировка под каждый заказ отдельон на ПЛАН
+    /**
+     * 
+     * @param id_shipments number
+     * @param type cbed | detal 
+     */
+    async materialShipmentsType(id_shipments: number, type: string) {
+        console.log(id_shipments, type);
+
+        const shipments = await this.shipments.findByPk(id_shipments);
+        if (!shipments) throw new HttpException('Не удалось получить заказ', HttpStatus.BAD_REQUEST);
+        return shipments;
     }
 
     // Начальная функция для подсчета дифицита 
