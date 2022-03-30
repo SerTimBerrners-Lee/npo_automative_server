@@ -9,7 +9,7 @@ import { Detal } from 'src/detal/detal.model';
 import { Operation } from 'src/detal/operation.model';
 import { TechProcess } from 'src/detal/tech-process.model';
 import { TypeOperation } from 'src/detal/type-operation.model';
-import { EZ_KOLVO, StatusAssemble, StatusMetaloworking } from 'src/files/enums';
+import { EZ_KOLVO, KOLVO, StatusAssemble, StatusMetaloworking } from 'src/files/enums';
 import { Metaloworking } from 'src/metaloworking/metaloworking.model';
 import { MetaloworkingService } from 'src/metaloworking/metaloworking.service';
 import { Product } from 'src/product/product.model';
@@ -398,10 +398,133 @@ export class ScladService {
      */
     async materialShipmentsType(id_shipments: number, type: string) {
         console.log(id_shipments, type);
+        const include = type == 'cbed' ? [{ model: Cbed }, { model: Product }] : [{ model: Detal }];
 
-        const shipments = await this.shipments.findByPk(id_shipments);
-        if (!shipments) throw new HttpException('Не удалось получить заказ', HttpStatus.BAD_REQUEST);
-        return shipments;
+        const res = await this.shipments.findByPk(id_shipments, { include });
+        if (!res) throw new HttpException('Не удалось получить заказ', HttpStatus.BAD_REQUEST);
+        const shipments = res.toJSON();
+
+        let list_objects = [];
+        try {
+            if (res.list_cbed_detal) list_objects = JSON.parse(res.list_cbed_detal);
+            if (res.list_hidden_cbed_detal) list_objects = list_objects.concat(JSON.parse(res.list_hidden_cbed_detal));
+            if (type == 'cbed' && res.product) list_objects.push({ 
+                type: 'cbed',
+                product: true,
+                obj: { id: res.product.id, name: res.product.name, articl: res.product.articl },
+                kol: res.kol || 0
+            });
+            
+            list_objects = list_objects.filter(el => el.type == type);
+            for(const obj of list_objects) {
+                let iterable: any;
+                if (type == 'cbed') {
+                    iterable = shipments['cbeds'];
+                    shipments['product'].product = true;
+                    iterable.push(shipments['product']);
+                } else iterable = shipments['detals'];
+
+                for(const item of iterable) {
+                    if (obj.obj.id != item.id) continue;
+                    if (item.product && !obj.product) continue;
+
+                    let pars = [];
+                    if (item.materialList) pars = JSON.parse(item.materialList);
+                    if (item.listPokDet) pars = pars.concat(JSON.parse(item.listPokDet));
+
+                    if (type == 'detal' && item.mat_zag) {
+                        const material = await this.material.findByPk(item.mat_zag);
+                        if (material) pars.push({
+                            art: '',
+                            mat: { id: item.mat_zag, name: material.name },
+                            kol: 1,
+                            ez:  1,
+                        });
+                    }
+                    obj.materialList = pars;
+                }
+            }
+        } catch (err) { console.error(err) }
+        
+        const materialsArr = [];
+        // Фильтруем материалы
+        for (const item of list_objects) {
+            console.log(item);
+            for (const mat of item.materialList) {
+                let check = true;
+                for( const mA of materialsArr) {
+                    if (mat.mat.id == mA.mat.id) {
+                        const count = (Number(mA.kol) * Number(item.kol));
+                        const res = this.returnEzKolvo(mA.ez, mat.ez_kolvo, mat.kolvo, count, count);
+                        mat.kol = Number(mat.kol) + count; 
+                        mat.ez_kolvo = res.ez_kolvo;
+                        mat.kolvo = res.kolvo;
+                        check = false;
+                    }
+                }
+                if (check) {
+                    const count = (Number(mat.kol) * Number(item.kol));
+                    const res = this.returnEzKolvo(mat.ez, JSON.parse(EZ_KOLVO), JSON.parse(KOLVO), count, count);
+                    materialsArr.push({
+                        ...mat, 
+                        kol: count,
+                        ez_kolvo: res.ez_kolvo,
+                        kolvo: res.kolvo
+                    });
+                }
+                else check = true;
+            }
+        }
+
+        const newArr = [];
+        for (const item of materialsArr) {
+            const material = (await this.material.findByPk(item.mat.id)).toJSON();
+            if (material) {
+                material['plan'] = {
+                    ez_kolvo: item.ez_kolvo, 
+                    kolvo: item.kolvo
+                }
+                newArr.push(material);
+            }
+        }
+        
+        return newArr;
+    }
+
+    returnEzKolvo (ez: number, ez_kolvo: any, kolvo: any, mr: number, sk: number) {
+        switch(Number(ez)) {
+            case 1:
+                kolvo.c1 = true;
+                ez_kolvo.c1_kolvo.min_remaining += Number(mr);
+                ez_kolvo.c1_kolvo.shipments_kolvo += Number(sk);
+            break;
+            case 2:
+                kolvo.c2 = true;
+                ez_kolvo.c2_kolvo.min_remaining += Number(mr);
+                ez_kolvo.c2_kolvo.shipments_kolvo += Number(sk);
+            break;
+            case 3:
+                kolvo.c3 = true;
+                ez_kolvo.c3_kolvo.min_remaining += Number(mr);
+                ez_kolvo.c3_kolvo.shipments_kolvo += Number(sk);
+            break;
+            case 4:
+                kolvo.c4 = true;
+                ez_kolvo.c4_kolvo.min_remaining += Number(mr);
+                ez_kolvo.c4_kolvo.shipments_kolvo += Number(sk);
+            break;
+            case 5:
+                kolvo.c5 = true;
+                ez_kolvo.c5_kolvo.min_remaining += Number(mr);
+                ez_kolvo.c5_kolvo.shipments_kolvo += Number(sk);
+            break;
+            default:
+                ez_kolvo.c1_kolvo.min_remaining += Number(mr);
+                ez_kolvo.c1_kolvo.shipments_kolvo += Number(sk);
+            break;
+        }
+
+        return { kolvo, ez_kolvo };
     }
 
     // Начальная функция для подсчета дифицита 
@@ -456,8 +579,8 @@ export class ScladService {
         if(!materialObj) return false;
 
         try {
-            const ez_kolvo = JSON.parse(material.ez_kolvo);
-            const kolvo = JSON.parse(material.kolvo);
+            let ez_kolvo = JSON.parse(material.ez_kolvo);
+            let kolvo = JSON.parse(material.kolvo);
             
             let shipments_kolvo = (Math.round(materialObj.kol) * Number(vars.shipments_kolvo));
             if(shipments_kolvo < 1) shipments_kolvo = 0;
@@ -469,39 +592,10 @@ export class ScladService {
             material.shipments_kolvo += shipments_kolvo;
             material.min_remaining += min_remaining;
 
+            const res = this.returnEzKolvo(Number(materialObj.ez), ez_kolvo, kolvo, min_remaining, shipments_kolvo);
+            ez_kolvo = res.ez_kolvo;
+            kolvo = res.kolvo;
 
-            switch(Number(materialObj.ez)) {
-                case 1:
-                    kolvo.c1 = true
-                    ez_kolvo.c1_kolvo.min_remaining += min_remaining
-                    ez_kolvo.c1_kolvo.shipments_kolvo += shipments_kolvo
-                break;
-                case 2:
-                    kolvo.c2 = true
-                    ez_kolvo.c2_kolvo.min_remaining += min_remaining
-                    ez_kolvo.c2_kolvo.shipments_kolvo += shipments_kolvo
-                break;
-                case 3:
-                    kolvo.c3 = true
-                    ez_kolvo.c3_kolvo.min_remaining += min_remaining
-                    ez_kolvo.c3_kolvo.shipments_kolvo += shipments_kolvo
-                break;
-                case 4:
-                    kolvo.c4 = true
-                    ez_kolvo.c4_kolvo.min_remaining += min_remaining
-                    ez_kolvo.c4_kolvo.shipments_kolvo += shipments_kolvo
-                break;
-                case 5:
-                    kolvo.c5 = true
-                    ez_kolvo.c5_kolvo.min_remaining += min_remaining
-                    ez_kolvo.c5_kolvo.shipments_kolvo += shipments_kolvo
-                break;
-                default:
-                    ez_kolvo.c1_kolvo.min_remaining += min_remaining
-                    ez_kolvo.c1_kolvo.shipments_kolvo += shipments_kolvo
-                break;
-            }
-            
             material.kolvo = JSON.stringify(kolvo)
             material.ez_kolvo = JSON.stringify(ez_kolvo)
         } catch(err) {console.error(err+ '\n\n\nERROR IN STR: 410 \n\n\n')}
@@ -581,7 +675,7 @@ export class ScladService {
             }
 
             // Сортируем заказы (чтобы не повторялись).
-            let shipments = [];
+            const shipments = [];
             for(const item of allData) {
                 for(const sh of item.shipments) {
                     let exist = false
@@ -609,8 +703,8 @@ export class ScladService {
             model: PodPodMaterial,
             where: {id: mat_id},
             attributes: ['id']
-        }]
-        if(includes.length && !includesNoProduct) include.push(...includes)
+        }];
+        if(includes.length && !includesNoProduct) include.push(...includes);
 
         const where = {ban: false} 
         const attrimbute = [
@@ -620,28 +714,28 @@ export class ScladService {
             'min_remaining', 
             'name', 
             'id'
-        ]
+        ];
         
         const allProduct = await this.productReprository.findAll({include, 
             attributes: ['listPokDet', ...attrimbute], where
-        })
-        if(includes.length, includesNoProduct) include.push(...includes)
+        });
+        if(includes.length, includesNoProduct) include.push(...includes);
         const allCbed = await this.cbedReprository.findAll({include, 
             attributes: ['listPokDet', ...attrimbute], where
-        })
+        });
         const allDetal = await this.detalReprository.findAll({include, 
             attributes: ['mat_zag', 'mat_zag_zam', 'massZag', 'lengt', ...attrimbute], where
-        })
+        });
 
-        const prod = JSON.parse(JSON.stringify(allProduct))
-        const cbed = JSON.parse(JSON.stringify(allCbed))
-        const detal = JSON.parse(JSON.stringify(allDetal))
+        const prod = JSON.parse(JSON.stringify(allProduct));
+        const cbed = JSON.parse(JSON.stringify(allCbed));
+        const detal = JSON.parse(JSON.stringify(allDetal));
 
-        prod.forEach((el: any) => el['type'] = 'prod')
-        cbed.forEach((el: any) => el['type'] = 'cbed')
-        detal.forEach((el: any)=> el['type'] = 'detal')
+        prod.forEach((el: any) => el['type'] = 'prod');
+        cbed.forEach((el: any) => el['type'] = 'cbed');
+        detal.forEach((el: any)=> el['type'] = 'detal');
 
-        return { prod, cbed, detal }
+        return { prod, cbed, detal };
     }
 
     private returnObjForListShipments(type: string, _id: number, sh: Shipments) {
@@ -650,9 +744,9 @@ export class ScladService {
             if(sh.list_cbed_detal) arr = JSON.parse(sh.list_cbed_detal);
             if(sh.list_hidden_cbed_detal) arr = arr.concat(JSON.parse(sh.list_hidden_cbed_detal));
             
-            let objData = [];
+            const objData = [];
             for(const item of arr) {
-                if(item.type == type && _id == item.obj.id) objData.push(item)
+                if(item.type == type && _id == item.obj.id) objData.push(item);
             }
 
             return objData;
@@ -667,7 +761,7 @@ export class ScladService {
         
         const { prod, cbed, detal }: any = await this.findParentsComplectMaterial(mat_id, includes, includesNoProduct);
 
-        let allData = []
+        let allData = [];
 
         function returnObjMat(item: any, zag: any) {
             if(!zag) return item;
@@ -675,49 +769,49 @@ export class ScladService {
                 mat: {id: zag},
                 kol: 1,
                 ez: 1
-            })
+            });
             if(item.massZag)
                 item.materialList.push({
                     mat: {id: zag},
                     kol: Math.round(item.massZag),
                     ez: 3
-                })
+                });
             if(item.lengt) {
                 item.materialList.push({
                     mat: {id: zag},
                     kol: Math.round(item.lengt),
                     ez: 2
-                })
+                });
             }
-            return item
+            return item;
         }
 
         try {
-            allData = [...prod, ...cbed, ...detal];
+            allData = [...prod, ...cbed, ...detal];;
 
             for(let item of allData) {
                 if(item.materialList) 
-                    item.materialList = JSON.parse(item.materialList)
-                else item.materialList = []
+                    item.materialList = JSON.parse(item.materialList);
+                else item.materialList = [];
                 if(item?.listPokDet && item.listPokDet)
-                    item.listPokDet = JSON.parse(item.listPokDet)
-                else item.listPokDet = []
+                    item.listPokDet = JSON.parse(item.listPokDet);
+                else item.listPokDet = [];
 
-                item = returnObjMat(item, item?.mat_zag)
-                item = returnObjMat(item, item?.mat_zag_zam)
+                item = returnObjMat(item, item?.mat_zag);
+                item = returnObjMat(item, item?.mat_zag_zam);
 
                 item.materialList = [...item.materialList, ...item.listPokDet].filter((el: any) => {
-                    return el.mat && el.mat.id == mat_id
+                    return el.mat && el.mat.id == mat_id;
                 })
-                delete item.listPokDet
+                delete item.listPokDet;
 
             } 
         } catch(e) {
-            console.error(e)
-            this.logger.error("Произошла ошибка service::getMaterialParents")
+            console.error(e);
+            this.logger.error("Произошла ошибка service::getMaterialParents");
         }
        
-        return allData
+        return allData;
     }
 
     // Сортировка материала по заказам 

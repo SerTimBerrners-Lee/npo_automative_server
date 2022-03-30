@@ -338,29 +338,27 @@ export class SettingsService {
         if(areaCrossSectional && areaCrossSectional.edizm && areaCrossSectional.znach) 
             await this.edizmReprository.findByPk(areaCrossSectional.edizm).then(res => {
                 if(res) 
-                    podPodMaterial.areaCrossSectional = JSON.stringify({edizm: res, znach: areaCrossSectional.znach})
+                    podPodMaterial.areaCrossSectional = JSON.stringify({edizm: res, znach: areaCrossSectional.znach});
             })
-        else 
-            podPodMaterial.areaCrossSectional = null
+        else podPodMaterial.areaCrossSectional = null;
 
         await podPodMaterial.save()
 
         if(dto.rootParentId) {
-            podPodMaterial.podMaterialId = podMaterials.id
+            podPodMaterial.podMaterialId = podMaterials.id;
             if(dto.rootParentId) { 
-                let material = await this.materialReprository.findByPk(dto.rootParentId)
-                if(material)
-                    podPodMaterial.materialsId = material.id
+                let material = await this.materialReprository.findByPk(dto.rootParentId);
+                if(material) podPodMaterial.materialsId = material.id;
             }
         }
-        await podPodMaterial.save()
+        await podPodMaterial.save();
 
         if(dto.providers) {
-            podPodMaterial.providers = []
-            const providers = JSON.parse(dto.providers)
+            podPodMaterial.providers = [];
+            const providers = JSON.parse(dto.providers);
             for(const prx of providers) {
-                const res = await this.providersReprository.findByPk(prx.id)
-                if(res) podPodMaterial.$add('providers', res.id)
+                const res = await this.providersReprository.findByPk(prx.id);
+                if(res) podPodMaterial.$add('providers', res.id);
             }
         }
 
@@ -375,43 +373,42 @@ export class SettingsService {
         if(dto.docs, files.document) 
             await this.documentsService.attachDocumentForObject(podPodMaterial, dto, files);
 
-        await podPodMaterial.save()
-        return podPodMaterial
+        await podPodMaterial.save();
+        return podPodMaterial;
     }
 
     async getPodPodMaterial() {
-        const podPodMaterial = await this.podPodMaterialReprository.findAll({where: {ban: false}, include: {all: true}})
-        return podPodMaterial
+        const podPodMaterial = await this.podPodMaterialReprository.findAll({where: {ban: false}, include: {all: true}});
+        return podPodMaterial;
     }
 
     async getPodMaterialById(id: number) {
-        const podMaterial = await this.podMaterialReprository.findByPk(id, {include: {all:true}})
-        return podMaterial 
+        const podMaterial = await this.podMaterialReprository.findByPk(id, {include: {all:true}});
+        return podMaterial;
     }
 
     async removePPMById(id: number) {
-        const PPM = await this.podPodMaterialReprository.findByPk(id)
-        if(PPM)
-            return await this.podPodMaterialReprository.destroy({where: {id}})
+        const PPM = await this.podPodMaterialReprository.findByPk(id);
+        if(PPM) return await this.podPodMaterialReprository.destroy({where: {id}});
     }
 
     async banPPMById(id: number) {
-        const PPM = await this.podPodMaterialReprository.findByPk(id)
+        const PPM = await this.podPodMaterialReprository.findByPk(id);
         if(PPM) {
-            PPM.ban = !PPM.ban 
-            await PPM.save()
-            return PPM
+            PPM.ban = !PPM.ban;
+            await PPM.save();
+            return PPM;
         }
             
     }
 
     async getOnePPT(id: number) {
-        const PPM = await this.podPodMaterialReprository.findByPk(id, {include: {all: true}})
-        return PPM || null
+        const PPM = await this.podPodMaterialReprository.findByPk(id, {include: {all: true}});
+        return PPM || null;
     }
 
     async getAllPPT() {
-        return await this.podPodMaterialReprository.findAll({where: {ban: false}})
+        return await this.podPodMaterialReprository.findAll({where: {ban: false}});
     }
 
     async getDeficitMaterial() {
@@ -426,58 +423,57 @@ export class SettingsService {
             }
         });
         
-        return materials
+        return materials;
     }
  
     async getAllShipmentsPPM() {
-        const materials = await this.podPodMaterialReprository.findAll({include: {all: true}})
+        const materials = await this.podPodMaterialReprository.findAll({include: {all: true}});
         if(!materials)
-            throw new HttpException('Материалов не найдено', HttpStatus.BAD_GATEWAY)
+            throw new HttpException('Материалов не найдено', HttpStatus.BAD_GATEWAY);
     
-        let new_mat_arr = [] 
-        const comparison = new DateMethods().comparison
+        const new_mat_arr = [];
+        const comparison = new DateMethods().comparison;
 
-        for(let mat of materials) {
+        for(const mat of materials) {
             if(mat.deliveries && mat.deliveries.length) {
                 for(let dev of mat.deliveries) {
                     if(comparison(dev.date_shipments,  undefined, '>' )) {
-                        let dev_all = await this.deliveriesReprository.findByPk(dev.id, {include: ['documents', 'provider']})
-                        new_mat_arr.push({mat, dev: dev_all})
+                        const dev_all = await this.deliveriesReprository.findByPk(dev.id, {include: ['documents', 'provider']});
+                        new_mat_arr.push({mat, dev: dev_all});
                     }
                 }
             }
         }
 
-        return new_mat_arr
+        return new_mat_arr;
     }
 
     async getNormHors() {
-        const nh = await this.normhorsReprository.findAll()
-        return nh
+        const nh = await this.normhorsReprository.findAll();
+        return nh;
     }
 
     async updateNormHors(znach: any) {
-        const nh = await this.normhorsReprository.findOne()
+        const nh = await this.normhorsReprository.findOne();
         if(nh) {
-            nh.znach = znach.znach
-            nh.save()
+            nh.znach = znach.znach;
+            nh.save();
         }
     }
 
     async getAllMaterialProvider() {
-        const materials = await this.podPodMaterialReprository.findAll({include: {all: true}})
+        const materials = await this.podPodMaterialReprository.findAll({include: {all: true}});
 
         if(!materials)
-            throw new HttpException('Произошла ошибка при получении дефицита. ', HttpStatus.BAD_REQUEST)
+            throw new HttpException('Произошла ошибка при получении дефицита. ', HttpStatus.BAD_REQUEST);
 
         let materials_provider = []
         for(let material of materials) {
-            if(!material.providers.length)
-                continue
-            materials_provider.push(material)
+            if(!material.providers.length) continue;
+            materials_provider.push(material);
         }
 
-        return materials_provider
+        return materials_provider;
     }
 
     async getAllMaterialProviderById(id: number) {
