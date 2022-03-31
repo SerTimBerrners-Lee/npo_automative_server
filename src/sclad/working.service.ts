@@ -114,7 +114,7 @@ export class WorkingService {
     else workers.type = WorkingType.ass;
 
     workers.description = workers_data.description;
-    await workers.save()
+    await workers.save();
 
     for(const item of workers_complect) {
       if(workers_data.type == 'det') {
@@ -123,19 +123,19 @@ export class WorkingService {
           detal_id: item.detal_id,
           my_kolvo: item.my_kolvo,
           shipments_kolvo: item.shipments_kolvo
-        })
-        workers.$add('metall', metall.id)
+        });
+        workers.$add('metall', metall.id);
       } else {
         const assemble = await this.assembleService.createAssemble({
           ...workers_data,
           cbed_id: item.cbed_id,
           my_kolvo: item.my_kolvo,
           shipments_kolvo: item.shipments_kolvo
-        })
-        workers.$add('assemble', assemble.id)
+        });
+        workers.$add('assemble', assemble.id);
       }
     }
 
-    return workers
+    return workers;
   }
 }

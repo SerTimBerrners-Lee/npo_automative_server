@@ -349,7 +349,7 @@ export class ShipmentsService {
 	async updateStatus(shipments: Array<Shipments>, new_status: string) {
 		for(let item of shipments) {
 			if(item.ban) continue;
-			item.status = new_status
+			item.status = new_status;
 			await item.save()
 		}
 	}

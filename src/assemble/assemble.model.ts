@@ -1,7 +1,9 @@
 import { ApiProperty } from "@nestjs/swagger";
-import { Model, Column, DataType, Table, ForeignKey, BelongsTo} from "sequelize-typescript";
+import { Model, Column, DataType, Table, ForeignKey, BelongsTo, BelongsToMany} from "sequelize-typescript";
 import { Cbed } from "src/cbed/cbed.model";
 import { StatusAssemble } from "src/files/enums";
+import { WorkingAssemble } from "src/sclad/working-assemble.model";
+import { Working } from "src/sclad/working.model";
 
 interface AssembleAttrCreate {
   date_order: string;
@@ -33,7 +35,7 @@ export class Assemble extends Model<Assemble, AssembleAttrCreate> {
   number_order: string;
 
   @ApiProperty({example: '1', description: ''})
-  @Column({type: DataType.STRING})
+  @Column({type: DataType.STRING}) 
   date_shipments: string;
 
   @ApiProperty({example: '1', description: ''})
@@ -51,6 +53,9 @@ export class Assemble extends Model<Assemble, AssembleAttrCreate> {
   @ApiProperty({example: '', description: ''})
   @Column({type: DataType.STRING, defaultValue: StatusAssemble.performed})
   status: string;
+
+  @BelongsToMany(() => Working, () => WorkingAssemble)
+  workings: Working[];
 
   @ForeignKey(() => Cbed)
   @Column({type: DataType.INTEGER})

@@ -5,6 +5,8 @@ import { DetalModule } from 'src/detal/detal.module';
 import { MetaloworkingModule } from 'src/metaloworking/metaloworking.module';
 import { Product } from 'src/product/product.model';
 import { ProductModule } from 'src/product/product.module';
+import { WorkingAssemble } from 'src/sclad/working-assemble.model';
+import { Working } from 'src/sclad/working.model';
 import { SettingsModule } from 'src/settings/settings.module';
 import { ShipmentsModule } from 'src/shipments/shipments.module';
 import { AssembleController } from './assemble.controller';
@@ -17,7 +19,9 @@ import { AssembleService } from './assemble.service';
 	imports: [
 		SequelizeModule.forFeature([
 			Assemble,
-			Product
+			Product,
+			WorkingAssemble,
+			Working
 		]),
 		CbedModule,
 		SettingsModule,

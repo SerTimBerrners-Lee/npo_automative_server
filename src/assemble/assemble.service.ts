@@ -8,6 +8,7 @@ import { TechProcess } from 'src/detal/tech-process.model';
 import { StatusAssemble, statusShipment } from 'src/files/enums';
 import { MetaloworkingService } from 'src/metaloworking/metaloworking.service';
 import { Product } from 'src/product/product.model';
+import { Working } from 'src/sclad/working.model';
 import { SettingsService } from 'src/settings/settings.service';
 import { Shipments } from 'src/shipments/shipments.model';
 import { ShipmentsService } from 'src/shipments/shipments.service';
@@ -109,19 +110,38 @@ export class AssembleService {
 		], where: {ban: isBan}})
 		// Фильтрация по операциям
 		for(let obj of assembly) {
-			if(!obj.cbed || !obj.cbed.techProcesses || !obj.cbed.techProcesses.operations.length) continue
+			if(!obj.cbed || !obj.cbed.techProcesses || !obj.cbed.techProcesses.operations.length) continue;
 			for(let i in obj.cbed.techProcesses.operations) {
 				for(let j in obj.cbed.techProcesses.operations) {
 					if(obj.cbed.techProcesses.operations[i].id < obj.cbed.techProcesses.operations[j].id) {
-						const ggg = obj.cbed.techProcesses.operations[i]
-						obj.cbed.techProcesses.operations[i] = obj.cbed.techProcesses.operations[j]
-						obj.cbed.techProcesses.operations[j] = ggg
+						const ggg = obj.cbed.techProcesses.operations[i];
+						obj.cbed.techProcesses.operations[i] = obj.cbed.techProcesses.operations[j];
+						obj.cbed.techProcesses.operations[j] = ggg;
 					}
 				}
 			}
 		}
-		
-		return assembly
+		 
+		return assembly;
+	}
+
+	async getAllAssemblePlan() {
+		const assembly = await this.assembleReprository.findAll({ where: { ban: false }, include: [
+			{
+				model: Cbed,
+				attributes: ['id', 'name', 'articl', 'shipments_kolvo'],
+				include: [{
+					model: Shipments
+				}]
+			},
+			{
+				model: Working
+			},
+		]});
+		if (!assembly)
+			throw new HttpException('Не удалось получить сборки', HttpStatus.NOT_FOUND);
+
+		return assembly;
 	}
 
 	// Кидаем сборку в бан.

@@ -27,6 +27,12 @@ export class AssembleController {
 			return this.assembleService.getAllAssemble(isBan)
 	}
 
+	@ApiOperation({summary: 'Получить все Сборки'})
+	@Get('/asstoplan')
+	getAllAssemblePlan() {
+			return this.assembleService.getAllAssemblePlan();
+	}
+
 	@ApiOperation({summary: 'Получить Сборку'})
 	@Get('/:id')
 	getAssembleById(@Param('id') id: number) {
