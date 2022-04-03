@@ -2,14 +2,11 @@ import { forwardRef, HttpException, HttpStatus, Inject, Injectable } from '@nest
 import { InjectModel } from '@nestjs/sequelize';
 import { Cbed } from 'src/cbed/cbed.model';
 import { CbedService } from 'src/cbed/cbed.service';
-import { DetalService } from 'src/detal/detal.service';
 import { Operation } from 'src/detal/operation.model';
 import { TechProcess } from 'src/detal/tech-process.model';
 import { StatusAssemble, statusShipment } from 'src/files/enums';
-import { MetaloworkingService } from 'src/metaloworking/metaloworking.service';
 import { Product } from 'src/product/product.model';
 import { Working } from 'src/sclad/working.model';
-import { SettingsService } from 'src/settings/settings.service';
 import { Shipments } from 'src/shipments/shipments.model';
 import { ShipmentsService } from 'src/shipments/shipments.service';
 import { Assemble } from './assemble.model';
@@ -22,10 +19,7 @@ export class AssembleService {
 		@Inject(forwardRef(()=> ShipmentsService))
 		private shipmentsService: ShipmentsService,
 		@InjectModel(Product) private productReprostory: typeof Product,
-		private cbedService: CbedService,
-		private settingsService: SettingsService, 
-		private detalService: DetalService, 
-		private metaloworkingService: MetaloworkingService) {} 
+		private cbedService: CbedService) {} 
 
 	// Добавляем сборку
 	async createAssemble(dto: CreateAssembleDto) {
@@ -33,8 +27,8 @@ export class AssembleService {
 			.create({
 				date_order: dto.date_order,
 				description: dto.description,
-				type_izd: dto.type
-			})
+				type_izd: dto.type || 'cbed'
+			});
 		if(!assemble)
 			throw new HttpException('Не удалось отправить в производство', HttpStatus.BAD_GATEWAY);
 		
