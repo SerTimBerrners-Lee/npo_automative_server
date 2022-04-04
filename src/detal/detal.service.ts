@@ -1,5 +1,6 @@
 import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
 import { InjectModel } from '@nestjs/sequelize';
+import { Sequelize } from 'sequelize-typescript';
 import { Actions } from 'src/actions/actions.model';
 import { Cbed } from 'src/cbed/cbed.model';
 import { Documents } from 'src/documents/documents.model';
@@ -26,7 +27,8 @@ export class DetalService {
         @InjectModel(Actions) private actionsReprository: typeof Actions,
         @InjectModel(Product) private productReprository: typeof Product,
         @InjectModel(Cbed) private cbedReprository: typeof Cbed,
-        private documentsService: DocumentsService
+        private documentsService: DocumentsService,
+        private sequelize: Sequelize
     ) {} 
 
     async getAllDetals(light: string) {
@@ -135,143 +137,154 @@ export class DetalService {
 
     private async upCreateDetal(dto: any, files: any, detal: any) {
 
-        if(dto.articl != 'null')
-            detal.articl = dto.articl
-            else detal.articl = 0
-        if(dto.description != 'null')
-            detal.description = dto.description 
-            else detal.description = ''
-        if(dto.parametrs)
-            detal.parametrs = dto.parametrs
-        if(dto.haracteriatic)
-            detal.haracteriatic = dto.haracteriatic
-        if(dto.DxL != 'null')
-            detal.DxL = dto.DxL
-            else detal.DxL = 0
-        // Haracteristics zag
-        if(dto.diametr && dto.diametr != 'null')
-            detal.diametr = dto.diametr
-        else detal.diametr = ''
+        try {
+            await this.sequelize.transaction(async t => {
+                const transactionHost = { transaction: t };
 
-        if(dto.lengt && dto.lengt != 'null')
-            detal.lengt = dto.lengt
-        else detal.lengt = ''
+                if(dto.articl != 'null')
+                    detal.articl = dto.articl
+                    else detal.articl = 0
+                if(dto.description != 'null')
+                    detal.description = dto.description 
+                    else detal.description = ''
+                if(dto.parametrs)
+                    detal.parametrs = dto.parametrs
+                if(dto.haracteriatic)
+                    detal.haracteriatic = dto.haracteriatic
+                if(dto.DxL != 'null')
+                    detal.DxL = dto.DxL
+                    else detal.DxL = 0
+                // Haracteristics zag
+                if(dto.diametr && dto.diametr != 'null')
+                    detal.diametr = dto.diametr
+                else detal.diametr = ''
 
-        if(dto.height && dto.height != 'null')
-            detal.height = dto.height
-        else detal.height = ''   
+                if(dto.lengt && dto.lengt != 'null')
+                    detal.lengt = dto.lengt
+                else detal.lengt = ''
 
-        if(dto.thickness && dto.thickness != 'null')
-            detal.thickness = dto.thickness
-        else detal.thickness = ''
+                if(dto.height && dto.height != 'null')
+                    detal.height = dto.height
+                else detal.height = ''   
 
-        if(dto.wallThickness && dto.wallThickness != 'null')
-            detal.wallThickness = dto.wallThickness
-        else detal.wallThickness = ''
+                if(dto.thickness && dto.thickness != 'null')
+                    detal.thickness = dto.thickness
+                else detal.thickness = ''
 
-        if(dto.width && dto.width != 'null')
-            detal.width = dto.width
-        else detal.width = ''
+                if(dto.wallThickness && dto.wallThickness != 'null')
+                    detal.wallThickness = dto.wallThickness
+                else detal.wallThickness = ''
 
-        if(dto.areaCS && dto.areaCS != 'null')
-            detal.areaCS = dto.areaCS
-        else detal.areaCS = ''
+                if(dto.width && dto.width != 'null')
+                    detal.width = dto.width
+                else detal.width = ''
 
-        if(dto.massZag != 'null')
-            detal.massZag = dto.massZag
-        else detal.massZag = 0
+                if(dto.areaCS && dto.areaCS != 'null')
+                    detal.areaCS = dto.areaCS
+                else detal.areaCS = ''
 
-        if(dto.trash != 'null')
-            detal.trash = dto.trash
-        else detal.trash = 0
-        detal.attention = dto.attention
+                if(dto.massZag != 'null')
+                    detal.massZag = dto.massZag
+                else detal.massZag = 0
 
-        console.log(dto);
+                if(dto.trash != 'null')
+                    detal.trash = dto.trash
+                else detal.trash = 0
+                detal.attention = dto.attention
 
-        await detal.save()
-        if(detal.materials && detal.materials.length) {
-            for(let det of detal.materials) {
-                await detal.$remove('materials', det.id)
-            }
-        }
+                await detal.save({ transactionHost });
 
-        if(Number(dto.responsible)) {
-            const user = await this.userRepository.findByPk(dto.responsible)
-            if(user)
-                detal.responsibleId = user.id
-        }
-
-        detal.mat_zag = null;
-        if(Number(dto.mat_zag)) {
-            detal.mat_zag = dto.mat_zag;
-            let material = await this.podPodMaterialReprository.findByPk(dto.mat_zag);
-            if(material) {
-                await detal.$add('materials', material.id);
-                detal.mat_zag = dto.mat_zag;
-                await detal.save();
-            }
-        }
-
-        detal.mat_zag_zam = null;
-        if(Number(dto.mat_zag_zam)) {
-            detal.mat_zag_zam = dto.mat_zag_zam;
-            let material = await this.podPodMaterialReprository.findByPk(dto.mat_zag_zam);
-            if(material) {
-                await detal.$add('materials', material.id);
-                detal.mat_zag_zam = dto.mat_zag_zam;
-                await detal.save();
-            }
-        }
-
-        if(dto.materialList) {
-            const mList = JSON.parse(dto.materialList)
-            if(mList.length) {
-                for(let m = 0; m < mList.length; m++) {
-                    let material = await this.podPodMaterialReprository.findByPk(mList[m].mat.id)
-                    if(material) {
-                        mList[m].mat.name = material.name
-                        await detal.$add('materials', material.id)
+                if(detal.materials && detal.materials.length) {
+                    for(let det of detal.materials) {
+                        await detal.$remove('materials', det.id)
                     }
                 }
-                detal.materialList = JSON.stringify(mList)
-            }
-        } else 
-            detal.materialList = ''   
 
-        await detal.save()
-
-        if(Number(dto.techProcessID)) {
-            const tp = await this.techProcessReprository.findByPk(dto.techProcessID)
-            if(tp) {
-                tp.detalId = detal.id
-                await tp.save()
-            }
-        }
-
-        if(detal.documents) {
-            for(const doc of detal.documents) {
-                detal.$remove('documents', doc.id)
-            }
-        }
-        
-        if(dto.file_base && dto.file_base != '[]') {
-            try {
-                const pars = JSON.parse(dto.file_base)
-                for(const file of pars) {
-                    const check_files = await this.documentsService.getFileById(file)
-                    if(check_files)
-                        await detal.$add('documents', check_files)
+                if(Number(dto.responsible)) {
+                    const user = await this.userRepository.findByPk(dto.responsible)
+                    if(user)
+                        detal.responsibleId = user.id
                 }
-            }   catch(e) {
-                console.error(e)
-            }
-        }
 
-        if(dto.docs, files.document) 
-            await this.documentsService.attachDocumentForObject(detal, dto, files)
- 
-        await detal.save()
-        return detal
+                detal.mat_zag = null;
+                if(Number(dto.mat_zag)) {
+                    detal.mat_zag = dto.mat_zag;
+                    let material = await this.podPodMaterialReprository.findByPk(dto.mat_zag);
+                    if(material) {
+                        await detal.$add('materials', material.id);
+                        detal.mat_zag = dto.mat_zag;
+                    }
+                }
+
+                detal.mat_zag_zam = null;
+                if(Number(dto.mat_zag_zam)) {
+                    detal.mat_zag_zam = dto.mat_zag_zam;
+                    let material = await this.podPodMaterialReprository.findByPk(dto.mat_zag_zam);
+                    if(material) {
+                        await detal.$add('materials', material.id);
+                        detal.mat_zag_zam = dto.mat_zag_zam;
+                    }
+                }
+
+                if(dto.materialList) {
+                    const mList = JSON.parse(dto.materialList)
+                    if(mList.length) {
+                        for(let m = 0; m < mList.length; m++) {
+                            let material = await this.podPodMaterialReprository.findByPk(mList[m].mat.id)
+                            if(material) {
+                                mList[m].mat.name = material.name
+                                await detal.$add('materials', material.id)
+                            }
+                        }
+                        detal.materialList = JSON.stringify(mList)
+                    }
+                } else 
+                    detal.materialList = ''
+
+                if(Number(dto.techProcessID)) {
+                    const tp = await this.techProcessReprository.findByPk(dto.techProcessID)
+                    if(tp) {
+                        tp.detalId = detal.id
+                        await tp.save()
+                    }
+                }
+
+                // Проверяем - если документа нет в массиве документов - удаляем.
+                if(detal.documents && detal.documents.length) {
+                    for(const doc of detal.documents) {
+                        detal.$remove('documents', doc.id)
+                    }
+                }
+
+                if(dto.file_base && dto.file_base != '[]') {
+                    const pars = JSON.parse(dto.file_base)
+                    for(const file of pars) {
+                        if(detal.documents && detal.documents.length) {
+                            let doc_id = null;
+                            for(const doc of detal.documents) {
+                                doc_id = doc.id;
+                                if (doc.id == file) doc_id = null;
+                            }
+                            if (doc_id) await detal.$remove('documents', doc_id);
+                            doc_id = null;
+                        }
+
+                        const check_files = await this.documentsService.getFileById(file);
+                        if(check_files)
+                            await detal.$add('documents', check_files);
+                    }
+                }
+
+                if(dto.docs, files.document) 
+                    await this.documentsService.attachDocumentForObject(detal, dto, files);
+        
+                await detal.save(transactionHost);
+                return detal;
+            });
+        } catch(err) {
+            console.error(err);
+            throw new HttpException('Ошибка с сохранением детали', HttpStatus.BAD_GATEWAY)
+        }
     } 
 
     async createNewTechProcess(dto: UpCreateTechProcessDto, files: any) {

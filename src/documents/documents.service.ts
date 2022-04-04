@@ -52,7 +52,7 @@ export class DocumentsService {
      * @param files 
      */
     async attachDocumentForObject(obj: any, dto: any, files: any) {
-        const arrDocuments = await this.createArrDocuments(dto, files)
+        const arrDocuments = await this.createArrDocuments(dto, files);
         if(arrDocuments && arrDocuments.length) {
             const obj_documents = await obj.$get('documents');
             for(const doc of arrDocuments) {
