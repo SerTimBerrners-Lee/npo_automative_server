@@ -75,37 +75,43 @@ export class SettingsService {
     }
 
     async getAllTypeMaterial() {
-        const materials = await this.materialReprository.findAll({include: {all: true}})
+        const materials = await this.materialReprository.findAll({include: [{all: true}, {
+            model: PodPodMaterial, 
+            where: { ban: false }
+        }]});
         
-        return materials
+        return materials;
     }
 
     async getOneMaterial(id: number) {
-        return await this.materialReprository.findByPk(id)
+        return await this.materialReprository.findByPk(id);
     }
 
     async getAllPodTypeMaterial(instans: string | number) {
         let materials = []
         if(instans == 'all')
-            materials = await this.podMaterialReprository.findAll({include: {all: true}})
+            materials = await this.podMaterialReprository.findAll({include: [{all: true}, {
+                model: PodPodMaterial, 
+                where: { ban: false }
+            }]});
         else 
-            materials = await this.podMaterialReprository.findAll({where: { instansMaterial: instans }})
+            materials = await this.podMaterialReprository.findAll({where: { instansMaterial: instans }});
 
-        return materials
+        return materials;
     }
 
     async createMaterial(dto: CreateMaterialDto) {
         const material = await this.materialReprository.create({name: dto.name})
         if(!material)
-            throw new HttpException('Произошла проблема при запросе к базе данных', HttpStatus.BAD_REQUEST)
+            throw new HttpException('Произошла проблема при запросе к базе данных', HttpStatus.BAD_REQUEST);
         
         if(dto.instansMaterial) {
-            material.instansMaterial = dto.instansMaterial
-            await material.save()
+            material.instansMaterial = dto.instansMaterial;
+            await material.save();
         }
 
-        const updateMat = await this.createOrUpdateMaterial(dto, material.id)
-        return updateMat
+        const updateMat = await this.createOrUpdateMaterial(dto, material.id);
+        return updateMat;
     }
     
     async updateMaterial(dto: UpdateMaterialDto) {
