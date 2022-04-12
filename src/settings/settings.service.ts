@@ -360,13 +360,20 @@ export class SettingsService {
         await podPodMaterial.save();
 
         if(dto.providers) {
-            podPodMaterial.providers = [];
+            for(const item of podPodMaterial.providers) {
+                await podPodMaterial.$remove('providers', item.id);
+            }
             const providers = JSON.parse(dto.providers);
+            
             for(const prx of providers) {
-                const res = await this.providersReprository.findByPk(prx.id);
+                const res = await this.providersReprository.findByPk(prx.id, { attributes: ['id']});
                 if(res) podPodMaterial.$add('providers', res.id);
             }
-        }
+        } else {
+            for(const item of podPodMaterial.providers) {
+                await podPodMaterial.$remove('providers', item.id);
+            }
+        };
 
         if(podPodMaterial.documents) {
             for(const doc of podPodMaterial.documents) {
