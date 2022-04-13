@@ -123,8 +123,11 @@ export class Shipments extends Model<Shipments, ShipmentsAttrCreate> {
         if (
             !item.ban // Если не в бане 
             && dt.dateDifference(undefined, item.date_shipments) < 1 // Просрочено 
-            && item.status != statusShipment.done // И не отгружено
           ) {
+
+          if (item.status == statusShipment.overbue) continue; // Статус просрочено уже есть 
+          if (item.status == statusShipment.done) continue; // Статус Отгружено - пропускаем
+
           item.status = statusShipment.overbue;
           await item.save();
         }
