@@ -116,14 +116,15 @@ export class Shipments extends Model<Shipments, ShipmentsAttrCreate> {
     @AfterFind
     static async checkOverbye(shipment: Array<Shipments>) {
       // Если просрочено по времени - меняем статус при условии что задача не удалена
-      const dt = new DateMethods()
+      const dt = new DateMethods();
 
       if(!shipment?.length) return;
       for(const item of shipment) {
-        if(
-          !item.ban &&
-          dt.dateDifference(undefined, item.date_shipments) < 1 &&
-          item.status != statusShipment.overbue && item.status != statusShipment.done) {
+        if (
+            !item.ban // Если не в бане 
+            && dt.dateDifference(undefined, item.date_shipments) < 1 // Просрочено 
+            && item.status != statusShipment.done // И не отгружено
+          ) {
           item.status = statusShipment.overbue;
           await item.save();
         }
