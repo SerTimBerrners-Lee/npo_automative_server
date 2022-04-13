@@ -252,7 +252,7 @@ export class ShipmentsService {
 	}
 
 	async getAllShipmentsTo() {
-		const shipments = await this.shipmentsReprository.findAll({include: ['childrens', 
+		const shipments = await this.shipmentsReprository.findAll({include: [
 		{
 			model: Product,
 			attributes: ['name', 'id', 'articl', 'fabricNumber']
@@ -341,9 +341,31 @@ export class ShipmentsService {
 		return await this.shipmentsReprository.findByPk(id, {include: [
 			{
 				model: Buyer,
-				attributes: ['id']
+				attributes: ['id', 'name']
+			},
+			{
+				model: Product,
+				attributes: ['id', 'name', 'articl', 'fabricNumber']
 			}, 'documents'
 		]})
+	}
+
+	async getIncludeModelSh(id: number, folder: string) {
+		let include: any;
+		if (folder == 'childrens') {
+			include = [{
+					model: Shipments,
+					include: [
+						{ model: Product, attributes: ['id', 'name', 'articl'] },
+						{ model: Buyer, attributes: ['id', 'name'] },
+						'documents'
+					],
+				}]
+		} else include = [folder];
+
+		const sh = await this.shipmentsReprository.findByPk(id, {include, attributes: ['id']});
+		if (!sh) throw new HttpException('Не удалось найти задачу или само поле к задаче', HttpStatus.BAD_GATEWAY);
+		return sh;
 	}
 
 	async updateStatus(shipments: Array<Shipments>, new_status: string) {

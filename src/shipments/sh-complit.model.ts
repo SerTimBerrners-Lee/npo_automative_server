@@ -45,6 +45,14 @@ export class ShComplit extends Model<ShComplit, ShComplitAttrCreate> {
     @Column({type: DataType.STRING})
     base: string;
 
+    @ApiProperty({example: '1', description: 'Дата выполнения'})
+    @Column({type: DataType.STRING})
+    date_create: string;
+
+		@ApiProperty({example: '1', description: 'Транспортная компания'})
+    @Column({type: DataType.STRING})
+    transport: string;
+
 		@ApiProperty({example: '1', description: 'Если заказчик склад'})
     @Column({type: DataType.BOOLEAN, defaultValue: false})
     to_sklad: boolean;

@@ -65,3 +65,7 @@ $ npm run test:cov
 # выполняем установку зависимости
 $ sudo apt-get install imagemagick ghostscript poppler-utils
 ```
+
+## Code Style 
+1. Controller
+  - Контроллер должен иметь название соответствующее функции к которой он обращается в Сервисе.

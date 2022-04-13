@@ -41,6 +41,12 @@ export class ShipmentsController {
 		return this.shComplitSettings.getAll();
 	}
 
+	@ApiOperation({summary: 'Получает Включенные модели к Задаче'})
+  @Get('/getinclude/:id/:folder')
+	getIncludeModelSh(@Param('id') id: number, @Param('folder') folder: string) {
+		return this.shipmentsSettings.getIncludeModelSh(id, folder);
+	}
+
 	@ApiOperation({summary: 'Обновлние заказа'})
 	@UseInterceptors(FileFieldsInterceptor([
 			{name: 'document', maxCount: 40}

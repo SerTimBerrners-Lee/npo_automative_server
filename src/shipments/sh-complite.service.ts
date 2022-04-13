@@ -25,6 +25,8 @@ export class ShComplitService {
       sh_complit.description = dto.description;
       sh_complit.fabric_number = dto.fabric_number;
       sh_complit.name_check = dto.name_check;
+      sh_complit.date_create = dto.date_create;
+      sh_complit.transport = dto.transport;
 
       if(dto.responsible_user_id && dto.responsible_user_id != 'null') {
         const user = await this.userReprository.findByPk(dto.responsible_user_id);

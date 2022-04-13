@@ -10,5 +10,7 @@ export class ShCheckDto {
   readonly shipments_id: number;
   readonly responsible_user_id: string;
   readonly creater_user_id: string;
+  readonly date_create: string;
+  readonly transport: string;
   readonly docs: any;	
 }
