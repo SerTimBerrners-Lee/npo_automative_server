@@ -41,28 +41,28 @@ export class ShipmentsService {
 
 		try {
 			const data = JSON.parse(dto.data)
-			if(!data) throw new HttpException('Пустой запрос', HttpStatus.NO_CONTENT)
-			data.docs = dto.docs
+			if(!data) throw new HttpException('Пустой запрос', HttpStatus.NO_CONTENT);
+			data.docs = dto.docs;
 
-			let shipment: any
+			let shipment: any;
 			if(data.parent_id) {
 				const parentShipments = await this.shipmentsReprository.findByPk(data.parent_id, {include: {all: true}})
 				if(parentShipments) {
-						let pars_number = parentShipments.number_order.split('от')
-						numberEndShipments = `${pars_number[0]}/${parentShipments.childrens.length + 1} от ${pars_number[1]}`
+						const pars_number = parentShipments.number_order.split('от');
+						numberEndShipments = `${pars_number[0]}/${parentShipments.childrens.length + 1} от ${pars_number[1]}`;
 
 						shipment = await this.shipmentsReprository.create({number_order: numberEndShipments});
 						if(!shipment)
-							throw new HttpException('Не удалось создать заказ', HttpStatus.BAD_REQUEST)
+							throw new HttpException('Не удалось создать заказ', HttpStatus.BAD_REQUEST);
 
-						shipment.parent_id = data.parent_id
-						await shipment.save()
+						shipment.parent_id = data.parent_id;
+						await shipment.save();
 						return await this.upCreateShipments(data, shipment, files);
 				}
 			}
 			shipment = await this.shipmentsReprository.create({number_order: numberEndShipments});
 			if(!shipment)
-				throw new HttpException('Не удалось создать заказ', HttpStatus.BAD_REQUEST)
+				throw new HttpException('Не удалось создать заказ', HttpStatus.BAD_REQUEST);
 
 			return await this.upCreateShipments(data, shipment, files);
 		} catch(e) {console.error(e)}
@@ -71,14 +71,14 @@ export class ShipmentsService {
 
 	async updateShipments(dto: UpCreateShipmentsDto, files: any) {
 		try {
-			const data = JSON.parse(dto.data)
+			const data = JSON.parse(dto.data);
 			if(!data)
-				throw new HttpException('Пустой запрос', HttpStatus.NO_CONTENT)
+				throw new HttpException('Пустой запрос', HttpStatus.NO_CONTENT);
 			const shipment = await this.shipmentsReprository.findByPk(data.id, {include: {all: true}});
 			if(!shipment)
-				throw new HttpException('Не удалось найти заказ', HttpStatus.BAD_REQUEST)
-			data.docs = dto.docs
-			return await this.upCreateShipments(data, shipment, files)
+				throw new HttpException('Не удалось найти заказ', HttpStatus.BAD_REQUEST);
+			data.docs = dto.docs;
+			return await this.upCreateShipments(data, shipment, files);
 		} catch(e) {console.error(e)}
 	}
 
@@ -99,7 +99,7 @@ export class ShipmentsService {
 				for(let doc of pars_id_documents) {
 					const docs = await this.documentsService.getFileById(doc);
 					if(docs) 
-						await shipment.$add('documents', docs.id);
+						await shipment.$add('documents', docs.id);;
 				}
 			} catch(e) {console.error(e)}
 		}
@@ -116,56 +116,55 @@ export class ShipmentsService {
 						for(let upl_izd of parsCurList) {
 							if(upl_izd.type == izd.type && upl_izd.obj.id == izd.obj.id) {
 								if(Number(izd.kol) > Number(upl_izd.kol)) {
-									izd.kol = Math.round(Number(izd.kol) - Number(upl_izd.kol))
-									continue
+									izd.kol = Math.round(Number(izd.kol) - Number(upl_izd.kol));
+									continue;
 								}
-								if(Number(izd.kol) < Number(upl_izd.kol)) izd.kol = Math.round(Number(izd.kol) - Number(upl_izd.kol))
-								else check = false
+								if(Number(izd.kol) < Number(upl_izd.kol)) izd.kol = Math.round(Number(izd.kol) - Number(upl_izd.kol));
+								else check = false;
 							}
 						}
-						if(!check) continue 
+						if(!check) continue;
 					}
-					await this.incrementShipmentsKolvo(izd, shipment, 'increment')
+					await this.incrementShipmentsKolvo(izd, shipment, 'increment');
 				}
 				if(shipment.list_cbed_detal) {
-					let parsCurList = JSON.parse(shipment.list_cbed_detal)
-					if(shipment.list_hidden_cbed_detal) parsCurList = parsCurList.concat(JSON.parse(shipment.list_hidden_cbed_detal))
-					for(let izd of parsCurList) {
-						let check = false
+					let parsCurList = JSON.parse(shipment.list_cbed_detal);
+					if(shipment.list_hidden_cbed_detal) parsCurList = parsCurList.concat(JSON.parse(shipment.list_hidden_cbed_detal));
+					for(const izd of parsCurList) {
+						let check = false;
 						for(let dat_item of list_izd) {
-							if(dat_item.type == izd.type && dat_item.obj.id == izd.obj.id) check = true
+							if(dat_item.type == izd.type && dat_item.obj.id == izd.obj.id) check = true;
 						}
-						if(!check) await this.incrementShipmentsKolvo(izd, shipment, 'decriment')
-						check = false
+						if(!check) await this.incrementShipmentsKolvo(izd, shipment, 'decriment');
+						check = false;
 					}
 				}
 				shipment.list_cbed_detal = data.list_cbed_detal
 				shipment.list_hidden_cbed_detal = data.list_hidden_cbed_detal
 			} catch(e) {console.error(e)}
 		} else {
-			shipment.list_cbed_detal = ''
-			shipment.list_hidden_cbed_detal = ''
+			shipment.list_cbed_detal = '';
+			shipment.list_hidden_cbed_detal = '';
 		}
 
 		if(data.buyer && Number(data.buyer) && !data.to_sklad) {
-			const buyer = await this.buyerService.getByuerById(data.buyer)
+			const buyer = await this.buyerService.getByuerById(data.buyer);
 			if(buyer) {
-				shipment.buyerId = buyer.id
-				await shipment.save()
+				shipment.buyerId = buyer.id;
+				await shipment.save();
 			}
 		}
 		if(data.to_sklad) {
-			if(shipment.buyerId) 
-				shipment.buyerId = null
-			await shipment.save()
+			if(shipment.buyerId) shipment.buyerId = null;
+			await shipment.save();
 		}
 		if(data.product && !data.is_not_product) {
-			const product = await this.productService.getById(data.product.id)
+			const product = await this.productService.getById(data.product.id);
 			if(product) {
-				product.shipments_kolvo += Number(data.kol)
-				shipment.productId = product.id
-				await product.save()
-				await shipment.save()
+				product.shipments_kolvo += Number(data.kol);
+				shipment.productId = product.id;
+				await product.save();
+				await shipment.save();
 			}
 		}
 
@@ -176,20 +175,20 @@ export class ShipmentsService {
 			await this.documentsService.attachDocumentForObject(shipment, data, files);
 		}
 
-		await shipment.save()
-		return shipment
+		await shipment.save();
+		return shipment;
 	}
 
 	async deleteShipmentsById(id:number) {
-		const shipments = await this.shipmentsReprository.findByPk(id)
+		const shipments = await this.shipmentsReprository.findByPk(id);
 		if(!shipments) 
-			throw new HttpException('Не удалось найти задачу', HttpStatus.NOT_FOUND)
+			throw new HttpException('Не удалось найти задачу', HttpStatus.NOT_FOUND);
 
 		if(!shipments.ban) {
-			shipments.ban = true
-			shipments.status = statusShipment.ban
-			await shipments.save()
-			return shipments.id
+			shipments.ban = true;
+			shipments.status = statusShipment.ban;
+			await shipments.save();
+			return shipments.id;
 		}
 
 		if(shipments.list_cbed_detal) {
@@ -207,7 +206,7 @@ export class ShipmentsService {
 		await shipments.save()
 		const result = await this.shipmentsReprository.destroy({where: {id: shipments.id}})
 
-		return result
+		return result;
 	}
 
 	/**
@@ -223,7 +222,7 @@ export class ShipmentsService {
 				if(action == 'increment') shipment.$add('cbeds', izdels.id)
 				else shipment.$remove('cbeds', izdels.id)
 				
-				await izdels.save()
+				await izdels.save();
 			}
 		} else if(izd.type == 'detal') {
 				let izdels = await this.detalService.findByIdDetal(izd.obj.id, 'true')
@@ -231,14 +230,14 @@ export class ShipmentsService {
 					if(action == 'increment') shipment.$add('detals', izdels.id)
 					else shipment.$remove('detals', izdels.id)
 
-					await izdels.save()
+					await izdels.save();
 				}
 		}
 	}
 
 	async getAllShipments(light: string = 'false') {
-		if(light == 'false') return await this.shipmentsReprository.findAll({include: {all: true}})
-		if(light == 'true') return await this.shipmentsReprository.findAll({ attributes: ['id', 'number_order', 'date_shipments'] })
+		if(light == 'false') return await this.shipmentsReprository.findAll({include: {all: true}});
+		if(light == 'true') return await this.shipmentsReprository.findAll({ attributes: ['id', 'number_order', 'date_shipments'] });
 	}
 
 	async getShipmentsIzd(id: number) {
@@ -248,7 +247,7 @@ export class ShipmentsService {
 				{model: Cbed},
 				{model: Product}
 			]
-		})
+		});
 	}
 
 	async getAllShipmentsTo() {
@@ -262,11 +261,11 @@ export class ShipmentsService {
 			attributes: ['name']
 		}
 		]})
-		return shipments
+		return shipments;
 	}
 
 	async getAllShipmentsSclad(to_sclad: boolean) {
-		return await this.shipmentsReprository.findAll({where: {to_sklad: to_sclad}, include: {all: true}})
+		return await this.shipmentsReprository.findAll({where: {to_sklad: to_sclad}, include: {all: true}});
 	}
 
 	async changeShipmentToSclad(id: number) {
@@ -274,7 +273,7 @@ export class ShipmentsService {
 		if(shipments) {
 			shipments.to_sklad = !shipments.to_sklad
 			await shipments.save()
-			return shipments
+			return shipments;
 		}
 	}
 
@@ -301,7 +300,7 @@ export class ShipmentsService {
 			if(sh.cbeds && sh.cbeds.length) assemble.push(sh)
 		}
 		
-		return assemble
+		return assemble;
 	}
 
 	async getAllShipmentsMetaloworking(light: string = 'false') {
@@ -322,7 +321,7 @@ export class ShipmentsService {
 				delete sh['detals']
 			}
 		}
-		return metaloworking
+		return metaloworking;
 	}
 
 	async getAllShipmentsById(id: number, light: string = 'false') {
@@ -352,19 +351,32 @@ export class ShipmentsService {
 
 	async getIncludeModelSh(id: number, folder: string) {
 		let include: any;
+		let attributes: any;
 		if (folder == 'childrens') {
 			include = [{
 					model: Shipments,
 					include: [
-						{ model: Product, attributes: ['id', 'name', 'articl'] },
+						{ model: Product, attributes: ['id', 'name', 'articl', 'fabricNumber'] },
 						{ model: Buyer, attributes: ['id', 'name'] },
 						'documents'
 					],
-				}]
-		} else include = [folder];
+				}, 
+				{ model: Product, attributes: ['id', 'name', 'articl'] },
+				{ model: Buyer, attributes: ['id', 'name'] },
+				'documents'];
+		} else {
+			include = [folder];
+			attributes = ['id'];
+		};
 
-		const sh = await this.shipmentsReprository.findByPk(id, {include, attributes: ['id']});
+		let sh: any = await this.shipmentsReprository.findByPk(id, {include, attributes});
 		if (!sh) throw new HttpException('Не удалось найти задачу или само поле к задаче', HttpStatus.BAD_GATEWAY);
+		if (folder == 'childrens' && sh.childrens) {
+			const maps: any = sh.toJSON();
+			sh = sh.toJSON();
+			delete maps.childrens;
+			sh.childrens.push(maps);
+		}
 		return sh;
 	}
 
@@ -372,7 +384,8 @@ export class ShipmentsService {
 		for(let item of shipments) {
 			if(item.ban) continue;
 			item.status = new_status;
-			await item.save()
+
+			await item.save();
 		}
 	}
 
