@@ -1,3 +1,5 @@
+import 'dotenv/config';
+
 export enum StatusAssemble {
   performed = 'В процессе',
   done = 'Готово',
@@ -30,9 +32,9 @@ export const EZ_KOLVO = '{"c1_kolvo":{"material_kolvo":0,"shipments_kolvo":0,"mi
 
 export const KOLVO = '{"c1":true,"c2":false,"c3":false,"c4":false,"c5":false}';
 
-export const HOME_DIR = `/home/${process.env.SYSTEM_USER}/`;
-export const PUBLIC_DIR = `${HOME_DIR}Desktop/npo_automative_server/dist/static/public/`;
-export const STATIC_DIR = `${HOME_DIR}Desktop/npo_automative_server/dist/static/`;
+export const HOME_DIR = `${process.env.PWD}/`;
+export const PUBLIC_DIR = `${HOME_DIR}dist/static/public/`;
+export const STATIC_DIR = `${HOME_DIR}dist/static/`;
 
 export enum WorkingType {
   ass = "ass",
