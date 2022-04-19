@@ -7,6 +7,7 @@ import { DateMethods } from 'src/files/date.methods';
 const util = require('util');
 const exec = util.promisify(require('child_process').exec);
 import { parse } from 'node-html-parser';
+import { PUBLIC_DIR, STATIC_DIR } from './enums';
 const archiver = require('archiver');
 
 interface AttrFilesReturn {
@@ -15,11 +16,9 @@ interface AttrFilesReturn {
     readonly size: string;
 }
 
-const DIR_SCRIPT = '/home/npo/Desktop/script/'
-const DIR_BACKUP = '/home/npo/Desktop/db'
-const HOME_DIR = '/home/david/'
-const PUBLIC_DIR = `${HOME_DIR}Desktop/npo_automative_server/dist/static/public/`
-const STATIC_DIR = `${HOME_DIR}Desktop/npo_automative_server/dist/static/`
+const DIR_SCRIPT = '/home/npo/Desktop/script/';
+const DIR_BACKUP = '/home/npo/Desktop/db';
+
 @Injectable()
 export class FilesService {
 

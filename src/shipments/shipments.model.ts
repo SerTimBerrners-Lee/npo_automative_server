@@ -7,6 +7,7 @@ import { DocumentsShipments } from "src/documents/documents-shipments.mode";
 import { Documents } from "src/documents/documents.model";
 import { DateMethods } from "src/files/date.methods";
 import { statusShipment } from "src/files/enums";
+import { logs } from "src/files/logs";
 import { Product } from "src/product/product.model";
 import { PodPodMaterial } from "src/settings/pod-pod-material.model";
 import { ShComplit } from "./sh-complit.model";
@@ -126,10 +127,11 @@ export class Shipments extends Model<Shipments, ShipmentsAttrCreate> {
           ) {
 
           if (item.status == statusShipment.overbue) continue; // Статус просрочено уже есть 
-          if (item.status == statusShipment.done) continue; // Статус Отгружено - пропускаем
-
-          item.status = statusShipment.overbue;
-          await item.save();
+          if (item.status != statusShipment.done && item.status) {
+            logs('Измененный заказ', 'Предыдуший статус', item.status, 'id заказа', item.id);
+            item.status = statusShipment.overbue;
+            await item.save();
+          }; // Статус Отгружено - пропускаем
         }
       }
   }
