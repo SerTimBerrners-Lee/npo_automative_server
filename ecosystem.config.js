@@ -24,12 +24,9 @@ module.exports = {
   deploy: {
     prod: {
       user: 'npo',
-      host: [{
-        host: '89.23.4.133',
-        port: '22',
-      }],
-      repo: 'https://github.com/SerTimBerrners-Lee/npo_automative_server',
-      ref: 'origin/master',
+      host: '89.23.4.133',
+      repo: 'git@github.com:SerTimBerrners-Lee/npo_automative_server',
+      ref:  'origin/master',
       path: '/home/npo/Desktop/npo_automative_server',
       'post-deploy': 'npm install && pm2 startOrReload ecosystem.config.js --env production'
     }
