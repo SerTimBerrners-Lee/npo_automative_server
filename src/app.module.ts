@@ -127,7 +127,7 @@ import { ShComplitUsers } from "./shipments/sh-complit-user.model";
     providers: [],
     imports: [
         ConfigModule.forRoot({
-            envFilePath: `.${process.env.NODE_ENV}.env`
+            envFilePath: '.env'
         }),
         ServeStaticModule.forRoot({
             rootPath: join(__dirname, '..', 'dist/static'),
