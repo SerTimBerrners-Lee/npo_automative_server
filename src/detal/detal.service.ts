@@ -137,9 +137,10 @@ export class DetalService {
 
     private async upCreateDetal(dto: any, files: any, detal: any) {
 
+        const t = await this.sequelize.transaction();
+        const transactionHost = { transaction: t };
+
         try {
-            await this.sequelize.transaction(async t => {
-                const transactionHost = { transaction: t };
 
                 if(dto.articl != 'null')
                     detal.articl = dto.articl
@@ -175,25 +176,19 @@ export class DetalService {
                     detal.wallThickness = dto.wallThickness
                 else detal.wallThickness = ''
 
-                if(dto.width && dto.width != 'null')
-                    detal.width = dto.width
-                else detal.width = ''
+                if(dto.width && dto.width != 'null') detal.width = dto.width;
+                else detal.width = '';
 
-                if(dto.areaCS && dto.areaCS != 'null')
-                    detal.areaCS = dto.areaCS
-                else detal.areaCS = ''
+                if(dto.areaCS && dto.areaCS != 'null') detal.areaCS = dto.areaCS;
+                else detal.areaCS = '';
 
-                if(dto.massZag != 'null')
-                    detal.massZag = dto.massZag
-                else detal.massZag = 0
+                if(dto.massZag != 'null') detal.massZag = dto.massZag;
+                else detal.massZag = 0;
 
-                if(dto.trash != 'null')
-                    detal.trash = dto.trash
-                else detal.trash = 0
-                detal.attention = dto.attention
-
-                await detal.save({ transactionHost });
-
+                if(dto.trash != 'null') detal.trash = dto.trash;
+                else detal.trash = 0;
+                detal.attention = dto.attention;
+                
                 if(detal.materials && detal.materials.length) {
                     for(let det of detal.materials) {
                         await detal.$remove('materials', det.id)
@@ -202,8 +197,7 @@ export class DetalService {
 
                 if(Number(dto.responsible)) {
                     const user = await this.userRepository.findByPk(dto.responsible)
-                    if(user)
-                        detal.responsibleId = user.id
+                    if(user) detal.responsibleId = user.id
                 }
 
                 detal.mat_zag = null;
@@ -278,11 +272,14 @@ export class DetalService {
                 if(dto.docs, files.document) 
                     await this.documentsService.attachDocumentForObject(detal, dto, files);
         
-                await detal.save(transactionHost);
+                await detal.save({ transactionHost });
+                await t.commit();
+                
                 return detal;
-            });
+
         } catch(err) {
             console.error(err);
+            await t.rollback();
             throw new HttpException('Ошибка с сохранением детали', HttpStatus.BAD_GATEWAY)
         }
     } 
