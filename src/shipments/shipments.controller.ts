@@ -41,6 +41,12 @@ export class ShipmentsController {
 		return this.shComplitSettings.getAll();
 	}
 
+	@ApiOperation({summary: 'Получает отметку по id'})
+  @Get('/shcomplite/:id')
+	getById(@Param('id') id: number) {
+		return this.shComplitSettings.getById(id);
+	}
+
 	@ApiOperation({summary: 'Получает Включенные модели к Задаче'})
   @Get('/getinclude/:id/:folder')
 	getIncludeModelSh(@Param('id') id: number, @Param('folder') folder: string) {

@@ -25,9 +25,13 @@ export class ShComplit extends Model<ShComplit, ShComplitAttrCreate> {
     @Column({type: DataType.STRING})
     date_order: string;
 
-		@ApiProperty({example: '1', description: 'Дата выполнения'})
+		@ApiProperty({example: '1', description: 'Дата планируемой отгрузки'})
     @Column({type: DataType.STRING})
     date_shipments: string;
+
+    @ApiProperty({example: '1', description: 'Дата фактической отгрузки'})
+    @Column({type: DataType.STRING})
+    date_shipments_fakt: string;
 
 		@ApiProperty({example: '1', description: 'Номер заказа'})
     @Column({type: DataType.STRING})

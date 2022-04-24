@@ -15,7 +15,7 @@ export class ShComplitService {
 		private documentsService: DocumentsService) {}
 
     async create(dto: ShCheckDto, files: any) {
-      console.log(dto)
+      console.log(dto, files)
       const sh_complit = await this.shComplitReprository.create({ shipments_id: dto.shipments_id });
       if(!sh_complit) throw new HttpException('Не удолось создать отгрузку', HttpStatus.BAD_REQUEST);
       
@@ -27,6 +27,7 @@ export class ShComplitService {
       sh_complit.name_check = dto.name_check;
       sh_complit.date_create = dto.date_create;
       sh_complit.transport = dto.transport;
+      sh_complit.date_shipments_fakt = dto.date_shipments_fakt;
 
       if(dto.responsible_user_id && dto.responsible_user_id != 'null') {
         const user = await this.userReprository.findByPk(dto.responsible_user_id);
@@ -47,21 +48,22 @@ export class ShComplitService {
       const shipments = await this.shipmentsReprository.findByPk(dto.shipments_id);
       if(shipments) {
         shipments.status = statusShipment.done;
+        shipments.sh_complit_id = sh_complit.id;
         await shipments.save();
       }
 
       if(dto.docs, files.document) 
-            await this.documentsService.attachDocumentForObject(sh_complit, dto, files);
+        await this.documentsService.attachDocumentForObject(sh_complit, dto, files);
       
       await sh_complit.save();
       return sh_complit;
     }
 
     async getAll() {
-        const sh_complits = await this.shComplitReprository.findAll({include: { all: true }});
-        if(!sh_complits) throw new HttpException('Не удалось получить список отгрузок', HttpStatus.BAD_REQUEST);
+      const sh_complits = await this.shComplitReprository.findAll({include: { all: true }});
+      if(!sh_complits) throw new HttpException('Не удалось получить список отгрузок', HttpStatus.BAD_REQUEST);
 
-        return sh_complits;
+      return sh_complits;
     }
 
     async getById(id: number) {

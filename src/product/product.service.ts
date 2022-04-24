@@ -187,7 +187,17 @@ export class ProductService {
         return await this.productReprository.findAll({attributes: [
             'id', 'name', 'ban', 'fabricNumber', 'articl', 'attention', 'createdAt', 'responsibleId'
         ]})
-    } 
+    }
+
+    async getRenains() {
+        const product = await this.productReprository.findAll({ attributes: [
+            'id', 'name', 'ban', 'fabricNumber', 'articl', 'attention', 'createdAt', 'product_kolvo', 'assemble_kolvo'
+        ], raw: true});
+        if(!product)
+            throw new HttpException('Не удалось получить остатки Продукт для склада', HttpStatus.BAD_REQUEST);
+
+        return product;
+    }
 
     async getById(id: number) {
         return await this.productReprository.findByPk(id)

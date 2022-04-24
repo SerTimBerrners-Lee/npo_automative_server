@@ -60,6 +60,12 @@ export class DetalController {
         return this.detalService.addFileToDetal(dto)
     }
 
+    @ApiOperation({summary: 'Получение остатка для склада'})
+    @Get('/remains')
+    getRenains() {
+        return this.detalService.getRenains()
+    }
+
     @ApiOperation({summary: 'Remove detal by id '})
     @Delete('/:id')
     removeDeleteById(@Request() req: any, @Param('id') id: number, ) {

@@ -43,6 +43,11 @@ export class ProductController {
         return this.productService.getAllProductArticl()
     }
 
+    @ApiOperation({summary: 'Получение остатка для склада'})
+    @Get('/remains')
+    getRenains() {
+        return this.productService.getRenains();
+    }
 
     @ApiOperation({summary: 'Получаем все Изделия'})
     @Get('/:light')

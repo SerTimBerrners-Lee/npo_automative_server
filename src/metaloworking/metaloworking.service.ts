@@ -33,21 +33,19 @@ export class MetaloworkingService {
 			.create({
 				date_order: dto.date_order,
 				description: dto.description 
-			})
+			});
+	
 		if(!metaloworking)
-			throw new HttpException('Не удалось отправить в производство', HttpStatus.BAD_GATEWAY)
+			throw new HttpException('Не удалось отправить в производство', HttpStatus.BAD_GATEWAY);
 
 		metaloworking.number_order = dto.number_order.trim() + "_" + String(metaloworking.id);
-		if(!dto.date_order) metaloworking.date_order = new Date().toLocaleString('ru-RU').split(',')[0]
+		if(!dto.date_order) metaloworking.date_order = new Date().toLocaleString('ru-RU').split(',')[0];
 
-		await metaloworking.save()
+		await metaloworking.save();
 
-		if(!dto.detal_id) return metaloworking
-		const detal = await this.detalService.findByIdDetal(dto.detal_id)
-		if(!detal) return metaloworking
-
-		if(detal.shipments.length) 
-			await this.shipmentsService.updateStatus(detal.shipments, statusShipment.performed)
+		if(!dto.detal_id) return metaloworking;
+		const detal = await this.detalService.findByIdDetal(dto.detal_id);
+		if(!detal) return metaloworking;
 
 		metaloworking.detal_id = detal.id
 		metaloworking.kolvo_shipments = dto.my_kolvo

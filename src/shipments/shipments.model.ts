@@ -118,9 +118,15 @@ export class Shipments extends Model<Shipments, ShipmentsAttrCreate> {
     static async checkOverbye(shipment: Array<Shipments>) {
       // Если просрочено по времени - меняем статус при условии что задача не удалена
       const dt = new DateMethods();
-
+      
       if(!shipment?.length) return;
       for(const item of shipment) {
+        if (item.status === 'Выполняется') {
+          item.status = statusShipment.order;
+          await item.save();
+        }
+
+
         if (
             !item.ban // Если не в бане 
             && dt.dateDifference(undefined, item.date_shipments) < 1 // Просрочено 

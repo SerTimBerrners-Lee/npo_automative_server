@@ -17,7 +17,6 @@ export enum StatusMetaloworking {
 export enum statusShipment {
 	order = 'Заказано',
 	ban = 'Удалено',
-	performed = 'Выполняется',
 	done = 'Отгружено',
   overbue = 'Просрочено' 
 }

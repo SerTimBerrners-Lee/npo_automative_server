@@ -44,6 +44,12 @@ export class CbedController {
         return this.cbedService.updateCbed(dto, files)
     }
 
+    @ApiOperation({summary: 'Получение остатка для склада'})
+    @Get('/remains')
+    getRenains() {
+        return this.cbedService.getRenains();
+    }
+    
     @ApiOperation({summary: 'Получаем все сборочные единицы'})
     @Get('/:light')
     getAllCbed(@Param('light') light: string) {

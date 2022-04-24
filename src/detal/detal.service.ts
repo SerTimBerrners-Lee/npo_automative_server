@@ -32,10 +32,20 @@ export class DetalService {
     ) {} 
 
     async getAllDetals(light: string) {
-        if(light == 'false') return await this.detalReprository.findAll({include: {all: true}, raw: true})
+        if(light == 'false') return await this.detalReprository.findAll({include: {all: true}, raw: true});
         return await this.detalReprository.findAll({ attributes: [
             'id', 'name', 'ban', 'articl', 'attention', 'createdAt', 'responsibleId'
-        ], raw: true})
+        ], raw: true});
+    }
+
+    async getRenains() {
+        const detal = await this.detalReprository.findAll({ attributes: [
+            'id', 'name', 'ban', 'articl', 'attention', 'createdAt', 'detal_kolvo', 'metalloworking_kolvo'
+        ], raw: true});
+        if(!detal)
+            throw new HttpException('Не удалось получить остатки Деталей для склада', HttpStatus.BAD_REQUEST);
+
+        return detal;
     }
 
     async createNewDetal(dto: CreateDetalDto, files: any, authID: any) {

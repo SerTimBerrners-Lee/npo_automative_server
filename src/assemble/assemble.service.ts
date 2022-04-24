@@ -40,12 +40,9 @@ export class AssembleService {
 		if(!dto.cbed_id) return assemble;
 		let cbed: Cbed | Product;
 		if(dto.type == 'prod') 
-			cbed = await this.productReprostory.findByPk(dto.cbed_id, {include: ['shipments']});
+			cbed = await this.productReprostory.findByPk(dto.cbed_id);
 		else cbed = await this.cbedService.findById(dto.cbed_id, 'true')	;
 		if(!cbed) return assemble;
-
-		if(cbed.shipments?.length) 
-			await this.shipmentsService.updateStatus(cbed.shipments, statusShipment.performed);
 
 		assemble.cbed_id = cbed.id;
 		assemble.kolvo_shipments = dto.my_kolvo;

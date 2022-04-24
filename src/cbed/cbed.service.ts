@@ -211,13 +211,23 @@ export class CbedService {
         if(light == 'true') {
             const cbed = await this.cbedReprository.findAll({attributes: [
                 'id', 'name', 'ban', 'articl', 'attention', 'createdAt', 'responsibleId'
-            ]})
-            return cbed
+            ]});
+            return cbed;
         }
         else {
-            const cbed = await this.cbedReprository.findAll({include: {all: true}})
-            return cbed
+            const cbed = await this.cbedReprository.findAll({include: {all: true}});
+            return cbed;
         }
+    }
+
+    async getRenains() {
+        const cbed = await this.cbedReprository.findAll({ attributes: [
+            'id', 'name', 'ban', 'articl', 'attention', 'createdAt', 'cbed_kolvo', 'assemble_kolvo'
+        ], raw: true});
+        if(!cbed)
+            throw new HttpException('Не удалось получить остатки Сборок для склада', HttpStatus.BAD_REQUEST);
+
+        return cbed;
     }
 
     async findById(id: number, light = 'false') {
