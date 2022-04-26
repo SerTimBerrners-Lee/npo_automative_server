@@ -1,6 +1,7 @@
 
 
 export class ShCheckDto {
+  readonly id: number;
   readonly date_order: string;
   readonly number_order: string;
   readonly date_shipments: string;

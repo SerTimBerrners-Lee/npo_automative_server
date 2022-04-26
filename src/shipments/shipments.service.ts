@@ -1,5 +1,6 @@
 import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
 import { InjectModel } from '@nestjs/sequelize';
+import { Op } from 'sequelize';
 import { Buyer } from 'src/buyer/buyer.model';
 import { BuyerService } from 'src/buyer/buyer.service';
 import { Cbed } from 'src/cbed/cbed.model';
@@ -240,6 +241,27 @@ export class ShipmentsService {
 		if(light == 'true') return await this.shipmentsReprository.findAll({ attributes: ['id', 'number_order', 'date_shipments'] });
 	}
 
+	async getAllShipmentsNoStatus(status: number = 2) {
+		let folder: string = 'done';
+
+		if (status == 0) folder = 'order';
+		if (status == 1) folder = 'ban';
+		if (status == 2) folder = 'done';
+		if (status == 3) folder = 'overbue';
+
+		const shipments = await this.shipmentsReprository.findAll({ attributes: ['id', 'number_order', 'date_shipments'], 
+			where: {
+				status: {
+					[Op.not]: statusShipment[folder]
+				}
+			}
+		});
+		console.log(shipments, folder);
+		if (!shipments) throw new HttpException('Не удалось получить заказы', HttpStatus.BAD_GATEWAY);
+
+		return shipments;
+	}
+
 	async getShipmentsIzd(id: number) {
 		return await this.shipmentsReprository.findByPk(id, {
 			include: [
@@ -293,6 +315,11 @@ export class ShipmentsService {
 				light == 'false' ? {all: true} :
 				'cbeds'
 			],
+			where: {
+				status: {
+					[Op.not]: statusShipment.done
+				}
+			},
 			attributes: light ? ['id', 'number_order', 'date_shipments'] : { exclude: ['updatedAt', 'createdAt']}
 		})
 		const assemble: any = []
@@ -309,6 +336,11 @@ export class ShipmentsService {
 				light == 'false' ? {all: true} :
 				'detals'
 			],
+			where: {
+				status: {
+					[Op.not]: statusShipment.done
+				}
+			},
 			attributes: light ? ['id', 'number_order', 'date_shipments'] : { exclude: ['updatedAt', 'createdAt']}
 		})
 		const metaloworking: any = []

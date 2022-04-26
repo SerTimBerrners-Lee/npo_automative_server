@@ -77,7 +77,7 @@ export class ShComplit extends Model<ShComplit, ShComplitAttrCreate> {
     shipments: Shipments;
     
     @BelongsToMany(() => Documents, () => DocumentsShComplit)
-    documents: DocumentsShComplit[];
+    documents: Documents[];
 
     @BelongsToMany(() => User, () => ShComplitUsers)
     users: ShComplitUsers[];

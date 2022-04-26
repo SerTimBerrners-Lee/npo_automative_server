@@ -35,6 +35,17 @@ export class ShipmentsController {
 		return this.shComplitSettings.create(dto, files);
 	}
 
+	@ApiOperation({summary: 'Обновление отгрузки заказа'})
+	@UseInterceptors(FileFieldsInterceptor([
+			{name: 'document', maxCount: 40}
+	]))
+  @Post('/shcheckupdate')
+	shComplitUpdate(
+		@Body() dto: ShCheckDto,
+		@UploadedFiles() files: { document?: Express.Multer.File[]} ) {
+		return this.shComplitSettings.update(dto, files);
+	}
+
 	@ApiOperation({summary: 'Получает все отметки отгрузки'})
   @Get('/shcheck')
 	getAllShComplit() {
@@ -69,7 +80,13 @@ export class ShipmentsController {
 	deleteShipmentsById(@Param('id') id: number) {
 		return this.shipmentsSettings.deleteShipmentsById(id);
 	}
-
+	
+	@ApiOperation({summary: 'Получить все заказы с сортировкой по статусу'})
+	@Get('/status/:status')
+	getAllShipmentsNoStatus(@Param('status') status: number = 2) {
+		return this.shipmentsSettings.getAllShipmentsNoStatus(status);
+	}
+	
 	@ApiOperation({summary: 'Получить все заказы'})
   @Get('/all/:light')
 	getAllShipments(@Param('light') light: string = 'false') {
@@ -79,7 +96,6 @@ export class ShipmentsController {
 	@ApiOperation({summary: 'Получить изделия для заказа'})
   @Get('/one/izd/:id')
 	getShipmentsIzd(@Param('id') id: number) {
-		console.log('\n\n\n\n\ id', id)
 		return this.shipmentsSettings.getShipmentsIzd(id);
 	}
 
