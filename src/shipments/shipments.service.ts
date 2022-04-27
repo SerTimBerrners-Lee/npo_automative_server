@@ -244,9 +244,9 @@ export class ShipmentsService {
 	async getShipmentsIzd(id: number) {
 		return await this.shipmentsReprository.findByPk(id, {
 			include: [
-				{model: Detal},
-				{model: Cbed},
-				{model: Product}
+				{ model: Detal },
+				{ model: Cbed },
+				{ model: Product }
 			]
 		});
 	}
@@ -265,7 +265,7 @@ export class ShipmentsService {
 		]});
 
 		for(const item of shipments) {
-			if (item) console.log(item.sh_complit)
+			if (item.sh_complit_id) console.log(item)
 		}
 
 		return shipments;
