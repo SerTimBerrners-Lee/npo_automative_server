@@ -12,6 +12,7 @@ import { statusShipment } from 'src/files/enums';
 import { Product } from 'src/product/product.model';
 import { ProductService } from 'src/product/product.service';
 import { UpCreateShipmentsDto } from './dto/up-create-shipments.dto';
+import { ShComplit } from './sh-complit.model';
 import { Shipments } from './shipments.model';
 
 @Injectable()
@@ -25,7 +26,7 @@ export class ShipmentsService {
 
 	async createShipments(dto: UpCreateShipmentsDto, files: any) {
 		const dm = new DateMethods()
-		if(!dto.data) 
+		if (!dto.data) 
 			throw new HttpException('Пустое тело запроса', HttpStatus.NO_CONTENT)
 		const endShipments = await this.shipmentsReprository.findOne(
 			{
@@ -35,7 +36,7 @@ export class ShipmentsService {
 				attributes: ['id'],
 				limit: 1
 			})
-		let endYears = dm.date().split('.')[dm.date().split('.').length - 1].slice(2);
+		const endYears = dm.date().split('.')[dm.date().split('.').length - 1].slice(2);
 		let numberEndShipments = endShipments && endShipments.id ?  
 			`№ ${endYears}-${endShipments.id + 1} от ${dm.date()}` : `№ ${endYears}-1 от ${dm.date()}`
 
@@ -45,14 +46,14 @@ export class ShipmentsService {
 			data.docs = dto.docs;
 
 			let shipment: any;
-			if(data.parent_id) {
+			if (data.parent_id) {
 				const parentShipments = await this.shipmentsReprository.findByPk(data.parent_id, {include: {all: true}})
-				if(parentShipments) {
+				if (parentShipments) {
 						const pars_number = parentShipments.number_order.split('от');
 						numberEndShipments = `${pars_number[0]}/${parentShipments.childrens.length + 1} от ${pars_number[1]}`;
 
 						shipment = await this.shipmentsReprository.create({number_order: numberEndShipments});
-						if(!shipment)
+						if (!shipment)
 							throw new HttpException('Не удалось создать заказ', HttpStatus.BAD_REQUEST);
 
 						shipment.parent_id = data.parent_id;
@@ -61,21 +62,21 @@ export class ShipmentsService {
 				}
 			}
 			shipment = await this.shipmentsReprository.create({number_order: numberEndShipments});
-			if(!shipment)
+			if (!shipment)
 				throw new HttpException('Не удалось создать заказ', HttpStatus.BAD_REQUEST);
 
 			return await this.upCreateShipments(data, shipment, files);
-		} catch(e) {console.error(e)}
+		} catch (e) {console.error(e)}
 
 	}
 
 	async updateShipments(dto: UpCreateShipmentsDto, files: any) {
 		try {
 			const data = JSON.parse(dto.data);
-			if(!data)
-				throw new HttpException('Пустой запрос', HttpStatus.NO_CONTENT);
+			if (!data) throw new HttpException('Пустой запрос', HttpStatus.NO_CONTENT);
+
 			const shipment = await this.shipmentsReprository.findByPk(data.id, {include: {all: true}});
-			if(!shipment)
+			if (!shipment)
 				throw new HttpException('Не удалось найти заказ', HttpStatus.BAD_REQUEST);
 			data.docs = dto.docs;
 			return await this.upCreateShipments(data, shipment, files);
@@ -236,7 +237,7 @@ export class ShipmentsService {
 	}
 
 	async getAllShipments(light: string = 'false') {
-		if(light == 'false') return await this.shipmentsReprository.findAll({include: {all: true}});
+		if(light == 'false') return await this.shipmentsReprository.findAll({include: { all: true }});
 		if(light == 'true') return await this.shipmentsReprository.findAll({ attributes: ['id', 'number_order', 'date_shipments'] });
 	}
 
@@ -259,13 +260,20 @@ export class ShipmentsService {
 		{
 			model: Buyer,
 			attributes: ['name']
+		},
+		{ model: ShComplit, attributes: ['date_shipments_fakt', 'id'] },
+		]});
+
+		for(const item of shipments) {
+			if (item) console.log(item.sh_complit)
 		}
-		]})
+
 		return shipments;
 	}
 
 	async getAllShipmentsSclad(to_sclad: boolean) {
-		return await this.shipmentsReprository.findAll({where: {to_sklad: to_sclad}, include: {all: true}});
+		const result =  await this.shipmentsReprository.findAll({where: {to_sklad: to_sclad}, include: {all: true}});
+		return result;
 	}
 
 	async changeShipmentToSclad(id: number) {
@@ -363,6 +371,7 @@ export class ShipmentsService {
 				}, 
 				{ model: Product, attributes: ['id', 'name', 'articl'] },
 				{ model: Buyer, attributes: ['id', 'name'] },
+				{ model: ShComplit, attributes: ['date_shipments_fakt', 'id'] },
 				'documents'];
 		} else {
 			include = [folder];
@@ -377,6 +386,7 @@ export class ShipmentsService {
 			delete maps.childrens;
 			sh.childrens.push(maps);
 		}
+
 		return sh;
 	}
 
