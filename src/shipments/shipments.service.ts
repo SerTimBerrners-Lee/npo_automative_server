@@ -1,5 +1,6 @@
 import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
 import { InjectModel } from '@nestjs/sequelize';
+import { Op } from 'sequelize';
 import { Buyer } from 'src/buyer/buyer.model';
 import { BuyerService } from 'src/buyer/buyer.service';
 import { Cbed } from 'src/cbed/cbed.model';
@@ -238,7 +239,9 @@ export class ShipmentsService {
 
 	async getAllShipments(light: string = 'false') {
 		if(light == 'false') return await this.shipmentsReprository.findAll({include: { all: true }});
-		if(light == 'true') return await this.shipmentsReprository.findAll({ attributes: ['id', 'number_order', 'date_shipments'] });
+		if(light == 'true') return await this.shipmentsReprository.findAll({ attributes: ['id', 'number_order', 'date_shipments'], where: { status: {
+			[Op.not]: statusShipment.done
+		}} });
 	}
 
 	async getShipmentsIzd(id: number) {
@@ -264,15 +267,14 @@ export class ShipmentsService {
 		{ model: ShComplit, attributes: ['date_shipments_fakt', 'id'] },
 		]});
 
-		for(const item of shipments) {
-			if (item.sh_complit_id) console.log(item)
-		}
-
 		return shipments;
 	}
 
 	async getAllShipmentsSclad(to_sclad: boolean) {
-		const result =  await this.shipmentsReprository.findAll({where: {to_sklad: to_sclad}, include: {all: true}});
+		const result =  await this.shipmentsReprository.findAll({where: {to_sklad: to_sclad}, 
+			include: [
+				{ all: true },
+				{ model: ShComplit, attributes: ['date_shipments_fakt', 'id'] }]});
 		return result;
 	}
 
@@ -342,7 +344,8 @@ export class ShipmentsService {
 			{
 				model: Detal, 
 				include: ['shipments']
-			}
+			},
+			{ model: ShComplit, attributes: ['date_shipments_fakt', 'id'] },
 		]})
 
 		return await this.shipmentsReprository.findByPk(id, {include: [
@@ -353,7 +356,9 @@ export class ShipmentsService {
 			{
 				model: Product,
 				attributes: ['id', 'name', 'articl', 'fabricNumber']
-			}, 'documents'
+			},
+			{ model: ShComplit, attributes: ['date_shipments_fakt', 'id'] },
+			'documents'
 		]})
 	}
 
@@ -366,6 +371,7 @@ export class ShipmentsService {
 					include: [
 						{ model: Product, attributes: ['id', 'name', 'articl', 'fabricNumber'] },
 						{ model: Buyer, attributes: ['id', 'name'] },
+						{ model: ShComplit, attributes: ['date_shipments_fakt', 'id'] },
 						'documents'
 					],
 				}, 
