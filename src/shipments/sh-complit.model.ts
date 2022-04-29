@@ -33,6 +33,10 @@ export class ShComplit extends Model<ShComplit, ShComplitAttrCreate> {
     @Column({type: DataType.STRING})
     date_shipments_fakt: string;
 
+    @ApiProperty({example: '1', description: 'Номер отгрузки'})
+    @Column({type: DataType.STRING})
+    number_complit: string;
+
 		@ApiProperty({example: '1', description: 'Номер заказа'})
     @Column({type: DataType.STRING})
     number_order: string;

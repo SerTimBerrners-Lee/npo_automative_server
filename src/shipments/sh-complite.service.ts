@@ -1,7 +1,10 @@
 import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
 import { InjectModel } from '@nestjs/sequelize';
+import { Buyer } from 'src/buyer/buyer.model';
 import { DocumentsService } from 'src/documents/documents.service';
+import { DateMethods } from 'src/files/date.methods';
 import { statusShipment } from 'src/files/enums';
+import { Product } from 'src/product/product.model';
 import { User } from 'src/users/users.model';
 import { ShCheckDto } from './dto/sh-check.dto';
 import { ShComplit } from './sh-complit.model';
@@ -17,6 +20,10 @@ export class ShComplitService {
     async create(dto: ShCheckDto, files: any) {
       const sh_complit = await this.shComplitReprository.create({ shipments_id: dto.shipments_id });
       if(!sh_complit) throw new HttpException('Не удолось создать отгрузку', HttpStatus.BAD_REQUEST);
+
+      const DM = new DateMethods();
+      const str = String(DM.dt.getUTCFullYear()).slice(2);
+      sh_complit.number_complit = `O${str}-${sh_complit.id}`;
       
       sh_complit.date_order = dto.date_order;
       sh_complit.number_order = dto.number_order;
@@ -73,7 +80,21 @@ export class ShComplitService {
     }
 
     async getAll() {
-      const sh_complits = await this.shComplitReprository.findAll({include: { all: true }});
+      const sh_complits = await this.shComplitReprository.findAll({include: [{ all: true },
+        {
+          model: Shipments,
+          include: [
+            {
+              model: Product,
+              attributes: ['name', 'id', 'articl']
+            },
+            {
+              model: Buyer,
+              attributes: ['id', 'name']
+            }
+          ],
+        },
+      ]});
       if(!sh_complits) throw new HttpException('Не удалось получить список отгрузок', HttpStatus.BAD_REQUEST);
 
       return sh_complits;
