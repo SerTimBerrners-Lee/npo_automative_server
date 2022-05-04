@@ -67,7 +67,7 @@ export class ShComplit extends Model<ShComplit, ShComplitAttrCreate> {
 
     @ApiProperty({example: '1', description: 'Примечание к заказу'})
     @Column({type: DataType.STRING})
-    description: string;
+    description: string; 
 
     @ApiProperty({example: '1', description: 'Ответственный'})
     @Column({type: DataType.INTEGER})
@@ -76,6 +76,10 @@ export class ShComplit extends Model<ShComplit, ShComplitAttrCreate> {
     @ApiProperty({example: '1', description: 'Исполняющий'})
     @Column({type: DataType.INTEGER})
     creater_user_id: number;
+
+    @ForeignKey(() => Shipments)
+    @Column({type: DataType.INTEGER})
+    shipments_id: number;
 
     @HasOne(() => Shipments)
     shipments: Shipments;

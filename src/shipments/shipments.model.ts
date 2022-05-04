@@ -121,11 +121,6 @@ export class Shipments extends Model<Shipments, ShipmentsAttrCreate> {
       
       if(!shipment?.length) return;
       for(const item of shipment) {
-        if (item.sh_complit_id) {
-          item.status = statusShipment.done;
-          await item.save();
-        }
-
         if (
             !item.ban // Если не в бане 
             && dt.dateDifference(undefined, item.date_shipments) < 1 // Просрочено 
