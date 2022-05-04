@@ -80,7 +80,12 @@ export class ShComplitService {
     }
 
     async getAll() {
-      const sh_complits = await this.shComplitReprository.findAll({include: [{ all: true },
+      const sh_complits = await this.shComplitReprository.findAll({
+        where: {
+          ban: false
+        },
+        include: [
+          { all: true },
         {
           model: Shipments,
           include: [
@@ -105,5 +110,30 @@ export class ShComplitService {
       if (!sh_complit) throw new HttpException('Не удалось получить список отгрузок', HttpStatus.BAD_REQUEST);
 
       return sh_complit;
+    }
+
+    async combackComplit(id: number) {
+      const complit = await this.shComplitReprository.findByPk(id, {include: [
+        { model: Shipments }
+      ]});
+      if (!complit)
+        throw new HttpException('Не удалось получить отгрузку', HttpStatus.BAD_GATEWAY);
+
+      let shipments: any;
+      if (complit.shipments_id) shipments = await this.shipmentsReprository.findByPk(complit.shipments_id);
+      if (complit.shipments) shipments = await this.shipmentsReprository.findByPk(complit.shipments.id);
+
+      if (shipments) {
+        shipments.status = statusShipment.order;
+        shipments.sh_complit
+        shipments.sh_complit_id = null;
+        await shipments.save();
+      }
+
+      complit.ban = true;
+      complit.shipments_id = null;
+      await complit.save();
+
+      return true;
     }
 }

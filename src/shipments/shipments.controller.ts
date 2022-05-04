@@ -46,6 +46,12 @@ export class ShipmentsController {
 		return this.shComplitSettings.update(dto, files);
 	}
 
+	@ApiOperation({summary: 'Удаляем отметку о выполнении, убираем статус отгружено'})
+  @Get('/combackcomplit/:id')
+	combackComplit(@Param('id') id: number) {
+		return this.shComplitSettings.combackComplit(id);
+	}
+
 	@ApiOperation({summary: 'Получает все отметки отгрузки'})
   @Get('/shcheck')
 	getAllShComplit() {
