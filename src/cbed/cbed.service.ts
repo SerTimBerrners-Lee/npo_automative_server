@@ -327,5 +327,15 @@ export class CbedService {
 
         return new_arr
     }
+
+    async getAvatar(id: number) {
+        const cbed = await this.cbedReprository.findByPk(id, {include: ['documents']});
+        if (!cbed) throw new HttpException('Не найдена сборку', HttpStatus.BAD_REQUEST);
+
+        if (!cbed.documents) return '';
+        const path = await this.documentsService.returnIncludeAva(cbed.documents);
+
+        return { path };
+    } 
 }
  

@@ -11,6 +11,13 @@ import { UpdateDocumentDto } from './dto/update-document.dto';
 export class DocumentsController {
     constructor(private documentService: DocumentsService) {}
 
+
+    @ApiOperation({summary: 'Меняем файлу значение аватарки'})
+    @Get('/avachanges/:id')
+    avatarChangeBoolean(@Param('id') id: number) {
+        return this.documentService.avatarChangeBoolean(id)
+    }
+
     @ApiOperation({summary: 'Создание Документа'})
     @Post()
     create(@Body() dto: CreateDocumentsDto) {

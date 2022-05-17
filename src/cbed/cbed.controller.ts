@@ -10,6 +10,12 @@ import { CreateCbedDto } from './dto/create-cbed.dto';
 export class CbedController {
     constructor(private cbedService: CbedService) {}
 
+    @ApiOperation({summary: 'Плучаем аватарку'})
+    @Get('/ava/:id')
+    getAvatar(@Param('id') id: number) {
+        return this.cbedService.getAvatar(id)
+    }
+
     @ApiOperation({summary: 'Получаем Массив ID СБ у которых есть операции'})
     @Get('/operation/')
     getCbedIncludeOperation() {

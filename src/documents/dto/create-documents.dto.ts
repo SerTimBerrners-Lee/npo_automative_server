@@ -13,4 +13,6 @@ export default class CreateDocumentsDto {
     readonly version: number;
     @ApiProperty({example: 'МД', description: 'Тип документа'})
     readonly type: string;
+
+    readonly ava: boolean;
 }

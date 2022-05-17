@@ -23,7 +23,7 @@ export class DocumentsService {
     async createArrDocuments(dto: any, files: any) {
         if(!dto.docs || !files || !files.document || !files.document.length) return false
 
-        const NewArrsFile: Array<Documents> = []
+        const NewArrsFile: Array<Documents> = [];
         try {
             for(let inx in files.document) {
                 const docs = Object.values(JSON.parse(dto.docs))
@@ -34,12 +34,13 @@ export class DocumentsService {
                     docs[inx].version,
                     docs[inx].description,
                     docs[inx].name,
-                    docs[inx].newVersion
+                    docs[inx].newVersion,
+                    docs[inx].ava
                 )
                 if(!result) continue;
-                if(result) NewArrsFile.push(result)
+                if(result) NewArrsFile.push(result);
             }
-            return NewArrsFile
+            return NewArrsFile;
         } catch(e) {
             throw new HttpException('Не удалось создать файлы', HttpStatus.BAD_GATEWAY)
         }
@@ -69,6 +70,44 @@ export class DocumentsService {
     }
 
     /**
+     * Находим аватар и возвращаем
+     * Если не находим - находим png и делаем его аватаром
+     * @param documents 
+     * @returns path
+     */
+    async returnIncludeAva(documents: Array<Documents>): Promise<string> {
+        if (!documents || !documents.length) return '';
+        let find = '';
+        let ava: Documents = null;
+        let ava_two: Documents = null;
+
+        for (const item of documents) {
+            if (item.ava) find = item.path;
+            if (item.path && this.typeFile(item.path).toLocaleLowerCase() == 'png') {
+                ava = item;
+            }
+            if (item.path && this.typeFile(item.path).toLocaleLowerCase() == 'jpg') {
+                ava_two = item;
+            }
+        }
+        if (!find && ava) {
+            ava.ava = true;
+            find = ava.path;
+            await ava.save();
+        }
+        if (!find && !ava && ava_two) {
+            ava_two.ava = true;
+            find = ava_two.path;
+            await ava_two.save();
+        }
+        return find;
+    }
+
+    typeFile(str: string): string {
+        return str.split('.')[str.split('.').length - 1];
+    }
+
+    /**
      * 
      * @param obj 
      * @param json_id: '[{34}, {1}, {32}]' 
@@ -84,14 +123,14 @@ export class DocumentsService {
         } catch(err) {console.error(err)}
     }
 
-    async saveDocument(file: any, nameInstans = '', type = '', version = 1, description = '', name = '', newVersion = false) {
+    async saveDocument(file: any, nameInstans = '', type = '', version = 1, description = '', name = '', newVersion = false, ava = false) {
         const imageTypes = ['bmp', 'gif', 'jpg', 'png', 'pds', 'tif', 'odg', 'jpeg', 'eps', 'pict', 'pcx', 'ico', 'svg', 'webp', 'avif']
         let folderToSave = 'doc';
         try {
             let origName: string;
-            const fileType = file.originalname.split('.')[file.originalname.split('.').length - 1]
-            name ? origName = name + '.' + fileType : origName = file.originalname
-            for (let typ of imageTypes) 
+            const fileType = this.typeFile(file.originalname);
+            name ? origName = name + '.' + fileType : origName = file.originalname;
+            for (const typ of imageTypes) 
                 if (typ == fileType) folderToSave = 'image'
             
             const pathName = (origName + '__+__') + uuid.v4() +'.'+ fileType;
@@ -112,10 +151,7 @@ export class DocumentsService {
             const document = await this.createDocument({
                 name: origName,  
                 path: (folderToSave + '/' + pathName), 
-                nameInstans: nameInstans,
-                description: description,
-                version: version,
-                type: type
+                nameInstans, description, version, type, ava
             })
 
             if(newVersion && findDocuments) 
@@ -204,6 +240,18 @@ export class DocumentsService {
                 newDocument.$add('issues', izdels.id)
             }
         }
+    }
+
+    // Меняем файлу значение аватарки (в слайде такой файл будет выводиться на первое место)
+    async avatarChangeBoolean(id: number) {
+        const file = await this.documentReprository.findByPk(id);
+        if (!file) throw new HttpException('Не удалось найти файл', HttpStatus.BAD_GATEWAY);
+        
+        file.ava = !file.ava;
+        await file.save();
+        console.log(file.toJSON());
+        
+        return file;
     }
 
     async getAllDocument() {

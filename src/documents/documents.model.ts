@@ -67,6 +67,10 @@ export class Documents extends Model<Documents, DocumentsCreationAttrs> {
     @Column({type: DataType.BOOLEAN, defaultValue: false})
     banned: boolean;
 
+    @ApiProperty({example: 'false', description: 'Аватар'})
+    @Column({type: DataType.BOOLEAN, defaultValue: false})
+    ava: boolean;
+
     @BelongsToMany(() => User, () => DocumentsUser)
     users: User[];
 

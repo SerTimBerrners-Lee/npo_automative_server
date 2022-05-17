@@ -12,6 +12,12 @@ import { UpdateDetalDto } from './dto/update-detal.dto';
 export class DetalController {
     constructor(private detalService: DetalService) {}
 
+    @ApiOperation({summary: 'Плучаем аватарку'})
+    @Get('/ava/:id')
+    getAvatar(@Param('id') id: number) {
+        return this.detalService.getAvatar(id)
+    }
+
     @ApiOperation({summary: 'Получаем Массив ID Деталей у которых есть операции'})
     @Get('/operation/include')
     getDetalIncludeOperation() {

@@ -7,4 +7,5 @@ export class UpdateDocumentDto {
   readonly responsible_user_id: number;
   readonly id: number;
   readonly description: string;
+  readonly ava: boolean;
 }

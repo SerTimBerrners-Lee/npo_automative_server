@@ -415,14 +415,24 @@ export class DetalService {
         const detal = await this.detalReprository.findAll({include: [{
             model: TechProcess,
             include: [{all: true}]
-        }]})
+        }]});
         
-        let new_arr = []
-        for(let det of detal) {
-            if(!det.techProcesses || det.techProcesses.operations.length == 0) new_arr.push(det.id)
+        const new_arr = [];
+        for(const det of detal) {
+            if(!det.techProcesses || det.techProcesses.operations.length == 0) new_arr.push(det.id);
         }
 
-        return new_arr
+        return new_arr;
     }
+
+    async getAvatar(id: number) {
+        const detal = await this.detalReprository.findByPk(id, {include: ['documents']});
+        if (!detal) throw new HttpException('Не найдена деталь', HttpStatus.BAD_REQUEST);
+
+        if (!detal.documents) return '';
+        const path = await this.documentsService.returnIncludeAva(detal.documents);
+
+        return { path };
+    } 
 
 }
