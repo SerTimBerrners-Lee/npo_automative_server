@@ -393,31 +393,44 @@ export class ShipmentsService {
 		]})
 	}
 
-	async getIncludeModelSh(id: number, folder: string) {
-		let include: any;
+	async getAtributeModelSh(id: number, dto: any) {
+		console.log(id, dto, '\n\n\n')
+	}
+
+	async getIncludeModelSh(id: number, dto: any) {
+		if (!dto.includes || !dto.includes.length)
+			throw new HttpException('Пераеданы пустые поля', HttpStatus.BAD_REQUEST);
+
+		let include: any = [];
 		let attributes: any;
-		if (folder == 'childrens') {
-			include = [{
-					model: Shipments,
-					include: [
-						{ model: Product, attributes: ['id', 'name', 'articl', 'fabricNumber'] },
-						{ model: Buyer, attributes: ['id', 'name'] },
-						{ model: ShComplit, attributes: ['date_shipments_fakt', 'id'] },
-						'documents'
-					],
-				}, 
-				{ model: Product, attributes: ['id', 'name', 'articl'] },
-				{ model: Buyer, attributes: ['id', 'name'] },
-				{ model: ShComplit, attributes: ['date_shipments_fakt', 'id'] },
-				'documents'];
-		} else {
-			include = [folder];
-			attributes = ['id'];
-		};
+		let is_childrens: boolean = false;
+		
+		for (const folder of dto.includes) {
+			if (folder == 'childrens') {
+				is_childrens = true;
+				include.pust({
+						model: Shipments,
+						include: [
+							{ model: Product, attributes: ['id', 'name', 'articl', 'fabricNumber'] },
+							{ model: Buyer, attributes: ['id', 'name'] },
+							{ model: ShComplit, attributes: ['date_shipments_fakt', 'id'] },
+							'documents'
+						],
+					})
+				include.pust({ model: Product, attributes: ['id', 'name', 'articl'] })
+				include.pust({ model: Buyer, attributes: ['id', 'name'] })
+				include.pust({ model: ShComplit, attributes: ['date_shipments_fakt', 'id'] })
+				include.pust('documents');
+			} else {
+				include.push(folder);
+				attributes = ['id'];
+			};
+		}
 
 		let sh: any = await this.shipmentsReprository.findByPk(id, {include, attributes});
 		if (!sh) throw new HttpException('Не удалось найти задачу или само поле к задаче', HttpStatus.BAD_GATEWAY);
-		if (folder == 'childrens' && sh.childrens) {
+
+		if (is_childrens && sh.childrens) {
 			const maps: any = sh.toJSON();
 			sh = sh.toJSON();
 			delete maps.childrens;

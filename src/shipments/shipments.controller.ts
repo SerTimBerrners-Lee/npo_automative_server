@@ -64,10 +64,16 @@ export class ShipmentsController {
 		return this.shComplitSettings.getById(id);
 	}
 
+	@ApiOperation({summary: 'Получает определенные отрибуты к Задаче'})
+  @Post('/getattribute/:id/')
+	getAtributeModelSh(@Param('id') id: number, @Body() dto: any) {
+		return this.shipmentsSettings.getAtributeModelSh(id, dto);
+	}
+
 	@ApiOperation({summary: 'Получает Включенные модели к Задаче'})
-  @Get('/getinclude/:id/:folder')
-	getIncludeModelSh(@Param('id') id: number, @Param('folder') folder: string) {
-		return this.shipmentsSettings.getIncludeModelSh(id, folder);
+  @Post('/getinclude/:id/')
+	getIncludeModelSh(@Param('id') id: number, @Body() dto: any) {
+		return this.shipmentsSettings.getIncludeModelSh(id, dto);
 	}
 
 	@ApiOperation({summary: 'Обновлние заказа'})
