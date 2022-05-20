@@ -433,6 +433,16 @@ export class DetalService {
         const path = await this.documentsService.returnIncludeAva(detal.documents);
 
         return { path };
-    } 
+    }
+
+    async getAtribute(id: number, dto: any) {
+        if (!dto.attributes || !dto.attributes.length)
+			throw new HttpException('Пераеданы пустые поля', HttpStatus.BAD_REQUEST);
+
+        const detal = await this.detalReprository.findByPk(id, { attributes: dto.attributes });
+        if (!detal) throw new HttpException('Не удалось получить Деталь', HttpStatus.BAD_REQUEST);
+
+        return detal;
+	}
 
 }

@@ -408,7 +408,7 @@ export class ShipmentsService {
 		for (const folder of dto.includes) {
 			if (folder == 'childrens') {
 				is_childrens = true;
-				include.pust({
+				include.push({
 						model: Shipments,
 						include: [
 							{ model: Product, attributes: ['id', 'name', 'articl', 'fabricNumber'] },
@@ -417,10 +417,10 @@ export class ShipmentsService {
 							'documents'
 						],
 					})
-				include.pust({ model: Product, attributes: ['id', 'name', 'articl'] })
-				include.pust({ model: Buyer, attributes: ['id', 'name'] })
-				include.pust({ model: ShComplit, attributes: ['date_shipments_fakt', 'id'] })
-				include.pust('documents');
+				include.push({ model: Product, attributes: ['id', 'name', 'articl'] })
+				include.push({ model: Buyer, attributes: ['id', 'name'] })
+				include.push({ model: ShComplit, attributes: ['date_shipments_fakt', 'id'] })
+				include.push('documents');
 			} else {
 				include.push(folder);
 				attributes = ['id'];

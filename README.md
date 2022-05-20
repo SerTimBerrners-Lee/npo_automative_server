@@ -5,22 +5,7 @@
 [circleci-image]: https://img.shields.io/circleci/build/github/nestjs/nest/master?token=abc123def456
 [circleci-url]: https://circleci.com/gh/nestjs/nest
 
-  <p align="center">A progressive <a href="http://nodejs.org" target="_blank">Node.js</a> framework for building efficient and scalable server-side applications.</p>
-    <p align="center">
-<a href="https://www.npmjs.com/~nestjscore" target="_blank"><img src="https://img.shields.io/npm/v/@nestjs/core.svg" alt="NPM Version" /></a>
-<a href="https://www.npmjs.com/~nestjscore" target="_blank"><img src="https://img.shields.io/npm/l/@nestjs/core.svg" alt="Package License" /></a>
-<a href="https://www.npmjs.com/~nestjscore" target="_blank"><img src="https://img.shields.io/npm/dm/@nestjs/common.svg" alt="NPM Downloads" /></a>
-<a href="https://circleci.com/gh/nestjs/nest" target="_blank"><img src="https://img.shields.io/circleci/build/github/nestjs/nest/master" alt="CircleCI" /></a>
-<a href="https://coveralls.io/github/nestjs/nest?branch=master" target="_blank"><img src="https://coveralls.io/repos/github/nestjs/nest/badge.svg?branch=master#9" alt="Coverage" /></a>
-<a href="https://discord.gg/G7Qnnhy" target="_blank"><img src="https://img.shields.io/badge/discord-online-brightgreen.svg" alt="Discord"/></a>
-<a href="https://opencollective.com/nest#backer" target="_blank"><img src="https://opencollective.com/nest/backers/badge.svg" alt="Backers on Open Collective" /></a>
-<a href="https://opencollective.com/nest#sponsor" target="_blank"><img src="https://opencollective.com/nest/sponsors/badge.svg" alt="Sponsors on Open Collective" /></a>
-  <a href="https://paypal.me/kamilmysliwiec" target="_blank"><img src="https://img.shields.io/badge/Donate-PayPal-ff3f59.svg"/></a>
-    <a href="https://opencollective.com/nest#sponsor"  target="_blank"><img src="https://img.shields.io/badge/Support%20us-Open%20Collective-41B883.svg" alt="Support us"></a>
-  <a href="https://twitter.com/nestframework" target="_blank"><img src="https://img.shields.io/twitter/follow/nestframework.svg?style=social&label=Follow"></a>
 </p>
-  <!--[![Backers on Open Collective](https://opencollective.com/nest/backers/badge.svg)](https://opencollective.com/nest#backer)
-  [![Sponsors on Open Collective](https://opencollective.com/nest/sponsors/badge.svg)](https://opencollective.com/nest#sponsor)-->
 
 ## Description
 
@@ -45,19 +30,6 @@ $ npm run start:dev
 $ npm run start:prod
 ```
 
-## Test
-
-```bash
-# unit tests
-$ npm run test
-
-# e2e tests
-$ npm run test:e2e
-
-# test coverage
-$ npm run test:cov
-```
-
 ## Описание
 
 ```bash
@@ -69,3 +41,34 @@ $ sudo apt-get install imagemagick ghostscript poppler-utils
 ## Code Style 
 1. Controller
   - Контроллер должен иметь название соответствующее функции к которой он обращается в Сервисе.
+Предварительно необходимо установить:
+MongoDB - последнюю версию
+NodeJS - 9-10 версию
+
+## Code Style Git
+1. Оставляйте пустую строку между заголовком и описанием.
+2. Указываем тип коммита.
+    - feature — используется при добавлении новой функциональности уровня приложения
+    - fix — если исправили какую-то серьезную багу
+    - docs — всё, что касается документации
+    - style — исправляем опечатки, исправляем форматирование
+    - refactor — рефакторинг кода приложения
+    - test — всё, что связано с тестированием
+    - chore — обычное обслуживание кода
+3. Указываем область действия коммита
+Сразу после типа коммита без всяких пробелов указываем в скобках область, на которую распространяется наш коммит.
+После этого пишем наш стандартный коммит.
+Например при добавлении нового функционала в код модуля:
+```
+refactor(audio-controls) use common library for all controls
+```
+или в файле:
+```
+chore(Gruntfile.js) add watch task
+```
+Если областей несколько указываем их через запятую.
+
+С новыми ветками наименование так же с коммитами:
+```
+refactor(audio-controls)_new_branch
+```

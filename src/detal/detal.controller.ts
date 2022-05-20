@@ -12,6 +12,13 @@ import { UpdateDetalDto } from './dto/update-detal.dto';
 export class DetalController {
     constructor(private detalService: DetalService) {}
 
+
+    @ApiOperation({summary: 'Получает определенные отрибуты'})
+    @Post('/getattribute/:id/')
+	getAtributeModelSh(@Param('id') id: number, @Body() dto: any) {
+		return this.detalService.getAtribute(id, dto);
+	}
+
     @ApiOperation({summary: 'Плучаем аватарку'})
     @Get('/ava/:id')
     getAvatar(@Param('id') id: number) {
