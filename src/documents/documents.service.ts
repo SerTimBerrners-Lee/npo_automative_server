@@ -79,27 +79,27 @@ export class DocumentsService {
         if (!documents || !documents.length) return '';
         let find = '';
         let ava: Documents = null;
-        let ava_two: Documents = null;
+        // let ava_two: Documents = null;
 
         for (const item of documents) {
             if (item.ava) find = item.path;
             if (item.path && this.typeFile(item.path).toLocaleLowerCase() == 'png') {
                 ava = item;
             }
-            if (item.path && this.typeFile(item.path).toLocaleLowerCase() == 'jpg') {
-                ava_two = item;
-            }
+            // if (item.path && this.typeFile(item.path).toLocaleLowerCase() == 'jpg') {
+            //     ava_two = item;
+            // }
         }
         if (!find && ava) {
             ava.ava = true;
             find = ava.path;
             await ava.save();
         }
-        if (!find && !ava && ava_two) {
-            ava_two.ava = true;
-            find = ava_two.path;
-            await ava_two.save();
-        }
+        // if (!find && !ava && ava_two) {
+        //     ava_two.ava = true;
+        //     find = ava_two.path;
+        //     await ava_two.save();
+        // }
         return find;
     }
 

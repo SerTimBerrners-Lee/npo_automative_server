@@ -28,51 +28,51 @@ export class User extends Model<User, UserCreationAttrs> {
 
     @ApiProperty({example: 'Петров Виталий Валентинович', description: 'ФИО'})
     @Column({type: DataType.STRING, allowNull: false})
-    initial: string; 
+    initial: string;
 
     @ApiProperty({example: '001', description: 'Табельный номер'})
     @Column({type: DataType.STRING, unique: true, allowNull: false})
-    tabel: string; 
+    tabel: string;
 
     @ApiProperty({example: '01.12.2021', description: 'Дата приема на работу'})
     @Column({type: DataType.STRING, allowNull: true})
-    dateWork: string; 
+    dateWork: string;
 
     @ApiProperty({example: '02.12.2021', description: 'Дата увольнения с работы'})
     @Column({type: DataType.STRING, allowNull: true})
-    dateUnWork: string; 
+    dateUnWork: string;
 
     @ApiProperty({example: '02.12.1990', description: 'Дата увольнения с работы'})
     @Column({type: DataType.STRING, allowNull: true})
-    birthday: string; 
+    birthday: string;
 
     @ApiProperty({example: 'Петров В.В.', description: 'Логин'})
     @Column({type: DataType.STRING, allowNull: true})
-    login: string; 
+    login: string;
 
     @ApiProperty({example: 'г. Псков., Инженерная ул., д. 2', description: 'Постоянный адрес проживания'})
     @Column({type: DataType.STRING, allowNull: true})
-    adress: string; 
+    adress: string;
 
     @ApiProperty({example: 'г. Псков., Инженерная ул., д. 2', description: 'Адрес по прописке'})
     @Column({type: DataType.STRING, allowNull: true})
-    adressProps: string; 
+    adressProps: string;
 
     @ApiProperty({example: '8-999-892-90-11', description: 'Моб. телефон'})
     @Column({type: DataType.STRING, allowNull: true})
-    phone: string; 
+    phone: string;
 
     @ApiProperty({example: '...', description: 'Характеристика'})
     @Column({type: DataType.STRING, allowNull: true})
-    haracteristic: string; 
+    haracteristic: string;
 
     @ApiProperty({example: '...', description: 'Примечание'})
     @Column({type: DataType.STRING, allowNull: true})
-    primetch: string; 
+    primetch: string;
 
     @ApiProperty({example: 'david.perov60@gmail.com', description: 'Почта пользователя'})
     @Column({type: DataType.STRING, allowNull: true})
-    email: string;      
+    email: string;
 
     @ApiProperty({example: '12345678', description: 'Пароль пользователя'})
     @Column({type: DataType.STRING, allowNull: false})
@@ -132,24 +132,23 @@ export class User extends Model<User, UserCreationAttrs> {
 
     @AfterSync
     static async checkUser(sync: any) {
-        const user = await sync.sequelize.models.User
-        const role = await sync.sequelize.models.Role
-        if(!user)
-            return 
+        const user = await sync.sequelize.models.User;
+        const role = await sync.sequelize.models.Role;
+        if (!user) return;
 
         const hashPassword = await bcrypt.hash('54321', 5);
-        const allUser = await user.findAll()
-        if(!allUser.length) {
+        const allUser = await user.findAll();
+        if (!allUser.length) {
             const admin = await user.create({
                 password: hashPassword,
                 login: 'Admin.A.A',
                 tabel: '001',
                 initial: 'Admin Admin Admin'
-            })
-            // add role 
+            });
+            // add role
             if(role && admin) {
-                const firstRole = await role.findByPk(1)
-                if(firstRole) 
+                const firstRole = await role.findByPk(1);
+                if(firstRole)
                     user.update({rolesId: firstRole.id}, {where: {id: admin.id}})
                 
                 
