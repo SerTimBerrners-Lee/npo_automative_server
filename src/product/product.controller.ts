@@ -49,6 +49,12 @@ export class ProductController {
         return this.productService.getRenains();
     }
 
+    @ApiOperation({summary: 'Получаем все Изделия из Архива'})
+    @Get('/archive/')
+    getAllProductArchive() {
+        return this.productService.archive();
+    }
+
     @ApiOperation({summary: 'Получаем все Изделия'})
     @Get('/:light')
     getAllProduct(@Param('light') light: string) {

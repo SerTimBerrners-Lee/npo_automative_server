@@ -228,7 +228,21 @@ export class InstrumentService {
     } 
 
     async getAllNameInstrument() {
-        return await this.nameInastrumentReprository.findAll({include: {all: true}})
+        return await this.nameInastrumentReprository.findAll({include: {all: true}, where: { ban: false }})
+    }
+
+    async getArchive() {
+        const instrument = await this.nameInastrumentReprository.findAll({
+            attributes: ['name', 'id', 'attention'],
+            where: { ban: true },
+            include: [{
+                model: Instrument,
+                attributes: ['id', 'instans']
+            }]
+        });
+
+        if (!instrument) throw new HttpException('Не удалось получить инструменты из архива', HttpStatus.BAD_GATEWAY);
+        return instrument;
     }
 
     async attachFileToInstrument(instr_id: number, file_id: number) {

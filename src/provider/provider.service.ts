@@ -272,9 +272,17 @@ export class ProviderService {
     }
 
     async getProviders() {
-        const providers = await this.providersReprository.findAll({include: {all: true}})
-        if(providers)
-            return providers
+        const providers = await this.providersReprository.findAll({include: {all: true}, where: {ban: false}});
+        if (!providers) throw new HttpException('Не удалось получить поставщиков', HttpStatus.BAD_REQUEST);
+
+        return providers;
+    }
+
+    async getProvidersArchive() {
+        const provider = await this.providersReprository.findAll({ attributes: ['id', 'name', 'inn'], where: {ban: true} });
+        if (!provider) throw new HttpException('Не удалось получить поставщиков в архиве', HttpStatus.BAD_REQUEST);
+
+        return provider;
     }
 
     async banProvider(id: number) {

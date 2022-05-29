@@ -220,6 +220,15 @@ export class CbedService {
         }
     }
 
+    async archive() {
+        const cbed = await this.cbedReprository.findAll({attributes: [
+            'id', 'name', 'ban', 'articl', 'attention', 'createdAt', 'responsibleId'
+        ], where: {ban: true}});
+        if (!cbed) throw new HttpException('Произошла ошибка при получении сборок', HttpStatus.BAD_GATEWAY);
+
+        return cbed;
+    }
+
     async getRenains() {
         const cbed = await this.cbedReprository.findAll({ attributes: [
             'id', 'name', 'ban', 'articl', 'attention', 'createdAt', 'cbed_kolvo', 'assemble_kolvo'

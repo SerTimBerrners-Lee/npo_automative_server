@@ -424,6 +424,18 @@ export class SettingsService {
         return await this.podPodMaterialReprository.findAll({where: {ban: false}});
     }
 
+    async getAllPPTArchive() {
+        const materials = await this.podPodMaterialReprository.findAll({
+            attributes: ['name', 'attention'], where: { ban: true },
+            include: [{
+                model: PodMaterial,
+                attributes: ['id', 'instansMaterial']
+            }]
+        });
+        if (!materials) throw new HttpException('Не удалось получить материалы из архива', HttpStatus.BAD_GATEWAY);
+        return materials;
+    }
+
     async getDeficitMaterial() {
         const materials = await this.podPodMaterialReprository.findAll({include: [
             {model: PodMaterial},

@@ -37,6 +37,12 @@ export class DetalController {
         return this.detalService.getAllDetalArticl()
     }
 
+    @ApiOperation({summary: 'Получаем все детали в архиве'})
+    @Get('/archive/')
+    archive() {
+        return this.detalService.archive()
+    }
+
     @ApiOperation({summary: 'Создаем деталь'})
     @UseInterceptors(FileFieldsInterceptor([
         {name: 'document', maxCount: 40}

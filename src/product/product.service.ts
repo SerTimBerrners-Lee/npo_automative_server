@@ -189,6 +189,15 @@ export class ProductService {
         ]})
     }
 
+    async archive() {
+        const product = await this.productReprository.findAll({attributes: [
+            'id', 'name', 'ban', 'fabricNumber', 'articl', 'attention', 'createdAt', 'responsibleId'
+        ], where: {ban: true}});
+        
+        if (!product) throw new HttpException('Не удалось найти изделия', HttpStatus.BAD_GATEWAY);
+        return product;
+    }
+
     async getRenains() {
         const product = await this.productReprository.findAll({ attributes: [
             'id', 'name', 'ban', 'fabricNumber', 'articl', 'attention', 'createdAt', 'product_kolvo', 'assemble_kolvo'

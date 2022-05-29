@@ -57,13 +57,19 @@ export class InventaryController {
     return this.inventaryService.getAllPTInventary()
   }
 
+  @ApiOperation({summary: 'Получить весь инвентарь с баном'})
+  @Get('/name/archive/')
+  getArchive() {
+    return this.inventaryService.getArchive()
+  }
+
   @ApiOperation({summary: 'Получить инвентарь по id '})
   @Get('/name/:id')
   getInventaryById(@Param('id') id: number) {
     return this.inventaryService.getInventaryById(id)
   }
 
-  @ApiOperation({summary: 'Получить весь инвентарь '})
+  @ApiOperation({summary: 'Получить весь инвентарь'})
   @Get('/name/')
   getAllInventary() {
     return this.inventaryService.getAllInventary()

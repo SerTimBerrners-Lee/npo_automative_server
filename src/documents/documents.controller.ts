@@ -45,6 +45,12 @@ export class DocumentsController {
         return this.documentService.getAllDocument()
     }
 
+    @ApiOperation({summary: 'Получение всех документов в архиве'})
+    @Get('/archive/')
+    getAllDocumentsArchive() {
+        return this.documentService.getAllDocumentsArchive()
+    }
+
     @ApiOperation({summary: 'Получение всех архивных документов'})
     @Get('/banned/all/:length')
     getAllBanDocuments(@Param('length') length: number) {

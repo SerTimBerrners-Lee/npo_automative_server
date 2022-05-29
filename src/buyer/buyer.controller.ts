@@ -32,6 +32,12 @@ export class BuyerController {
         return this.buyerService.getBuyers(light)
     }
 
+    @ApiOperation({summary: 'Получаем всех покупателей в бане'})
+    @Get('/archive')
+    getBuyersArchive() { 
+        return this.buyerService.getBuyersArchive()
+    }
+
     @ApiOperation({summary: 'Перенести в архив покупателя'})
     @Delete('/:id')
     ban(@Param('id') id: number) { 

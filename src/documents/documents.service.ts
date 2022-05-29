@@ -257,7 +257,17 @@ export class DocumentsService {
     async getAllDocument() {
         const docsD = await this.documentReprository.findAll({where: {banned: false}})
         return docsD
-    } 
+    }
+
+    async getAllDocumentsArchive() {
+        const docs = await this.documentReprository.findAll({
+            attributes: ['id', 'name', 'updatedAt', 'type', 'description', 'banned'],
+            where: {banned: true}
+        });
+        if (!docs) throw new HttpException('Не удалось получить документы в архиве', HttpStatus.BAD_GATEWAY);
+
+        return docs;
+    }
 
     async getAllBanDocuments(length: number) {
         const query = {where: {banned: true}}

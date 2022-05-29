@@ -28,6 +28,12 @@ export class EquipmentController {
         return this.equipmentService.updateEquipmentType(dto)
     }
 
+    @ApiOperation({summary: 'Получение всех подтипов в бане'})
+    @Get('/eq/archive/')
+    getAllArchive() {
+        return this.equipmentService.getAllArchive()
+    }
+
     @ApiOperation({summary: 'Удаление типа '})
     @Delete('/:id')
     removeEquipmentType(@Param('id') id: number) {

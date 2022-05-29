@@ -101,7 +101,13 @@ export class InstrumentController {
     @Delete('/ban/:id')
     banNameInstrument(@Param('id') id: number) {
         return this.instrumentService.banNameInstrument(id)
-    } 
+    }
+    
+    @ApiOperation({summary: 'Получить все наименования инструментов в архиве'})
+    @Get('/nameinstrument/archive/')
+    getArchive() {
+        return this.instrumentService.getArchive()
+    }
 
     @ApiOperation({summary: 'Получить все наименования инструментов'})
     @Get('/nameinstrument')

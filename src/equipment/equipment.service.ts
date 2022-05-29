@@ -27,16 +27,15 @@ export class EquipmentService {
 
     async createEquipmentType(dto: any) {
         const equipment = await this.equipmentTypeReprository.create({name: dto.name})
-        if(!equipment)
+        if (!equipment)
            throw new HttpException('Произошла ошибка придобавлении', HttpStatus.BAD_REQUEST)
 
-        return equipment 
+        return equipment;
     }
 
     async getAllEquipmentType() {
-        const equipment = await this.equipmentTypeReprository.findAll({include: {all: true}})
-        if(equipment)
-            return equipment
+        const equipment = await this.equipmentTypeReprository.findAll({include: {all: true}});
+        if (equipment) return equipment;
     }
 
     async removeEquipmentType(id: number) {
@@ -49,7 +48,7 @@ export class EquipmentService {
 
     async updateEquipmentType(dto: any) {
         const equipment = await this.equipmentTypeReprository.findByPk(dto.id)
-        if(!equipment)
+        if (!equipment)
             throw new HttpException('Запись не найдена', HttpStatus.NOT_FOUND)
         equipment.name = dto.name
         await equipment.save()
@@ -58,11 +57,11 @@ export class EquipmentService {
 
     async createEquipmentPType(dto: any) {
         const equipment = await this.equipmentTypeReprository.findByPk(dto.parentId)
-        if(!equipment)
+        if (!equipment)
             throw new HttpException('Запись не найдена', HttpStatus.BAD_REQUEST)
 
         const equipmentPT = await this.equipemtnPTReprository.create({name: dto.name})
-        if(!equipmentPT)
+        if (!equipmentPT)
             throw new HttpException('Запись не найдена', HttpStatus.BAD_REQUEST)
         
         await equipment.$add('equipmentsPT', equipmentPT.id)
@@ -82,7 +81,7 @@ export class EquipmentService {
 
     async removeEquipmentPType(id: number) {
         const eq = await this.equipemtnPTReprository.findByPk(id)
-        if(!eq)
+        if (!eq)
             throw new HttpException('Ошибка при обновлении подтипа материала', HttpStatus.NOT_FOUND)
         
         await this.equipemtnPTReprository.destroy({where: {id}})
@@ -90,9 +89,8 @@ export class EquipmentService {
     }
 
     async getOneEquipmentPType(id: number) {
-        const equipmentPT = await this.equipemtnPTReprository.findByPk(id, {include: {all: true}})
-        if(equipmentPT)
-            return equipmentPT
+        const equipmentPT = await this.equipemtnPTReprository.findByPk(id, {include: {all: true}});
+        if (equipmentPT) return equipmentPT;
     }
 
     async getAllEquipmentPType() {
@@ -101,22 +99,22 @@ export class EquipmentService {
 
     async createEquipment(dto: CreateEquipmentDto, files: any) {
         const equipment = await this.equipmentReprository.create({name: dto.name })
-        if(!equipment)
+        if (!equipment)
             throw new HttpException('Произошла ошибка при добавлении', HttpStatus.BAD_REQUEST)
         
-        if(dto.description != 'null')
+        if (dto.description != 'null')
             equipment.description = dto.description
             else
                 equipment.description = ''
-        if(dto.deliveryTime != 'null')
+        if (dto.deliveryTime != 'null')
             equipment.deliveryTime = dto.deliveryTime
             else
                 equipment.deliveryTime = ''
-        if(dto.invNymber != 'null')
+        if (dto.invNymber != 'null')
             equipment.invNymber = dto.invNymber
             else
                 equipment.invNymber = ''
-         if(dto.responsible) {
+         if (dto.responsible) {
             const user = await this.userRepository.findByPk(dto.responsible)
             if(user) 
                 equipment.responsibleId = user.id
@@ -126,17 +124,16 @@ export class EquipmentService {
         
         await equipment.save()
 
-        if(dto.providers) {
+        if (dto.providers) {
             let providers = JSON.parse(dto.providers)
-            for(let prx of providers) {
+            for (const prx of providers) {
                 let res = await this.providersReprository.findByPk(prx.id)
-                if(res) 
-                    equipment.$add('providers', res.id)
+                if (res) equipment.$add('providers', res.id)
             }
         }
         await equipment.save()
 
-        if(Number(dto.parentId)) {
+        if (Number(dto.parentId)) {
             const equipmentPT = await this.equipemtnPTReprository.findByPk(dto.parentId)
             if(equipmentPT) {
                 await equipmentPT.$add('equipments', equipment.id)
@@ -144,9 +141,9 @@ export class EquipmentService {
             }
         }
 
-        if(Number(dto.rootParentId)) {
+        if (Number(dto.rootParentId)) {
             const equipmentType = await this.equipmentTypeReprository.findByPk(dto.rootParentId)
-            if(equipmentType) {
+            if (equipmentType) {
                 equipment.rootParentId = equipmentType.id
                 await equipment.save()
             }
@@ -154,22 +151,22 @@ export class EquipmentService {
 
         let instrumentIdList: any
         
-        if(dto.instrumentIdList)
+        if (dto.instrumentIdList)
             instrumentIdList = JSON.parse(dto.instrumentIdList)
-        if(instrumentIdList && instrumentIdList.length > 0) {
-            for(let inst of instrumentIdList) {
+        if (instrumentIdList && instrumentIdList.length > 0) {
+            for(const inst of instrumentIdList) {
                 let nameInstrument = await this.nameInstrumentReprository.findByPk(inst)
-                if(nameInstrument) {
+                if (nameInstrument) {
                     equipment.$add('nameInstrument', nameInstrument.id)
                     await equipment.save()
                 }
             }
         }
 
-        if(dto.docs) {
+        if (dto.docs) {
             let docs: any = Object.values(JSON.parse(dto.docs))
             let i = 0
-            for(let document of files.document) {
+            for (let document of files.document) {
                 let res = await this.documentsService.saveDocument(
                     document, 
                     docs[i].nameInstans, 
@@ -193,67 +190,63 @@ export class EquipmentService {
 
     async updateEquipmqnt(dto: UpdateEquipmentDto, files: any) {
         const equipment = await this.equipmentReprository.findByPk(dto.id, {include: {all: true}})
-        if(!equipment)
+        if (!equipment)
             throw new HttpException('Произошла ошибка при добавлении', HttpStatus.BAD_REQUEST)
         
-        if(dto.description != 'null')
+        if (dto.description != 'null')
             equipment.description = dto.description
             else
                 equipment.description = ''
-        if(dto.deliveryTime != 'null')
+        if (dto.deliveryTime != 'null')
             equipment.deliveryTime = dto.deliveryTime
             else
                 equipment.deliveryTime = ''
-        if(dto.invNymber != 'null')
+        if (dto.invNymber != 'null')
             equipment.invNymber = dto.invNymber
-            else
-                equipment.invNymber = ''
-        if(dto.name)
-            equipment.name = dto.name
+            else equipment.invNymber = '';
+        if (dto.name) equipment.name = dto.name;
 
-        if(dto.responsible) {
-            const user = await this.userRepository.findByPk(dto.responsible)
-            if(user) 
-                equipment.responsibleId = user.id
+        if (dto.responsible) {
+            const user = await this.userRepository.findByPk(dto.responsible);
+            if (user) equipment.responsibleId = user.id;
         }
 
-        equipment.attention = dto.attention
+        equipment.attention = dto.attention;
 
-        await equipment.save()
+        await equipment.save();
 
-        if(dto.providers) {
-            equipment.providers = []
-            let providers = JSON.parse(dto.providers)
-            for(let prx of providers) {
-                let res = await this.providersReprository.findByPk(prx.id)
-                if(res) 
-                    equipment.$add('providers', res.id)
+        if (dto.providers) {
+            equipment.providers = [];
+            let providers = JSON.parse(dto.providers);
+            for (const prx of providers) {
+                let res = await this.providersReprository.findByPk(prx.id);
+                if (res) equipment.$add('providers', res.id);
             }
         }
 
-        let instrumentIdList: any
+        let instrumentIdList: any;
         
-        for(let eq of equipment.nameInstrument){
-            await equipment.$remove('nameInstrument', eq.id) 
-            await equipment.save()
+        for (let eq of equipment.nameInstrument){
+            await equipment.$remove('nameInstrument', eq.id);
+            await equipment.save();
         }
 
-        if(dto.instrumentIdList)
-            instrumentIdList = JSON.parse(dto.instrumentIdList)
-        if(instrumentIdList && instrumentIdList.length > 0) {
-            for(let inst of instrumentIdList) {
-                let nameInstrument = await this.nameInstrumentReprository.findByPk(inst)
-                if(nameInstrument) {
-                    equipment.$add('nameInstrument', nameInstrument.id)
-                    await equipment.save()
+        if (dto.instrumentIdList)
+            instrumentIdList = JSON.parse(dto.instrumentIdList);
+        if (instrumentIdList && instrumentIdList.length > 0) {
+            for (const inst of instrumentIdList) {
+                let nameInstrument = await this.nameInstrumentReprository.findByPk(inst);
+                if (nameInstrument) {
+                    equipment.$add('nameInstrument', nameInstrument.id);
+                    await equipment.save();
                 }
             }
         }
 
-        if(dto.docs) {
-            let docs: any = Object.values(JSON.parse(dto.docs))
-            let i = 0
-            for(let document of files.document) {
+        if (dto.docs) {
+            let docs: any = Object.values(JSON.parse(dto.docs));
+            let i = 0;
+            for(const document of files.document) {
                 let res = await this.documentsService.saveDocument(
                     document, 
                     'p', 
@@ -263,51 +256,55 @@ export class EquipmentService {
                     docs[i].name
                 )
                 if(res && res.id) {
-                    const docId = await this.documentsReprository.findByPk(res.id)
-                    if(docId) await equipment.$add('documents', docId.id)
+                    const docId = await this.documentsReprository.findByPk(res.id);
+                    if(docId) await equipment.$add('documents', docId.id);
                 }
-                i++
+                i++;
             }
         }
 
-        await equipment.save()
-
-        return equipment
+        await equipment.save();
+        return equipment;
     }
     async getOneEquipment(id: number) {
-        const eq = await this.equipmentReprository.findByPk(id, {include: {all: true}})
-        if(!eq)
-            throw new HttpException('Не удалось найти оборудование',HttpStatus.NOT_FOUND)
-        return eq
+        const eq = await this.equipmentReprository.findByPk(id, {include: {all: true}});
+        if (!eq) throw new HttpException('Не удалось найти оборудование',HttpStatus.NOT_FOUND);
+        return eq;
     }
 
     async removeFileEquipment(id: number) {
-        const document = await this.documentsReprository.findByPk(id)
-        if(document) 
-            await document.destroy()
+        const document = await this.documentsReprository.findByPk(id);
+        if (document) await document.destroy();
     }
 
     async banEquipment(id: number) {
-        const equipment = await this.equipmentReprository.findByPk(id)
-        if(equipment) {
-            equipment.ban = !equipment.ban
-            await equipment.save()
+        const equipment = await this.equipmentReprository.findByPk(id);
+        if (equipment) {
+            equipment.ban = !equipment.ban;
+            await equipment.save();
         }
     }
 
     async getAllEquipment(light: string) {
         if(light == 'true')
-            return await this.equipmentReprository.findAll()
-        return await this.equipmentReprository.findAll({include: {all: true}})
+            return await this.equipmentReprository.findAll({where: {ban: false}});
+        return await this.equipmentReprository.findAll({include: {all: true}, where: {ban: false}});
+    }
+
+    async getAllArchive() {
+        const eqs = await this.equipmentReprository.findAll({where: {ban: true}, attributes: ['id', 'name']});
+        if (!eqs) throw new HttpException('Не удалось получить оборудование в архиве', HttpStatus.BAD_GATEWAY);
+
+        return eqs;
     }
 
     async attachFileToEquipment(eq_id: number, file_id: number) {
-        const equipment = await this.equipmentReprository.findByPk(eq_id)
-        const file = await this.documentsService.getFileById(file_id)
+        const equipment = await this.equipmentReprository.findByPk(eq_id);
+        const file = await this.documentsService.getFileById(file_id);
 
-        if(equipment && file) 
-            equipment.$add('documents', file.id)
+        if(equipment && file)
+            equipment.$add('documents', file.id);
 
-        return file
+        return file;
     }
 } 

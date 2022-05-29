@@ -11,7 +11,7 @@ import { ProviderService } from './provider.service';
 export class ProviderController {
     constructor(private providerService: ProviderService) {}
 
-    @ApiOperation({summary: 'Создаем подтип подтипа материала'})
+    @ApiOperation({summary: 'Создаем поставщика'})
     @UseInterceptors(FileFieldsInterceptor([
         {name: 'document', maxCount: 40}
     ]))
@@ -20,17 +20,25 @@ export class ProviderController {
         return this.providerService.createProvider(dto, files)
     }
 
+    @ApiOperation({summary: 'Поулчаем поставщика'})
     @Get('/') 
     getProviders() {
         return this.providerService.getProviders()
     }
+    
+    @ApiOperation({summary: 'Поулчаем поставщика в бане'})
+    @Get('/archive') 
+    getProvidersArchive() {
+        return this.providerService.getProvidersArchive()
+    }
 
+    @ApiOperation({summary: 'Поулчаем поставщика по id'})
     @Get('/ban/:id')
     banProviders(@Param('id') id: number) {
         return this.providerService.banProvider(id)
     }
 
-    @ApiOperation({summary: 'Создаем подставку'})
+    @ApiOperation({summary: 'Создаем поставку'})
     @UseInterceptors(FileFieldsInterceptor([
         {name: 'document', maxCount: 40}
     ]))

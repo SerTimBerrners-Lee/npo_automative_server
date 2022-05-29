@@ -32,10 +32,20 @@ export class DetalService {
     ) {} 
 
     async getAllDetals(light: string) {
-        if(light == 'false') return await this.detalReprository.findAll({include: {all: true}, raw: true});
+        if (light == 'false') return await this.detalReprository.findAll({include: {all: true}, raw: true});
         return await this.detalReprository.findAll({ attributes: [
             'id', 'name', 'ban', 'articl', 'attention', 'createdAt', 'responsibleId'
         ], raw: true});
+    }
+
+    async archive() {
+        const detal = await this.detalReprository.findAll({ attributes: [
+            'id', 'name', 'ban', 'articl', 'attention', 'createdAt', 'responsibleId'
+        ], where: {ban: true}});
+        if(!detal)
+            throw new HttpException('Преизошла ошибка при получении Деталей', HttpStatus.BAD_REQUEST);
+
+        return detal;
     }
 
     async getRenains() {

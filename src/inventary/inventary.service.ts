@@ -20,14 +20,14 @@ export class InventaryService {
 
     async createPInventary(dto: any) {
       const inventary = await this.pInventaryReprository.create(dto)
-      if(!inventary)
+      if (!inventary)
         throw new HttpException('Не удалось создать подтип', HttpStatus.BAD_GATEWAY)
       return await this.pInventaryReprository.findByPk(inventary.id, {include: {all: true}})
     }
 
     async updatePInventary(dto: any) {
       const inventary = await this.pInventaryReprository.findByPk(dto.id, {include: {all:true}})
-      if(!inventary)
+      if (!inventary)
         throw new HttpException('Не удалось создать подтип', HttpStatus.BAD_GATEWAY)
       inventary.name = dto.name
       await inventary.save()
@@ -40,7 +40,7 @@ export class InventaryService {
 
     async deletePInventary(id: number) {
       const inventary = await this.pInventaryReprository.findByPk(id)
-      if(inventary)
+      if (inventary)
         return await this.pInventaryReprository.destroy({where: {id}})
     }
 
@@ -49,14 +49,14 @@ export class InventaryService {
         name: dto.name,
         inventary_type_id: dto.inventary_type_id
       })
-      if(!inventary)
+      if (!inventary)
         throw new HttpException('Не удалось создать подтип', HttpStatus.BAD_GATEWAY)
       return inventary
     }
 
     async updatePTInventary(dto: any) {
       const inventary = await this.ptInventaryReprository.findByPk(dto.id)
-      if(!inventary)
+      if (!inventary)
         throw new HttpException('Не удалось обновить подтип', HttpStatus.BAD_GATEWAY)
       inventary.name = dto.name
       await inventary.save()
@@ -69,23 +69,29 @@ export class InventaryService {
 
     async deletePTInventary(id: number) {
       const inventary = await this.ptInventaryReprository.findByPk(id)
-      if(inventary)
+      if (inventary)
         return await this.ptInventaryReprository.destroy({where: {id}})
     }
 
     async getInventaryById(id: number) {
       const inventary =  await this.inventaryReprository.findByPk(id, {include: {all: true}})
-      if(inventary) return inventary
+      if (inventary) return inventary
     }
 
     async getAllInventary() {
-      const inventary = await this.inventaryReprository.findAll()
-      return inventary
+      const inventary = await this.inventaryReprository.findAll({where: {ban: false}});
+      return inventary;
+    }
+
+    async getArchive() {
+      const inventary = await this.inventaryReprository.findAll({where: {ban: true}, attributes: ['id', 'name']});
+      if (!inventary) throw new HttpException('Не удалоь получить инвентарь в архиве', HttpStatus.BAD_GATEWAY);
+      return inventary;
     }
 
     async createNewInventary(dto: CreateInventaryDto, files: any) {
       const inventary = await this.inventaryReprository.create({name: dto.name})
-      if(!inventary)
+      if (!inventary)
         throw new HttpException('Не удалось создать объект', HttpStatus.BAD_GATEWAY)
       const created_inventary = await this.inventaryReprository.findByPk(inventary.id, {include: {all: true}})
       

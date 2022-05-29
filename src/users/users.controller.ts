@@ -61,6 +61,12 @@ export class UsersController {
         return this.userService.getUser(light);
     }
 
+    @ApiOperation({summary: 'Получение всех пользователей с баном'})
+    @Get('/archive/')
+    getArchive() {
+        return this.userService.getArchive();
+    }
+
     @ApiOperation({summary: 'Удаление пользователя по ID'})
     @ApiResponse({status: 200, type: [User]})
     @Delete('/:id')

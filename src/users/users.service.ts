@@ -169,6 +169,21 @@ export class UsersService {
             }) 
     }
 
+    async getArchive() {
+        const users = await this.userRepository.findAll({
+            attributes: ['id', 'initial', 'login', 'tabel', 'banned'],
+            include: ['role'],
+            order: [
+                ['tabel', 'ASC']
+            ],
+            where: { banned: false }
+        });
+
+        if (!users) throw new HttpException('Не удалось получить пользователей', HttpStatus.BAD_GATEWAY);
+
+        return users;
+    }
+
     async getUserByPk(id: number) {
         const user = await this.userRepository.findByPk(id, {include: ['role', 'documents']})
 

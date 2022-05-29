@@ -15,6 +15,12 @@ import { SettingsService } from './settings.service';
 export class SettingsController {
     constructor(private settingsService: SettingsService) {}
 
+    @ApiOperation({summary: 'Получаем все Полдтип материала из Архива'})
+    @Get('/podpodtype/archive/')
+    getAllPPTArchive() {
+        return this.settingsService.getAllPPTArchive()
+    }
+
     @ApiOperation({summary: 'Создание типа ЕИ'})
     @Post('/typeedizm')
     createTypeEdizm(@Body() dto: CreateTypeEdizmDto) {

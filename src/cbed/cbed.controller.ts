@@ -28,6 +28,12 @@ export class CbedController {
         return this.cbedService.getAllCbedArticl()
     }
 
+    @ApiOperation({summary: 'Получаем все сборочные единицы в архиве'})
+    @Get('/archive/')
+    archive() {
+        return this.cbedService.archive()
+    }
+
     @ApiOperation({summary: 'Создаем Сборочную единицу'})
     @UseInterceptors(FileFieldsInterceptor([
         {name: 'document', maxCount: 40}

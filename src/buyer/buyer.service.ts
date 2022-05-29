@@ -73,10 +73,16 @@ export class BuyerService {
     }
 
     async getBuyers(light: string = 'false') {
-        if(light == 'true') return await this.buyerReprository.findAll()
+        if(light == 'true') return await this.buyerReprository.findAll({where: { ban: false }})
 
-        const buyers = await this.buyerReprository.findAll({include: {all: true}})
+        const buyers = await this.buyerReprository.findAll({include: {all: true}, where: { ban: false }})
         return buyers
+    }
+
+    async getBuyersArchive() {
+        const buyers = await this.buyerReprository.findAll({ attributes: ['id', 'name', 'inn'], where: { ban: true } });
+        if (!buyers) throw new HttpException('Не удалось получить Покупателей в бане', HttpStatus.BAD_GATEWAY);
+        return buyers;
     }
 
     async getByuerById(id: number) {
