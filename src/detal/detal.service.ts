@@ -32,10 +32,10 @@ export class DetalService {
     ) {} 
 
     async getAllDetals(light: string) {
-        if (light == 'false') return await this.detalReprository.findAll({include: {all: true}, raw: true});
+        if (light == 'false') return await this.detalReprository.findAll({include: {all: true}, raw: true, where: {ban: false}});
         return await this.detalReprository.findAll({ attributes: [
             'id', 'name', 'ban', 'articl', 'attention', 'createdAt', 'responsibleId'
-        ], raw: true});
+        ], raw: true, where: {ban: false}});
     }
 
     async archive() {

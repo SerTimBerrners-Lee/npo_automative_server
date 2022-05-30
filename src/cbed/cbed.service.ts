@@ -211,11 +211,11 @@ export class CbedService {
         if(light == 'true') {
             const cbed = await this.cbedReprository.findAll({attributes: [
                 'id', 'name', 'ban', 'articl', 'attention', 'createdAt', 'responsibleId'
-            ]});
+            ], where: {ban: false}});
             return cbed;
         }
         else {
-            const cbed = await this.cbedReprository.findAll({include: {all: true}});
+            const cbed = await this.cbedReprository.findAll({include: {all: true}, where: {ban: false}});
             return cbed;
         }
     }

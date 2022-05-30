@@ -182,11 +182,11 @@ export class ProductService {
 
     async getAllProduct(light: string) {
         if(light == 'false')
-            return await this.productReprository.findAll({include: {all: true}})
+            return await this.productReprository.findAll({include: {all: true}, where: {ban: false}})
 
         return await this.productReprository.findAll({attributes: [
             'id', 'name', 'ban', 'fabricNumber', 'articl', 'attention', 'createdAt', 'responsibleId'
-        ]})
+        ], where: {ban: false}})
     }
 
     async archive() {
