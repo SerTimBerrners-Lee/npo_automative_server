@@ -96,7 +96,7 @@ export class ShComplitService {
           include: [
             {
               model: Product,
-              attributes: ['name', 'id', 'articl']
+              attributes: ['name', 'id', 'articl', 'fabricNumber']
             },
             {
               model: Buyer,
