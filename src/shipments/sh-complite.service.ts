@@ -34,10 +34,11 @@ export class ShComplitService {
       sh_complit.date_create = dto.date_create;
       sh_complit.transport = dto.transport;
       sh_complit.date_shipments_fakt = dto.date_shipments_fakt;
+      const child = JSON.parse(dto.childrens);
 
-      if(dto.responsible_user_id && dto.responsible_user_id != 'null') {
+      if (dto.responsible_user_id && dto.responsible_user_id != 'null') {
         const user = await this.userReprository.findByPk(dto.responsible_user_id);
-        if(user) {
+        if (user) {
           sh_complit.responsible_user_id = user.id;
           sh_complit.$add('users', user.id);
         }
@@ -45,20 +46,26 @@ export class ShComplitService {
       
       if(dto.creater_user_id && dto.creater_user_id != 'null') {
         const user = await this.userReprository.findByPk(dto.creater_user_id);
-        if(user) {
+        if (user) {
           sh_complit.creater_user_id = user.id;
           sh_complit.$add('users', user.id);
         }
       }
 
-      const shipments = await this.shipmentsReprository.findByPk(dto.shipments_id);
-      if(shipments) {
-        shipments.status = statusShipment.done;
-        shipments.sh_complit_id = sh_complit.id;
-        await shipments.save();
+      if (child && child.length) {
+        for (const item of child) {
+          let shipments = await this.shipmentsReprository.findByPk(item.id);
+          if (shipments) {
+            shipments.status = statusShipment.done;
+            shipments.sh_complit_id = sh_complit.id;
+            await shipments.save();
+
+            sh_complit.$add('shipments', shipments.id);
+          }
+        }
       }
 
-      if(dto.docs, files.document) 
+      if (dto.docs, files.document) 
         await this.documentsService.attachDocumentForObject(sh_complit, dto, files);
       
       await sh_complit.save();
@@ -69,11 +76,9 @@ export class ShComplitService {
       const sh_complit = await this.shComplitReprository.findByPk(dto.id);
       if (!sh_complit) throw new HttpException('Не удалось получить отгрузку', HttpStatus.BAD_GATEWAY);
 
-
       sh_complit.description = dto.description;
-      console.log(dto.docs, files.document)
 
-      if(dto.docs, files.document) 
+      if (dto.docs, files.document) 
         await this.documentsService.attachDocumentForObject(sh_complit, dto, files);
       await sh_complit.save();
       return sh_complit;
@@ -100,7 +105,8 @@ export class ShComplitService {
           ],
         },
       ]});
-      if(!sh_complits) throw new HttpException('Не удалось получить список отгрузок', HttpStatus.BAD_REQUEST);
+      if (!sh_complits) throw new HttpException('Не удалось получить список отгрузок', HttpStatus.BAD_REQUEST);
+      console.log(sh_complits);
 
       return sh_complits;
     }
@@ -119,20 +125,19 @@ export class ShComplitService {
       if (!complit)
         throw new HttpException('Не удалось получить отгрузку', HttpStatus.BAD_GATEWAY);
 
-      let shipments: any;
-      if (complit.shipments_id) shipments = await this.shipmentsReprository.findByPk(complit.shipments_id);
-      if (complit.shipments) shipments = await this.shipmentsReprository.findByPk(complit.shipments.id);
+      for (const item of complit.shipments) {
+        let shipments: Shipments = await this.shipmentsReprository.findByPk(item.id);
 
-      if (shipments) {
-        shipments.status = statusShipment.order;
-        shipments.sh_complit
-        shipments.sh_complit_id = null;
-        await shipments.save();
+        if (shipments) {
+          shipments.status = statusShipment.order;
+          shipments.sh_complit_id = null;
+          await shipments.save();
+        }
+
+        complit.ban = true;
+        complit.$remove('shipments', item.id);
+        await complit.save();
       }
-
-      complit.ban = true;
-      complit.shipments_id = null;
-      await complit.save();
 
       return true;
     }

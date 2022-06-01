@@ -14,5 +14,6 @@ export class ShCheckDto {
   readonly date_create: string;
   readonly transport: string;
   readonly date_shipments_fakt: string;
-  readonly docs: any;	
+  readonly docs: any;
+  readonly childrens: any;
 }
