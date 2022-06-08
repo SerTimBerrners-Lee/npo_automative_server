@@ -28,9 +28,9 @@ export class AssembleController {
 	}
 
 	@ApiOperation({summary: 'Получить все Сборки'})
-	@Get('/asstoplan')
-	getAllAssemblePlan() {
-			return this.assembleService.getAllAssemblePlan();
+	@Get('/asstoplan/:type')
+	getAllAssemblePlan(@Param('type') type: string) {
+			return this.assembleService.getAllAssemblePlan(type);
 	}
 
 	@ApiOperation({summary: 'Получить Сборку'})

@@ -116,19 +116,24 @@ export class AssembleService {
 		return assembly;
 	}
 
-	async getAllAssemblePlan() {
-		const assembly = await this.assembleReprository.findAll({ where: { ban: false }, include: [
-			{
-				model: Cbed,
-				attributes: ['id', 'name', 'articl', 'shipments_kolvo'],
-				include: [{
-					model: Shipments
-				}]
-			},
-			{
-				model: Working
-			},
-		]});
+	async getAllAssemblePlan(type: string = 'all') {
+		const where = { ban: false };
+		if (type !== 'all') where['type_izd'] = type;
+
+		const assembly = await this.assembleReprository.findAll({ 
+			where,
+			include: [
+				{
+					model: Cbed,
+					attributes: ['id', 'name', 'articl', 'shipments_kolvo'],
+					include: [{
+						model: Shipments
+					}]
+				},
+				{
+					model: Working
+				},
+			]});
 		if (!assembly)
 			throw new HttpException('Не удалось получить сборки', HttpStatus.NOT_FOUND);
 
