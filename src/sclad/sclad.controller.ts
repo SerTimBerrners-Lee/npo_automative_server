@@ -63,11 +63,6 @@ export class ScladController {
         return this.scladService.getAllMaterialDeficit()
     }
 
-    @Get('/removeTypeEZ')
-    removeTypeEZ() {
-        return this.scladService.removeTypeEZ();
-    }
-
     @ApiOperation({summary: 'Получаем Дефицит для отдельного зпепзп'})
     @Get('/materialdeficit/shipments/:id/:type')
     materialShipmentsType(@Param('id') id: number, @Param('type') type: string) {

@@ -551,20 +551,6 @@ export class ScladService {
         this.formingDeficitMaterial = false;
     }
 
-    async removeTypeEZ() {
-        const material = await this.material.findAll({
-            attributes: ['id', 'kolvo'],
-        });
-
-        for (const item of material) {
-            const pars = JSON.parse(item.kolvo);
-            const values = Object.keys(pars)[1];
-            pars[values] = false;
-            item.kolvo = JSON.stringify(pars);
-            await item.save();
-        }
-    }
-
     /**
      * Получаем все Объекты к которым принадлежит материал
      * @param mat_id 
@@ -600,7 +586,7 @@ export class ScladService {
       * @returns 
       */
 	async formationDeficitMaterial(materialObj: any, vars: any, material: PodPodMaterial) {
-        if(!materialObj) return false;
+        if (!materialObj) return false;
 
         try {
             let ez_kolvo = JSON.parse(material.ez_kolvo);
