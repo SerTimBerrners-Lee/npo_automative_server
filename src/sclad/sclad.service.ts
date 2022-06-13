@@ -35,36 +35,39 @@ export class ScladService {
         private assembleService: AssembleService,
         private metaloworkingService: MetaloworkingService,
         ) {
-            this.logger = new Logger()
+            this.logger = new Logger();
+            this.formingDeficitMaterial = false;
         }
 
-    private logger: Logger
+    private logger: Logger;
+    private formingDeficitMaterial: boolean;
 
     async updateDeficit(dto: UpdateDeficitDto) {
         const deficit = await this.deficitReprository.update(
             { minRemainder: dto.minRemainder, recommendedRemainder: dto.recommendedRemainder }, 
-            { where: {id: dto.id} })
+            { where: {id: dto.id} }
+        );
                 
         if(!deficit)
-            throw new HttpException('Не удалось обновить таблицу дефицита', HttpStatus.BAD_REQUEST)
+            throw new HttpException('Не удалось обновить таблицу дефицита', HttpStatus.BAD_REQUEST);
         return deficit;
     }
 
     async getDeficit() {
-        return await this.deficitReprository.findAll({include: {all: true}})
+        return await this.deficitReprository.findAll({include: {all: true}});
     }
 
     async createMark(dto: CreateMarkDto) {
-       const mark = await this.marksReprository.create(dto)
+       const mark = await this.marksReprository.create(dto);
         if(!mark) 
-            throw new HttpException('Произошла ошибка при добавлении отметки.', HttpStatus.BAD_REQUEST)
+            throw new HttpException('Произошла ошибка при добавлении отметки.', HttpStatus.BAD_REQUEST);
 
-        await this.checkStatusProcess(dto)
-        return mark
+        await this.checkStatusProcess(dto);
+        return mark;
     }
 
     async getMarks() {
-        return await this.marksReprository.findAll({include: {all: true}})
+        return await this.marksReprository.findAll({include: {all: true}});
     }
 
     async getMarksByOperation(id: number) {
@@ -72,41 +75,38 @@ export class ScladService {
         if(!operations)
             throw new HttpException('Не удалось получить Марки по операции', HttpStatus.BAD_GATEWAY);
 
-        console.log(operations, id);
-
         return operations;
     }
 
     private async checkStatusProcess(dto: CreateMarkDto) {
         let objects: any;
         let tp: TechProcess;
-        console.log(dto);
-        if(dto.assemble_id) objects = await this.assembleService.getAssembleById(dto.assemble_id)
-        if(dto.metaloworking_id) objects = await this.metaloworkingService.getOneMetaloworkingById(dto.metaloworking_id)
-        if(!objects) 
-            throw new HttpException('Произошла ошибка при добавлении отметки2.', HttpStatus.BAD_REQUEST)
+        if (dto.assemble_id) objects = await this.assembleService.getAssembleById(dto.assemble_id);
+        if (dto.metaloworking_id) objects = await this.metaloworkingService.getOneMetaloworkingById(dto.metaloworking_id);
+        if (!objects) 
+            throw new HttpException('Произошла ошибка при добавлении отметки2.', HttpStatus.BAD_REQUEST);
 
-        if(dto.assemble_id) 
-            if(objects.cbed && objects.cbed.techProcesses) tp = objects.cbed.techProcesses
-        if(dto.metaloworking_id) 
-            if(objects.detal && objects.detal.techProcesses) tp = objects.detal.techProcesses
+        if (dto.assemble_id) 
+            if(objects.cbed && objects.cbed.techProcesses) tp = objects.cbed.techProcesses;
+        if (dto.metaloworking_id) 
+            if(objects.detal && objects.detal.techProcesses) tp = objects.detal.techProcesses;
             
-        if(!tp || !tp.operations || !tp.operations.length) 
-            throw new HttpException('Произошла ошибка при добавлении отметки.', HttpStatus.BAD_REQUEST)
+        if (!tp || !tp.operations || !tp.operations.length) 
+            throw new HttpException('Произошла ошибка при добавлении отметки.', HttpStatus.BAD_REQUEST);
             
-        let create_marks = 0
-        for(let oper of tp.operations) {
-            let kol = 0
-            for(let mark of oper.marks) {
-                kol = kol + mark.kol
+        let create_marks = 0;
+        for (const oper of tp.operations) {
+            let kol = 0;
+            for (const mark of oper.marks) {
+                kol = kol + mark.kol;
             }
-            if(objects.kolvo_shipments <= kol) create_marks++
+            if (objects.kolvo_shipments <= kol) create_marks++;
         }
-        if(create_marks >= tp.operations.length) {
-            if(dto.assemble_id) objects.status = StatusAssemble[1]
-            if(dto.metaloworking_id) objects.status = StatusMetaloworking[1]
+        if (create_marks >= tp.operations.length) {
+            if (dto.assemble_id) objects.status = StatusAssemble[1];
+            if (dto.metaloworking_id) objects.status = StatusMetaloworking[1];
         }
-        await objects.save()
+        await objects.save();
     }
 
     /**
@@ -124,21 +124,20 @@ export class ScladService {
                 model: Shipments,
                 attributes: ['kol', 'id']
             }]
-        })
+        });
 
-        for(const item of products) {
+        for (const item of products) {
             try {
-                const har = JSON.parse(item.haracteriatic)[1].znach
-                item.min_remaining = Number(har)
+                const har = JSON.parse(item.haracteriatic)[1].znach;
+                item.min_remaining = Number(har);
                 
-                item.shipments_kolvo = 0
-                if(item.shipments.length) {
-                    for(const sh of item.shipments) {
-                        item.shipments_kolvo += Number(sh.kol)
+                item.shipments_kolvo = 0;
+                if (item.shipments.length) {
+                    for (const sh of item.shipments) {
+                        item.shipments_kolvo += Number(sh.kol);
                     }
                 }
-                console.log('\n\n\n', item.shipments, '\n\n\n')
-                await item.save()
+                await item.save();
             } catch(err) {console.error(err)}
         }
 
@@ -159,7 +158,7 @@ export class ScladService {
                     )
                 ]
             }
-        })
+        });
     }
 
     async getAllDeficitCbed() {
@@ -169,15 +168,15 @@ export class ScladService {
                 model: Shipments,
                 attributes: ['id', 'list_cbed_detal', 'list_hidden_cbed_detal']
             }
-        })
+        });
 
-        for(let inx in cbeds) {
-            const remaining = await this.minRemainder(cbeds[inx], 'cbed')
-            let shipments_kolvo = await this.getIzdInShipmentsList(cbeds[inx].shipments, cbeds[inx].id, 'cbed');
+        for (let inx in cbeds) {
+            const remaining = await this.minRemainder(cbeds[inx], 'cbed');
+            const shipments_kolvo = await this.getIzdInShipmentsList(cbeds[inx].shipments, cbeds[inx].id, 'cbed');
 
-            cbeds[inx].min_remaining = remaining
-            cbeds[inx].shipments_kolvo = shipments_kolvo
-            await cbeds[inx].save() 
+            cbeds[inx].min_remaining = remaining;
+            cbeds[inx].shipments_kolvo = shipments_kolvo;
+            await cbeds[inx].save();
         }
 
         const deficitCbed = await this.cbedReprository.findAll({include: [
@@ -200,9 +199,9 @@ export class ScladService {
                     )
                 ]
             }
-        })
+        });
 
-        return deficitCbed
+        return deficitCbed;
 	}
 
     async getAllDeficitDetal() {
@@ -214,7 +213,7 @@ export class ScladService {
             }
         }) 
 
-        for(let inx in detals) {
+        for (let inx in detals) {
             const remaining = await this.minRemainder(detals[inx], 'detal')
             let shipments_kolvo = await this.getIzdInShipmentsList(detals[inx].shipments, detals[inx].id, 'detal');
             
@@ -243,35 +242,34 @@ export class ScladService {
             'shipments'
         ], 
         where: {
-            [Op.or]: [
-                Sequelize.where(
-                    Sequelize.col('detal_kolvo'), '<', Sequelize.col('min_remaining') 
-                ),
-                Sequelize.where(
-                    Sequelize.col('min_remaining'), '<', Sequelize.col('shipments_kolvo') 
-                ),
-            ]
-        }
-        })
+                [Op.or]: [
+                    Sequelize.where(
+                        Sequelize.col('detal_kolvo'), '<', Sequelize.col('min_remaining') 
+                    ),
+                    Sequelize.where(
+                        Sequelize.col('min_remaining'), '<', Sequelize.col('shipments_kolvo') 
+                    ),
+                ]
+            }
+        });
 
-        return deficitDetal
+        return deficitDetal;
 	}
 
     async getIzdInShipmentsList(shipments: any, izd_id: number, type: string) {
         let shipments_kolvo = 0
 
-        for(const item of shipments) {
+        for (const item of shipments) {
             let arr = [];
-            if(item.list_cbed_detal) arr = JSON.parse(item.list_cbed_detal) 
-            if(item.list_hidden_cbed_detal) arr = arr.concat(JSON.parse(item.list_hidden_cbed_detal))
+            if (item.list_cbed_detal) arr = JSON.parse(item.list_cbed_detal);
+            if (item.list_hidden_cbed_detal) arr = arr.concat(JSON.parse(item.list_hidden_cbed_detal));
 
-            for(const izd of arr) {
-                if(izd['obj'].id == izd_id && izd['type'] == type) {
-                    shipments_kolvo += Number(izd['kol'])
-                }
+            for (const izd of arr) {
+                if(izd['obj'].id == izd_id && izd['type'] == type)
+                    shipments_kolvo += Number(izd['kol']);
             }
         }
-        return shipments_kolvo
+        return shipments_kolvo;
     }
 
     async minRemainder(izd: Cbed | Detal, type: string): Promise<number> {
@@ -370,7 +368,10 @@ export class ScladService {
 
     // Deficit  materials
     async getAllMaterialDeficit() {
-        await this.writtingDeficitMaterials()
+        if (!this.formingDeficitMaterial) {
+            this.writtingDeficitMaterials();
+            this.formingDeficitMaterial = true;
+        }
         const materials = await this.material.findAll({
             where: {
                 [Op.or]: [
@@ -385,9 +386,9 @@ export class ScladService {
         })
 
         if(!materials)
-            throw new HttpException('Произошла ошибка при получении дефицита. ', HttpStatus.BAD_REQUEST)
+            throw new HttpException('Произошла ошибка при получении дефицита. ', HttpStatus.BAD_REQUEST);
 
-        return materials
+        return materials;
     }
 
     // Сортировка под каждый заказ отдельон на ПЛАН
@@ -449,7 +450,6 @@ export class ScladService {
         const materialsArr = [];
         // Фильтруем материалы
         for (const item of list_objects) {
-            console.log(item);
             for (const mat of item.materialList) {
                 let check = true;
                 for( const mA of materialsArr) {
@@ -519,6 +519,7 @@ export class ScladService {
                 ez_kolvo.c5_kolvo.shipments_kolvo += Number(sk);
             break;
             default:
+                console.log(ez_kolvo.c1_kolvo);
                 ez_kolvo.c1_kolvo.min_remaining += Number(mr);
                 ez_kolvo.c1_kolvo.shipments_kolvo += Number(sk);
             break;
@@ -527,38 +528,62 @@ export class ScladService {
         return { kolvo, ez_kolvo };
     }
 
-    // Начальная функция для подсчета дифицита 
+    /**
+     * Начальная функция для подсчета дифицита материала
+     * @returns 
+     */
     async writtingDeficitMaterials() {
         const material = await this.material.findAll({
             attributes: ['id', 'shipments_kolvo', 'material_kolvo', 'ez_kolvo'],
-        })
-        if(!material) return false;
+        });
+        if (!material) return false;
 
-        for(const item of material) {
-            item.shipments_kolvo = 0
-            item.material_kolvo = 0
-            item.min_remaining = 0
-            item.ez_kolvo = EZ_KOLVO
-            await item.save()
+        for (const item of material) {
+            item.shipments_kolvo = 0;
+            item.material_kolvo = 0;
+            item.min_remaining = 0;
+            item.ez_kolvo = EZ_KOLVO;
+            await item.save();
 
-            await this.getAllRemObjectForMat(item.id)
+            await this.getAllRemObjectForMat(item.id);
+        }
+
+        this.formingDeficitMaterial = false;
+    }
+
+    async removeTypeEZ() {
+        const material = await this.material.findAll({
+            attributes: ['id', 'kolvo'],
+        });
+
+        for (const item of material) {
+            const pars = JSON.parse(item.kolvo);
+            const values = Object.keys(pars)[1];
+            pars[values] = false;
+            item.kolvo = JSON.stringify(pars);
+            await item.save();
         }
     }
 
-    // Получаем все Объекты к которым принадлежит материал
+    /**
+     * Получаем все Объекты к которым принадлежит материал
+     * @param mat_id 
+     * @returns 
+     */
     async getAllRemObjectForMat(mat_id: number) {
         const allData = await this.getMaterialParents(mat_id);
 
-        for(const item of allData) {
-            for(const mat of item.materialList) {
+        for (const item of allData) {
+            for (const mat of item.materialList) {
                 if(!mat || !mat?.mat) continue; 
-                if(mat.mat.id == mat_id) {
-                    for(const res of item.materials) {
+                if (mat.mat.id == mat_id) {
+                    for (const res of item.materials) {
                         const material = await this.material.findByPk(res.id, {
                             attributes: ['ez_kolvo', 'id', 'shipments_kolvo', 'min_remaining', 'material_kolvo', 'kolvo']
-                        })
-                        let {min_remaining, shipments_kolvo} = item
-                        await this.formationDeficitMaterial(mat, {min_remaining, shipments_kolvo}, material)
+                        });
+                        if (!material) continue;
+                        const { min_remaining, shipments_kolvo } = item;
+                        await this.formationDeficitMaterial(mat, { min_remaining, shipments_kolvo }, material);
                     }
                 }
             }
@@ -567,9 +592,8 @@ export class ScladService {
         return true
     }
     
-     // Сохраняем количество для каждой ЕИ Материала
      /**
-      * 
+      * Сохраняем количество для каждой ЕИ Материала
       * @param materialObj { kol: number, ez: number }
       * @param vars { min_remaining: number, shipments_kolvo: number }
       * @param material: PodPodMaterial
@@ -596,8 +620,8 @@ export class ScladService {
             ez_kolvo = res.ez_kolvo;
             kolvo = res.kolvo;
 
-            material.kolvo = JSON.stringify(kolvo)
-            material.ez_kolvo = JSON.stringify(ez_kolvo)
+            material.kolvo = JSON.stringify(kolvo);
+            material.ez_kolvo = JSON.stringify(ez_kolvo);
         } catch(err) {console.error(err+ '\n\n\nERROR IN STR: 410 \n\n\n')}
 
         await material.save()
@@ -606,7 +630,6 @@ export class ScladService {
     /**
      * 
      * @param mat_id 
-
      */
     async getMaterialParentsDeficit(mat_id: number) {
         const provider = await this.providerReprository.count({
@@ -616,20 +639,20 @@ export class ScladService {
             }],
         });
 
-        let allData = await this.getMaterialParents(mat_id, [{
+        const allData = await this.getMaterialParents(mat_id, [{
             model: Product,
             attributes: ['id', 'name']
-        }], true)
+        }], true);
 
-        let arr: any = []
-        for(const item of allData) {
-            if(item.products && !item.products.length) continue;
-            arr.push(item)
+        const arr: any = []
+        for (const item of allData) {
+            if (item.products && !item.products.length) continue;
+            arr.push(item);
         }
 
-        allData.unshift({type: 'provider', count: provider})
+        allData.unshift({type: 'provider', count: provider});
 
-        return allData
+        return allData;
     }
 
     /**
@@ -647,43 +670,43 @@ export class ScladService {
 
         try {
             const allArr: any = await this.getMaterialParents(mat_id, includes, false);
-            let allData = [];
-            for(let item of allArr) {
-                if(!item || !item.shipments) continue;
-                if(item.shipments.length) allData.push(item) 
+            const allData = [];
+            for (const item of allArr) {
+                if (!item || !item.shipments) continue;
+                if (item.shipments.length) allData.push(item);
             }
 
-            for(let item of allData) {
-                for(const sh of item.shipments) {
+            for (const item of allData) {
+                for (const sh of item.shipments) {
                     sh.shipments_parents = 0;
                     sh.shipments_material = 0;
                     // Получаем количество 
-                    if(item.type == 'prod') {
-                        sh.shipments_parents = Number(sh.kol || 0) 
-                    }
+                    if(item.type == 'prod') 
+                        sh.shipments_parents = Number(sh.kol || 0);
+
                     if(item.type == 'detal' || item.type == 'cbed') {
                         const shData = this.returnObjForListShipments(item.type, item.id, sh);
-                        for(const sd of shData) {
-                            sh.shipments_parents = Number(sd.kol || 0) 
+                        for (const sd of shData) {
+                            sh.shipments_parents = Number(sd.kol || 0) ;
                         }
                     }
                     // Получаем количество материалов
-                    for(let material of item.materialList) {
-                        sh.shipments_material += (material.kol * sh.shipments_parents)
+                    for (const material of item.materialList) {
+                        sh.shipments_material += (material.kol * sh.shipments_parents);
                     }
                 }
             }
 
             // Сортируем заказы (чтобы не повторялись).
             const shipments = [];
-            for(const item of allData) {
-                for(const sh of item.shipments) {
-                    let exist = false
-                    for(const sh_new of shipments) {
+            for (const item of allData) {
+                for (const sh of item.shipments) {
+                    let exist = false;
+                    for (const sh_new of shipments) {
                         if(sh.id == sh_new.id) {
-                            sh_new.shipments_parents += Number(sh.shipments_parents)
-                            sh_new.shipments_material +=Number(sh.shipments_material)
-                            exist = true
+                            sh_new.shipments_parents += Number(sh.shipments_parents);
+                            sh_new.shipments_material +=Number(sh.shipments_material);
+                            exist = true;
                         }
                     }
 
@@ -741,12 +764,12 @@ export class ScladService {
     private returnObjForListShipments(type: string, _id: number, sh: Shipments) {
         try {
             let arr = [];
-            if(sh.list_cbed_detal) arr = JSON.parse(sh.list_cbed_detal);
-            if(sh.list_hidden_cbed_detal) arr = arr.concat(JSON.parse(sh.list_hidden_cbed_detal));
+            if (sh.list_cbed_detal) arr = JSON.parse(sh.list_cbed_detal);
+            if (sh.list_hidden_cbed_detal) arr = arr.concat(JSON.parse(sh.list_hidden_cbed_detal));
             
             const objData = [];
-            for(const item of arr) {
-                if(item.type == type && _id == item.obj.id) objData.push(item);
+            for (const item of arr) {
+                if (item.type == type && _id == item.obj.id) objData.push(item);
             }
 
             return objData;
@@ -780,7 +803,7 @@ export class ScladService {
                 item.materialList.push({
                     mat: {id: zag},
                     kol: Math.round(item.lengt),
-                    ez: 2
+                    ez: 4
                 });
             }
             return item;
@@ -789,7 +812,7 @@ export class ScladService {
         try {
             allData = [...prod, ...cbed, ...detal];;
 
-            for(let item of allData) {
+            for (let item of allData) {
                 if(item.materialList) 
                     item.materialList = JSON.parse(item.materialList);
                 else item.materialList = [];
@@ -819,8 +842,8 @@ export class ScladService {
     async materialShipmentsToId(mat_id: number) {
         const allData = await this.getMaterialParents(mat_id, {
             model: Shipments
-        })
+        });
 
-        return allData
+        return allData;
     }
 }

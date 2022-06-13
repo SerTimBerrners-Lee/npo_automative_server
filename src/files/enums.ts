@@ -28,6 +28,8 @@ export enum statusDelivery {
 }
 
 export const EZ_KOLVO = '{"c1_kolvo":{"material_kolvo":0,"shipments_kolvo":0,"min_remaining":0,"price":0, "deliveries_kolvo":0},"c2_kolvo":{"material_kolvo":0,"shipments_kolvo":0,"min_remaining":0,"price":0, "deliveries_kolvo":0},"c3_kolvo":{"material_kolvo":0,"shipments_kolvo":0,"min_remaining":0,"price":0, "deliveries_kolvo":0},"c4_kolvo":{"material_kolvo":0,"shipments_kolvo":0,"min_remaining":0,"price":0, "deliveries_kolvo":0},"c5_kolvo":{"material_kolvo":0,"shipments_kolvo":0,"min_remaining":0,"price":0, "deliveries_kolvo":0}}';
+// c1 = шт, c2 = л, c3 = кг, c4 = м, c5 = м.куб
+export const TYPE_EZ = '{"c1":false,"c2":false,"c3":false,"c4":true,"c5":false}';
 
 export const KOLVO = '{"c1":true,"c2":false,"c3":false,"c4":false,"c5":false}';
 
