@@ -134,18 +134,17 @@ export class DetalService {
     }
 
     async updateDetal(dto: UpdateDetalDto, files: any, authID: any) {
-        console.log(dto)
         const detal = await this.detalReprository.findByPk(dto.id, {include: {all: true}})
-        if(!detal)
+        if (!detal)
             throw new HttpException('Не удалосьм обновить деталь', HttpStatus.BAD_REQUEST)
 
         const action = await this.actionsReprository.create({action: "Внес изменения в детать"})
         let user: any
-        if(authID)
+        if (authID)
             user = await this.userRepository.findByPk(authID)
-        if(action) {
+        if (action) {
             action.detalId = detal.id
-            if(user)
+            if (user)
                 action.responsibleId = user.id
             await action.save()
         }
@@ -162,141 +161,140 @@ export class DetalService {
 
         try {
 
-                if(dto.articl != 'null')
-                    detal.articl = dto.articl
-                    else detal.articl = 0
-                if(dto.description != 'null')
-                    detal.description = dto.description 
-                    else detal.description = ''
-                if(dto.parametrs)
-                    detal.parametrs = dto.parametrs
-                if(dto.haracteriatic)
-                    detal.haracteriatic = dto.haracteriatic
-                if(dto.DxL != 'null')
-                    detal.DxL = dto.DxL
-                    else detal.DxL = 0
-                // Haracteristics zag
-                if(dto.diametr && dto.diametr != 'null')
-                    detal.diametr = dto.diametr
-                else detal.diametr = ''
+            if (dto.articl != 'null')
+                detal.articl = dto.articl
+                else detal.articl = 0
+            if (dto.description != 'null')
+                detal.description = dto.description 
+                else detal.description = ''
+            if (dto.parametrs)
+                detal.parametrs = dto.parametrs
+            if (dto.haracteriatic)
+                detal.haracteriatic = dto.haracteriatic
+            if (dto.DxL != 'null')
+                detal.DxL = dto.DxL
+                else detal.DxL = 0
+            // Haracteristics zag
+            if (dto.diametr && dto.diametr != 'null')
+                detal.diametr = dto.diametr
+            else detal.diametr = ''
 
-                if(dto.lengt && dto.lengt != 'null')
-                    detal.lengt = dto.lengt
-                else detal.lengt = ''
+            if (dto.lengt && dto.lengt != 'null')
+                detal.lengt = dto.lengt
+            else detal.lengt = ''
 
-                if(dto.height && dto.height != 'null')
-                    detal.height = dto.height
-                else detal.height = ''   
+            if (dto.height && dto.height != 'null')
+                detal.height = dto.height
+            else detal.height = ''   
 
-                if(dto.thickness && dto.thickness != 'null')
-                    detal.thickness = dto.thickness
-                else detal.thickness = ''
+            if (dto.thickness && dto.thickness != 'null')
+                detal.thickness = dto.thickness
+            else detal.thickness = ''
 
-                if(dto.wallThickness && dto.wallThickness != 'null')
-                    detal.wallThickness = dto.wallThickness
-                else detal.wallThickness = ''
+            if (dto.wallThickness && dto.wallThickness != 'null')
+                detal.wallThickness = dto.wallThickness
+            else detal.wallThickness = ''
 
-                if(dto.width && dto.width != 'null') detal.width = dto.width;
-                else detal.width = '';
+            if (dto.width && dto.width != 'null') detal.width = dto.width;
+            else detal.width = '';
 
-                if(dto.areaCS && dto.areaCS != 'null') detal.areaCS = dto.areaCS;
-                else detal.areaCS = '';
+            if (dto.areaCS && dto.areaCS != 'null') detal.areaCS = dto.areaCS;
+            else detal.areaCS = '';
 
-                if(dto.massZag != 'null') detal.massZag = dto.massZag;
-                else detal.massZag = 0;
+            if (dto.massZag != 'null') detal.massZag = dto.massZag;
+            else detal.massZag = 0;
 
-                if(dto.trash != 'null') detal.trash = dto.trash;
-                else detal.trash = 0;
-                detal.attention = dto.attention;
-                
-                if(detal.materials && detal.materials.length) {
-                    for(let det of detal.materials) {
-                        await detal.$remove('materials', det.id)
-                    }
+            if (dto.trash != 'null') detal.trash = dto.trash;
+            else detal.trash = 0;
+            detal.attention = dto.attention;
+            
+            if (detal.materials && detal.materials.length) {
+                for(let det of detal.materials) {
+                    await detal.$remove('materials', det.id)
                 }
+            }
 
-                if(Number(dto.responsible)) {
-                    const user = await this.userRepository.findByPk(dto.responsible)
-                    if(user) detal.responsibleId = user.id
-                }
+            if (Number(dto.responsible)) {
+                const user = await this.userRepository.findByPk(dto.responsible)
+                if(user) detal.responsibleId = user.id
+            }
 
-                detal.mat_zag = null;
-                if(Number(dto.mat_zag)) {
+            detal.mat_zag = null;
+            if (Number(dto.mat_zag)) {
+                detal.mat_zag = dto.mat_zag;
+                let material = await this.podPodMaterialReprository.findByPk(dto.mat_zag);
+                if(material) {
+                    await detal.$add('materials', material.id);
                     detal.mat_zag = dto.mat_zag;
-                    let material = await this.podPodMaterialReprository.findByPk(dto.mat_zag);
-                    if(material) {
-                        await detal.$add('materials', material.id);
-                        detal.mat_zag = dto.mat_zag;
-                    }
                 }
+            }
 
-                detal.mat_zag_zam = null;
-                if(Number(dto.mat_zag_zam)) {
+            detal.mat_zag_zam = null;
+            if (Number(dto.mat_zag_zam)) {
+                detal.mat_zag_zam = dto.mat_zag_zam;
+                let material = await this.podPodMaterialReprository.findByPk(dto.mat_zag_zam);
+                if(material) {
+                    await detal.$add('materials', material.id);
                     detal.mat_zag_zam = dto.mat_zag_zam;
-                    let material = await this.podPodMaterialReprository.findByPk(dto.mat_zag_zam);
-                    if(material) {
-                        await detal.$add('materials', material.id);
-                        detal.mat_zag_zam = dto.mat_zag_zam;
-                    }
                 }
+            }
 
-                if(dto.materialList) {
-                    const mList = JSON.parse(dto.materialList)
-                    if(mList.length) {
-                        for(let m = 0; m < mList.length; m++) {
-                            let material = await this.podPodMaterialReprository.findByPk(mList[m].mat.id)
-                            if(material) {
-                                mList[m].mat.name = material.name
-                                await detal.$add('materials', material.id)
-                            }
+            if (dto.materialList) {
+                const mList = JSON.parse(dto.materialList)
+                if(mList.length) {
+                    for(let m = 0; m < mList.length; m++) {
+                        let material = await this.podPodMaterialReprository.findByPk(mList[m].mat.id)
+                        if(material) {
+                            mList[m].mat.name = material.name
+                            await detal.$add('materials', material.id)
                         }
-                        detal.materialList = JSON.stringify(mList)
                     }
-                } else 
-                    detal.materialList = ''
-
-                if(Number(dto.techProcessID)) {
-                    const tp = await this.techProcessReprository.findByPk(dto.techProcessID)
-                    if(tp) {
-                        tp.detalId = detal.id
-                        await tp.save()
-                    }
+                    detal.materialList = JSON.stringify(mList)
                 }
+            } else 
+                detal.materialList = ''
 
-                // Проверяем - если документа нет в массиве документов - удаляем.
-                if(detal.documents && detal.documents.length) {
-                    for(const doc of detal.documents) {
-                        detal.$remove('documents', doc.id)
-                    }
+            if (Number(dto.techProcessID)) {
+                const tp = await this.techProcessReprository.findByPk(dto.techProcessID)
+                if(tp) {
+                    tp.detalId = detal.id
+                    await tp.save()
                 }
+            }
 
-                if(dto.file_base && dto.file_base != '[]') {
-                    const pars = JSON.parse(dto.file_base)
-                    for(const file of pars) {
-                        if(detal.documents && detal.documents.length) {
-                            let doc_id = null;
-                            for(const doc of detal.documents) {
-                                doc_id = doc.id;
-                                if (doc.id == file) doc_id = null;
-                            }
-                            if (doc_id) await detal.$remove('documents', doc_id);
-                            doc_id = null;
+            // Проверяем - если документа нет в массиве документов - удаляем.
+            if (detal.documents && detal.documents.length) {
+                for (const doc of detal.documents) {
+                    detal.$remove('documents', doc.id)
+                }
+            }
+
+            if (dto.file_base && dto.file_base != '[]') {
+                const pars = JSON.parse(dto.file_base)
+                for (const file of pars) {
+                    if(detal.documents && detal.documents.length) {
+                        let doc_id = null;
+                        for (const doc of detal.documents) {
+                            doc_id = doc.id;
+                            if (doc.id == file) doc_id = null;
                         }
-
-                        const check_files = await this.documentsService.getFileById(file);
-                        if(check_files)
-                            await detal.$add('documents', check_files);
+                        if (doc_id) await detal.$remove('documents', doc_id);
+                        doc_id = null;
                     }
+
+                    const check_files = await this.documentsService.getFileById(file);
+                    if (check_files)
+                        await detal.$add('documents', check_files);
                 }
+            }
 
-                if(dto.docs, files.document) 
-                    await this.documentsService.attachDocumentForObject(detal, dto, files);
-        
-                await detal.save({ transactionHost });
-                await t.commit();
-                
-                return detal;
-
+            if (dto.docs, files.document) 
+                await this.documentsService.attachDocumentForObject(detal, dto, files);
+    
+            await detal.save({ transactionHost });
+            await t.commit();
+            
+            return detal;
         } catch(err) {
             console.error(err);
             await t.rollback();
@@ -319,10 +317,10 @@ export class DetalService {
         tp.operations = [];
         if(dto.operationList) {
             const OL = JSON.parse(dto.operationList);
-            if(OL && OL.length) {
-                for(const oper in OL) {
+            if (OL && OL.length) {
+                for (const oper in OL) {
                     const o = await this.operationReprository.findByPk(OL[oper].id, { attributes: ['id'] });
-                    if(o) {
+                    if (o) {
                         o.idx = Number(oper) + 1;
                         await o.save();
                         await tp.$add('operations', o.id);
@@ -332,13 +330,13 @@ export class DetalService {
         }
         await tp.save();
 
-        if(dto.izd_id && Number(dto.izd_id) && dto.izd_type && dto.izd_type !== 'null') {
+        if (dto.izd_id && Number(dto.izd_id) && dto.izd_type && dto.izd_type !== 'null') {
             let izd: any;
-            if(dto.izd_type == 'detal') izd = await this.detalReprository.findByPk(dto.izd_id);
-            if(dto.izd_type == 'cbed') izd = await this.cbedReprository.findByPk(dto.izd_id);
-            if(dto.izd_type == 'product') izd = await this.productReprository.findByPk(dto.izd_id);
+            if (dto.izd_type == 'detal') izd = await this.detalReprository.findByPk(dto.izd_id);
+            if (dto.izd_type == 'cbed') izd = await this.cbedReprository.findByPk(dto.izd_id);
+            if (dto.izd_type == 'product') izd = await this.productReprository.findByPk(dto.izd_id);
 
-            if(!izd) 
+            if (!izd) 
                 throw new HttpException('Не удалось создать Технологический процесс', HttpStatus.BAD_REQUEST);
             tp[`${dto.izd_type}Id`] = izd.id;
             await tp.save();
@@ -346,24 +344,24 @@ export class DetalService {
 
         const action = await this.actionsReprository.create({action: description});
         let user: any;
-        if(dto.responsibleActionId)
+        if (dto.responsibleActionId)
             user = await this.userRepository.findByPk(dto.responsibleActionId);
-        if(action) {
+        if (action) {
             action.techProcessId = tp.id;
-            if(user) action.user = user.id;
+            if (user) action.user = user.id;
             await action.save();
         }
 
-        if(!tp)
+        if (!tp)
             throw new HttpException('Не удалось создать операцию', HttpStatus.BAD_REQUEST);
 
-        if(dto.description)
+        if (dto.description)
             tp.description = dto.description;
 
-        if(dto.docs) {
+        if (dto.docs) {
             let docs: any = Object.values(JSON.parse(dto.docs))
             let i = 0
-            for(let document of files.document) {
+            for (const document of files.document) {
                 let res = await this.documentsService.saveDocument(
                     document, 
                     'p', 
@@ -372,7 +370,7 @@ export class DetalService {
                     docs[i].description,
                     docs[i].name
                 )
-                if(res && res.id) {
+                if (res && res.id) {
                     const docId = await this.documentsReprository.findByPk(res.id)
                     if(docId) await tp.$add('documents', docId.id)
                 }

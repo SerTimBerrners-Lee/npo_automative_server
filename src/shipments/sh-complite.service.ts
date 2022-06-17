@@ -1,9 +1,12 @@
 import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
 import { InjectModel } from '@nestjs/sequelize';
 import { Buyer } from 'src/buyer/buyer.model';
+import { Cbed } from 'src/cbed/cbed.model';
+import { Detal } from 'src/detal/detal.model';
 import { DocumentsService } from 'src/documents/documents.service';
 import { DateMethods } from 'src/files/date.methods';
 import { statusShipment } from 'src/files/enums';
+import { logs } from 'src/files/logs';
 import { Product } from 'src/product/product.model';
 import { User } from 'src/users/users.model';
 import { ShCheckDto } from './dto/sh-check.dto';
@@ -54,8 +57,9 @@ export class ShComplitService {
 
       if (child && child.length) {
         for (const item of child) {
-          let shipments = await this.shipmentsReprository.findByPk(item.id);
+          const shipments = await this.shipmentsReprository.findByPk(item.id);
           if (shipments) {
+            this._shipmentsCommunicationsDrop(shipments.id);
             shipments.status = statusShipment.done;
             shipments.sh_complit_id = sh_complit.id;
             await shipments.save();
@@ -70,6 +74,35 @@ export class ShComplitService {
       
       await sh_complit.save();
       return sh_complit;
+    }
+
+    private async _shipmentsCommunicationsDrop(sh_id: number) {
+      // Удалить связи между деталями изделиями и сборками
+      const sh: any = (await this.shipmentsReprository.findByPk(sh_id, {
+        include: [
+          {
+            model: Detal,
+            include: ['shipments']
+          },
+          {
+            model: Cbed,
+            include: ['shipments']
+          },
+          {
+            model: Product,
+            include: ['shipments']
+          }
+        ]
+      }));
+
+      const objectList = sh.detals.concat(sh.cbeds, [sh.product]);
+      if (!objectList.length) return false;
+      for (const obj of objectList) {
+        if (obj.shipments.id == sh.id) {
+          await obj.$remove('shipments', sh.id);
+          await obj.save();
+        }
+      }
     }
 
     async update(dto: ShCheckDto, files: any) {
@@ -106,7 +139,6 @@ export class ShComplitService {
         },
       ]});
       if (!sh_complits) throw new HttpException('Не удалось получить список отгрузок', HttpStatus.BAD_REQUEST);
-      console.log(sh_complits);
 
       return sh_complits;
     }
@@ -126,7 +158,7 @@ export class ShComplitService {
         throw new HttpException('Не удалось получить отгрузку', HttpStatus.BAD_GATEWAY);
 
       for (const item of complit.shipments) {
-        let shipments: Shipments = await this.shipmentsReprository.findByPk(item.id);
+        const shipments: Shipments = await this.shipmentsReprository.findByPk(item.id);
 
         if (shipments) {
           shipments.status = statusShipment.order;

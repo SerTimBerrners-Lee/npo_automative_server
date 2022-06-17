@@ -48,7 +48,6 @@ export class AssembleController {
 	@ApiOperation({summary: 'Вернуть Сборку из Архива'})
 	@Put('/comback/:id')
 	combackeAssembly(@Param('id') id: number) {
-		console.log(id, "ASSEMBLy")
 			return this.assembleService.combackeAssembly(id)
 	}
 

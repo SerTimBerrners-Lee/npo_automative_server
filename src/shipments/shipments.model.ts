@@ -1,5 +1,5 @@
 import { ApiProperty } from "@nestjs/swagger";
-import { Model, Column, DataType, Table, ForeignKey, BelongsTo, BelongsToMany, HasMany, BeforeFind, AfterFind} from "sequelize-typescript";
+import { Model, Column, DataType, Table, ForeignKey, BelongsTo, BelongsToMany, HasMany, AfterFind} from "sequelize-typescript";
 import { Buyer } from "src/buyer/buyer.model";
 import { Cbed } from "src/cbed/cbed.model";
 import { Detal } from "src/detal/detal.model";
@@ -7,7 +7,6 @@ import { DocumentsShipments } from "src/documents/documents-shipments.mode";
 import { Documents } from "src/documents/documents.model";
 import { DateMethods } from "src/files/date.methods";
 import { statusShipment } from "src/files/enums";
-import { logs } from "src/files/logs";
 import { Product } from "src/product/product.model";
 import { PodPodMaterial } from "src/settings/pod-pod-material.model";
 import { ShComplit } from "./sh-complit.model";
@@ -128,7 +127,6 @@ export class Shipments extends Model<Shipments, ShipmentsAttrCreate> {
 
           if (item.status == statusShipment.overbue) continue; // Статус просрочено уже есть 
           if (item.status != statusShipment.done && item.status) {
-            logs('Измененный заказ', 'Предыдуший статус', item.status, 'id заказа', item.id);
             item.status = statusShipment.overbue;
             await item.save();
           }; // Статус Отгружено - пропускаем

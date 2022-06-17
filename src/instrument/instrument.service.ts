@@ -92,65 +92,62 @@ export class InstrumentService {
     }
 
     async getPTInstrumentById(id: number) {
-        const pInstrument = await this.pIReorository.findByPk(id, {include: {all: true}})
-        if(pInstrument)
-            return pInstrument
+        const pInstrument = await this.pIReorository.findByPk(id, {include: {all: true}});
+        if (pInstrument) return pInstrument;
     }
 
     async getAllPInstrument() {
-        return await this.pIReorository.findAll({include: {all: true}})
+        return await this.pIReorository.findAll({include: {all: true}});
     }
 
     async createNameInstrument(dto: CreateNameInstrumentDto, files: any) {
         const nameInstrument = await this.nameInastrumentReprository.create({name: dto.name })
-        if(!nameInstrument)
-            throw new HttpException('Произошла ошибка при добавлении', HttpStatus.BAD_REQUEST)
+        if (!nameInstrument)
+            throw new HttpException('Произошла ошибка при добавлении', HttpStatus.BAD_REQUEST);
         
-        if(dto.description != 'null') 
-            nameInstrument.description = dto.description
+        if (dto.description != 'null') 
+            nameInstrument.description = dto.description;
         else 
-            nameInstrument.description = ''
-        if(dto.deliveryTime != 'null') 
-            nameInstrument.deliveryTime = dto.deliveryTime
+            nameInstrument.description = '';
+        if (dto.deliveryTime != 'null')
+            nameInstrument.deliveryTime = dto.deliveryTime;
         else 
-            nameInstrument.deliveryTime = ''
-        if(dto.minOstatok != 'null')
-            nameInstrument.minOstatok = dto.minOstatok
+            nameInstrument.deliveryTime = '';
+        if (dto.minOstatok != 'null')
+            nameInstrument.minOstatok = dto.minOstatok;
         else 
-            nameInstrument.minOstatok = ''
-        if(dto.mountUsed != 'null') 
-            nameInstrument.mountUsed = dto.mountUsed
-        else 
-            nameInstrument.mountUsed = ''
-        nameInstrument.attention = dto.attention
+            nameInstrument.minOstatok = '';
+        if (dto.mountUsed != 'null')
+            nameInstrument.mountUsed = dto.mountUsed;
+        else
+            nameInstrument.mountUsed = '';
+        nameInstrument.attention = dto.attention;
 
-        if(dto.providers) {
-            let providers = JSON.parse(dto.providers)
-            for(let prx of providers) {
-                let res = await this.providersReprository.findByPk(prx.id)
-                if(res) 
+        if (dto.providers) {
+            const providers = JSON.parse(dto.providers);
+            for (const prx of providers) {
+                const res = await this.providersReprository.findByPk(prx.id);
+                if (res) 
                     nameInstrument.$add('providers', res.id)
             }
         }
 
         await nameInstrument.save()
 
-        if(Number(dto.parentId)) {
+        if (Number(dto.parentId)) {
             const pInstrument = await this.pIReorository.findByPk(dto.parentId)
-            if(pInstrument) {
+            if (pInstrument) {
                 await pInstrument.$add('nameInstrument', nameInstrument.id)
                 await pInstrument.save()
             }
         }
-        if(Number(dto.rootParentId)) {
+        if (Number(dto.rootParentId)) {
             const instrument = await this.instrReprository.findByPk(dto.rootParentId)
-            if(instrument) {
+            if (instrument) {
                 nameInstrument.rootParentId = instrument.id
                 await nameInstrument.save()
             }
         }
-        console.log(dto);
-
 
         await this.documentsService.attachDocumentFrorObjectJSON(nameInstrument, dto.documents_base);
 
@@ -163,24 +160,23 @@ export class InstrumentService {
 
     async updateNameInstrument(dto: UpdateNameInstrumentDto, files: any) {
         const nameInstrument = await this.nameInastrumentReprository.findByPk(dto.id);
-        console.log(dto, 'updateNameInstrumentx');
 
-        if(!nameInstrument)
+        if (!nameInstrument)
             throw new HttpException('Произошла ошибка при добавлении', HttpStatus.BAD_REQUEST)
         nameInstrument.name = dto.name
-        if(dto.description != 'null') 
+        if (dto.description != 'null') 
             nameInstrument.description = dto.description
         else 
             nameInstrument.description = ''
-        if(dto.deliveryTime != 'null') 
+        if (dto.deliveryTime != 'null') 
             nameInstrument.deliveryTime = dto.deliveryTime
         else 
             nameInstrument.deliveryTime = ''
-        if(dto.minOstatok != 'null')
+        if (dto.minOstatok != 'null')
             nameInstrument.minOstatok = dto.minOstatok
         else 
             nameInstrument.minOstatok = ''
-        if(dto.mountUsed != 'null') 
+        if (dto.mountUsed != 'null') 
             nameInstrument.mountUsed = dto.mountUsed
         else 
             nameInstrument.mountUsed = ''
@@ -188,19 +184,19 @@ export class InstrumentService {
 
         await nameInstrument.save()
 
-        if(dto.providers) {
+        if (dto.providers) {
             nameInstrument.providers = []
-            let providers = JSON.parse(dto.providers)
-            for(let prx of providers) {
+            const providers = JSON.parse(dto.providers)
+            for (const prx of providers) {
                 let res = await this.providersReprository.findByPk(prx.id)
-                if(res) 
+                if (res) 
                     nameInstrument.$add('providers', res.id)
             }
         }
 
         await this.documentsService.attachDocumentFrorObjectJSON(nameInstrument, dto.documents_base);
 
-        if(dto.docs, files.document) 
+        if (dto.docs, files.document) 
             await this.documentsService.attachDocumentForObject(nameInstrument, dto, files);
 
         await nameInstrument.save();
@@ -209,13 +205,13 @@ export class InstrumentService {
 
     async getNameInstrument(id: number) {
         const nameInstrument = await this.nameInastrumentReprository.findByPk(id, {include: {all: true}})
-        if(nameInstrument) 
+        if (nameInstrument) 
             return nameInstrument
     }
 
     async removeFileInstrument(id: number) {
         const document = await this.documentsReprository.findByPk(id)
-        if(document) 
+        if (document) 
             await document.destroy()
     }
 
@@ -249,10 +245,10 @@ export class InstrumentService {
         const instrument = await this.nameInastrumentReprository.findByPk(instr_id)
         const file = await this.documentsService.getFileById(file_id)
 
-        if(instrument && file) 
+        if (instrument && file) 
             instrument.$add('documents', file.id)
 
-        return file
+        return file;
     }
 
     async getDeficitInstruments() {
@@ -264,6 +260,6 @@ export class InstrumentService {
             }
         });
         
-        return materials
+        return materials;
     }
 }

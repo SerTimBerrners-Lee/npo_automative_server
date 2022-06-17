@@ -249,8 +249,6 @@ export class DocumentsService {
         
         file.ava = !file.ava;
         await file.save();
-        console.log(file.toJSON());
-        
         return file;
     }
 

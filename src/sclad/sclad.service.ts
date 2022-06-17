@@ -9,7 +9,7 @@ import { Detal } from 'src/detal/detal.model';
 import { Operation } from 'src/detal/operation.model';
 import { TechProcess } from 'src/detal/tech-process.model';
 import { TypeOperation } from 'src/detal/type-operation.model';
-import { EZ_KOLVO, KOLVO, StatusAssemble, StatusMetaloworking } from 'src/files/enums';
+import { EZ_KOLVO, KOLVO, StatusAssemble, StatusMetaloworking, statusShipment } from 'src/files/enums';
 import { Metaloworking } from 'src/metaloworking/metaloworking.model';
 import { MetaloworkingService } from 'src/metaloworking/metaloworking.service';
 import { Product } from 'src/product/product.model';
@@ -122,7 +122,7 @@ export class ScladService {
             attributes: ['haracteriatic', 'id', 'product_kolvo', 'shipments_kolvo', 'min_remaining'],
             include: [{
                 model: Shipments,
-                attributes: ['kol', 'id']
+                attributes: ['kol', 'id', 'status']
             }]
         });
 
@@ -134,7 +134,8 @@ export class ScladService {
                 item.shipments_kolvo = 0;
                 if (item.shipments.length) {
                     for (const sh of item.shipments) {
-                        item.shipments_kolvo += Number(sh.kol);
+                        if (sh.status != statusShipment.done)
+                            item.shipments_kolvo += Number(sh.kol);
                     }
                 }
                 await item.save();
@@ -166,7 +167,7 @@ export class ScladService {
             attributes: {exclude: ['attention', 'haracteriatic', 'parametrs', 'description']},
             include: {
                 model: Shipments,
-                attributes: ['id', 'list_cbed_detal', 'list_hidden_cbed_detal']
+                attributes: ['id', 'list_cbed_detal', 'list_hidden_cbed_detal', 'status']
             }
         });
 
@@ -209,13 +210,13 @@ export class ScladService {
             attributes: {exclude: ['attention', 'haracteriatic', 'parametrs', 'description']},
             include: {
                 model: Shipments,
-                attributes: ['id', 'list_cbed_detal', 'list_hidden_cbed_detal']
+                attributes: ['id', 'list_cbed_detal', 'list_hidden_cbed_detal', 'status']
             }
         }) 
 
         for (let inx in detals) {
             const remaining = await this.minRemainder(detals[inx], 'detal')
-            let shipments_kolvo = await this.getIzdInShipmentsList(detals[inx].shipments, detals[inx].id, 'detal');
+            const shipments_kolvo = await this.getIzdInShipmentsList(detals[inx].shipments, detals[inx].id, 'detal');
             
             detals[inx].min_remaining = remaining
             detals[inx].shipments_kolvo = shipments_kolvo;
@@ -257,15 +258,17 @@ export class ScladService {
 	}
 
     async getIzdInShipmentsList(shipments: any, izd_id: number, type: string) {
-        let shipments_kolvo = 0
+        let shipments_kolvo = 0;
 
         for (const item of shipments) {
+            if (item.status == statusShipment.order) continue;
+            
             let arr = [];
             if (item.list_cbed_detal) arr = JSON.parse(item.list_cbed_detal);
             if (item.list_hidden_cbed_detal) arr = arr.concat(JSON.parse(item.list_hidden_cbed_detal));
 
             for (const izd of arr) {
-                if(izd['obj'].id == izd_id && izd['type'] == type)
+                if (izd['obj'].id == izd_id && izd['type'] == type)
                     shipments_kolvo += Number(izd['kol']);
             }
         }
@@ -360,8 +363,8 @@ export class ScladService {
 
     // return object in list  
     searchIzdToList(izd_id: number, type: string, list: any): object {
-        for(let item of list) {
-            if(izd_id == item.obj.id && type == item.type) return item
+        for (const item of list) {
+            if (izd_id == item.obj.id && type == item.type) return item;
         }
         return undefined;	
     }
@@ -385,7 +388,7 @@ export class ScladService {
             }
         })
 
-        if(!materials)
+        if (!materials)
             throw new HttpException('Произошла ошибка при получении дефицита. ', HttpStatus.BAD_REQUEST);
 
         return materials;
@@ -398,7 +401,6 @@ export class ScladService {
      * @param type cbed | detal 
      */
     async materialShipmentsType(id_shipments: number, type: string) {
-        console.log(id_shipments, type);
         const include = type == 'cbed' ? [{ model: Cbed }, { model: Product }] : [{ model: Detal }];
 
         const res = await this.shipments.findByPk(id_shipments, { include });
@@ -417,7 +419,7 @@ export class ScladService {
             });
             
             list_objects = list_objects.filter(el => el.type == type);
-            for(const obj of list_objects) {
+            for (const obj of list_objects) {
                 let iterable: any;
                 if (type == 'cbed') {
                     iterable = shipments['cbeds'];
@@ -425,7 +427,7 @@ export class ScladService {
                     iterable.push(shipments['product']);
                 } else iterable = shipments['detals'];
 
-                for(const item of iterable) {
+                for (const item of iterable) {
                     if (obj.obj.id != item.id) continue;
                     if (item.product && !obj.product) continue;
 
@@ -519,7 +521,6 @@ export class ScladService {
                 ez_kolvo.c5_kolvo.shipments_kolvo += Number(sk);
             break;
             default:
-                console.log(ez_kolvo.c1_kolvo);
                 ez_kolvo.c1_kolvo.min_remaining += Number(mr);
                 ez_kolvo.c1_kolvo.shipments_kolvo += Number(sk);
             break;
@@ -561,7 +562,7 @@ export class ScladService {
 
         for (const item of allData) {
             for (const mat of item.materialList) {
-                if(!mat || !mat?.mat) continue; 
+                if (!mat || !mat?.mat) continue; 
                 if (mat.mat.id == mat_id) {
                     for (const res of item.materials) {
                         const material = await this.material.findByPk(res.id, {
@@ -593,9 +594,9 @@ export class ScladService {
             let kolvo = JSON.parse(material.kolvo);
             
             let shipments_kolvo = (Math.round(materialObj.kol) * Number(vars.shipments_kolvo));
-            if(shipments_kolvo < 1) shipments_kolvo = 0;
+            if (shipments_kolvo < 1) shipments_kolvo = 0;
             let min_remaining = (Math.round(materialObj.kol) * Number(vars.min_remaining));
-            if(min_remaining < 1) min_remaining = 0;
+            if (min_remaining < 1) min_remaining = 0;
 
             if(!shipments_kolvo && !min_remaining) return false;
 
@@ -642,13 +643,12 @@ export class ScladService {
     }
 
     /**
-     * 
+     * Получить количество к каждому заказу [+]
+     * Отсортировать по заказам [+] Нужно умножать количество материала к Обекту на количество объектов к заказу
+     * Отправить массив заказов
      * @param mat_id 
      */
      async getMaterialShipmentsAttations(mat_id: number) {
-        // 1. Получить количество к каждому заказу [+]
-        // 2. Отсортировать по заказам [+] Нужно умножать количество материала к Обекту на количество объектов к заказу
-        // 3. Отправить массив заказов
         const includes = [{
             model: Shipments,
             attributes: ['list_cbed_detal', 'list_hidden_cbed_detal', 'kol', 'id', 'date_shipments', 'number_order', 'date_order']
@@ -666,7 +666,7 @@ export class ScladService {
                 for (const sh of item.shipments) {
                     sh.shipments_parents = 0;
                     sh.shipments_material = 0;
-                    // Получаем количество 
+                    // Получаем количество
                     if(item.type == 'prod') 
                         sh.shipments_parents = Number(sh.kol || 0);
 
@@ -689,9 +689,9 @@ export class ScladService {
                 for (const sh of item.shipments) {
                     let exist = false;
                     for (const sh_new of shipments) {
-                        if(sh.id == sh_new.id) {
+                        if (sh.id == sh_new.id) {
                             sh_new.shipments_parents += Number(sh.shipments_parents);
-                            sh_new.shipments_material +=Number(sh.shipments_material);
+                            sh_new.shipments_material += Number(sh.shipments_material);
                             exist = true;
                         }
                     }
@@ -700,7 +700,6 @@ export class ScladService {
                     exist = false;
                 }
             }
-
             return shipments;
         } catch(err) { console.error(err) }
 
@@ -713,7 +712,7 @@ export class ScladService {
             where: {id: mat_id},
             attributes: ['id']
         }];
-        if(includes.length && !includesNoProduct) include.push(...includes);
+        if (includes.length && !includesNoProduct) include.push(...includes);
 
         const where = {ban: false} 
         const attrimbute = [
@@ -728,7 +727,7 @@ export class ScladService {
         const allProduct = await this.productReprository.findAll({include, 
             attributes: ['listPokDet', ...attrimbute], where
         });
-        if(includes.length, includesNoProduct) include.push(...includes);
+        if (includes.length, includesNoProduct) include.push(...includes);
         const allCbed = await this.cbedReprository.findAll({include, 
             attributes: ['listPokDet', ...attrimbute], where
         });
@@ -773,19 +772,19 @@ export class ScladService {
         let allData = [];
 
         function returnObjMat(item: any, zag: any) {
-            if(!zag) return item;
+            if (!zag) return item;
             item.materialList.push({
                 mat: {id: zag},
                 kol: 1,
                 ez: 1
             });
-            if(item.massZag)
+            if (item.massZag)
                 item.materialList.push({
                     mat: {id: zag},
                     kol: Math.round(item.massZag),
                     ez: 3
                 });
-            if(item.lengt) {
+            if (item.lengt) {
                 item.materialList.push({
                     mat: {id: zag},
                     kol: Math.round(item.lengt),
@@ -799,10 +798,10 @@ export class ScladService {
             allData = [...prod, ...cbed, ...detal];;
 
             for (let item of allData) {
-                if(item.materialList) 
+                if (item.materialList) 
                     item.materialList = JSON.parse(item.materialList);
                 else item.materialList = [];
-                if(item?.listPokDet && item.listPokDet)
+                if (item?.listPokDet && item.listPokDet)
                     item.listPokDet = JSON.parse(item.listPokDet);
                 else item.listPokDet = [];
 

@@ -22,7 +22,7 @@ import 'dotenv/config';
         SwaggerModule.setup('/api/docs/', app, document)
     }
 
-    await app.listen(PORT, () => console.log(`
+    await app.listen(PORT, () => console.info(`
         '${process.env.APPLICATION_TYPE}...' 
         Server running on port: ${PORT}`))
 })()

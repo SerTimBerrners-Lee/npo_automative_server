@@ -10,6 +10,7 @@ import { DetalService } from 'src/detal/detal.service';
 import { DocumentsService } from 'src/documents/documents.service';
 import { DateMethods } from 'src/files/date.methods';
 import { statusShipment } from 'src/files/enums';
+import { logs, logsClear } from 'src/files/logs';
 import { Product } from 'src/product/product.model';
 import { ProductService } from 'src/product/product.service';
 import { UpCreateShipmentsDto } from './dto/up-create-shipments.dto';
@@ -43,7 +44,7 @@ export class ShipmentsService {
 
 		try {
 			const data = JSON.parse(dto.data)
-			if(!data) throw new HttpException('Пустой запрос', HttpStatus.NO_CONTENT);
+			if (!data) throw new HttpException('Пустой запрос', HttpStatus.NO_CONTENT);
 			data.docs = dto.docs;
 
 			let shipment: any;
@@ -91,53 +92,53 @@ export class ShipmentsService {
 		shipment.bron = data.bron;
 		shipment.base = data.base;
 		shipment.to_sklad = data.to_sklad;
-		if(data.description != 'null')
+		if (data.description != 'null')
 			shipment.description = data.description;
 			else shipment.description = '';
 
-		if(data.documentsData) {
+		if (data.documentsData) {
 			try {
 				const pars_id_documents = JSON.parse(data.documentsData);	
-				for(let doc of pars_id_documents) {
+				for (const doc of pars_id_documents) {
 					const docs = await this.documentsService.getFileById(doc);
-					if(docs) 
+					if (docs) 
 						await shipment.$add('documents', docs.id);;
 				}
 			} catch(e) {console.error(e)}
 		}
 
-		if(data.list_cbed_detal && data.list_cbed_detal != 'null' || data.list_cbed_detal != '[]') {
+		if (data.list_cbed_detal && data.list_cbed_detal != 'null' || data.list_cbed_detal != '[]') {
 			try {
 				let list_izd = JSON.parse(data.list_cbed_detal)
-				if(data.list_hidden_cbed_detal) list_izd = list_izd.concat(JSON.parse(data.list_hidden_cbed_detal))
+				if (data.list_hidden_cbed_detal) list_izd = list_izd.concat(JSON.parse(data.list_hidden_cbed_detal))
 				for(let izd of list_izd) {
-					if(data.id && shipment.list_cbed_detal) {
+					if (data.id && shipment.list_cbed_detal) {
 						let parsCurList = JSON.parse(shipment.list_cbed_detal)
-						if(shipment.list_hidden_cbed_detal) parsCurList = parsCurList.concat(JSON.parse(shipment.list_hidden_cbed_detal))
+						if (shipment.list_hidden_cbed_detal) parsCurList = parsCurList.concat(JSON.parse(shipment.list_hidden_cbed_detal))
 						let check = true
-						for(let upl_izd of parsCurList) {
-							if(upl_izd.type == izd.type && upl_izd.obj.id == izd.obj.id) {
-								if(Number(izd.kol) > Number(upl_izd.kol)) {
+						for (const upl_izd of parsCurList) {
+							if (upl_izd.type == izd.type && upl_izd.obj.id == izd.obj.id) {
+								if (Number(izd.kol) > Number(upl_izd.kol)) {
 									izd.kol = Math.round(Number(izd.kol) - Number(upl_izd.kol));
 									continue;
 								}
-								if(Number(izd.kol) < Number(upl_izd.kol)) izd.kol = Math.round(Number(izd.kol) - Number(upl_izd.kol));
+								if (Number(izd.kol) < Number(upl_izd.kol)) izd.kol = Math.round(Number(izd.kol) - Number(upl_izd.kol));
 								else check = false;
 							}
 						}
-						if(!check) continue;
+						if (!check) continue;
 					}
 					await this.incrementShipmentsKolvo(izd, shipment, 'increment');
 				}
-				if(shipment.list_cbed_detal) {
+				if (shipment.list_cbed_detal) {
 					let parsCurList = JSON.parse(shipment.list_cbed_detal);
-					if(shipment.list_hidden_cbed_detal) parsCurList = parsCurList.concat(JSON.parse(shipment.list_hidden_cbed_detal));
+					if (shipment.list_hidden_cbed_detal) parsCurList = parsCurList.concat(JSON.parse(shipment.list_hidden_cbed_detal));
 					for(const izd of parsCurList) {
 						let check = false;
-						for(let dat_item of list_izd) {
-							if(dat_item.type == izd.type && dat_item.obj.id == izd.obj.id) check = true;
+						for (const dat_item of list_izd) {
+							if (dat_item.type == izd.type && dat_item.obj.id == izd.obj.id) check = true;
 						}
-						if(!check) await this.incrementShipmentsKolvo(izd, shipment, 'decriment');
+						if (!check) await this.incrementShipmentsKolvo(izd, shipment, 'decriment');
 						check = false;
 					}
 				}
@@ -149,20 +150,20 @@ export class ShipmentsService {
 			shipment.list_hidden_cbed_detal = '';
 		}
 
-		if(data.buyer && Number(data.buyer) && !data.to_sklad) {
+		if (data.buyer && Number(data.buyer) && !data.to_sklad) {
 			const buyer = await this.buyerService.getByuerById(data.buyer);
-			if(buyer) {
+			if (buyer) {
 				shipment.buyerId = buyer.id;
 				await shipment.save();
 			}
 		}
-		if(data.to_sklad) {
-			if(shipment.buyerId) shipment.buyerId = null;
+		if (data.to_sklad) {
+			if (shipment.buyerId) shipment.buyerId = null;
 			await shipment.save();
 		}
-		if(data.product && !data.is_not_product) {
+		if (data.product && !data.is_not_product) {
 			const product = await this.productService.getById(data.product.id);
-			if(product) {
+			if (product) {
 				product.shipments_kolvo += Number(data.kol);
 				shipment.productId = product.id;
 				await product.save();
@@ -170,8 +171,8 @@ export class ShipmentsService {
 			}
 		}
 
-		if(data.docs, files.document) {
-			if(typeof data.docs == 'object' && data.docs?.length) 
+		if (data.docs, files.document) {
+			if (typeof data.docs == 'object' && data.docs?.length) 
 				data.docs = JSON.stringify(data.docs.map((el: any) => JSON.parse(el)));
 
 			await this.documentsService.attachDocumentForObject(shipment, data, files);
@@ -183,28 +184,28 @@ export class ShipmentsService {
 
 	async deleteShipmentsById(id:number) {
 		const shipments = await this.shipmentsReprository.findByPk(id);
-		if(!shipments) 
+		if (!shipments) 
 			throw new HttpException('Не удалось найти задачу', HttpStatus.NOT_FOUND);
 
-		if(!shipments.ban) {
+		if (!shipments.ban) {
 			shipments.ban = true;
 			shipments.status = statusShipment.ban;
 			await shipments.save();
 			return shipments.id;
 		}
 
-		if(shipments.list_cbed_detal) {
+		if (shipments.list_cbed_detal) {
 			try {
 				let pars = JSON.parse(shipments.list_cbed_detal)
-				if(shipments.list_hidden_cbed_detal) pars = pars.concat(JSON.parse(shipments.list_hidden_cbed_detal))
-				if(pars) {
-					for(let izd of pars) {
+				if (shipments.list_hidden_cbed_detal) pars = pars.concat(JSON.parse(shipments.list_hidden_cbed_detal))
+				if (pars) {
+					for(const izd of pars) {
 						this.incrementShipmentsKolvo(izd, shipments, 'decriment')
 					}
 				}
 			} catch(e) {console.error(e)}
 		}
-		if(shipments.productId) shipments.productId = null
+		if (shipments.productId) shipments.productId = null
 		await shipments.save()
 		const result = await this.shipmentsReprository.destroy({where: {id: shipments.id}})
 
@@ -218,18 +219,18 @@ export class ShipmentsService {
 	 * @param action 
 	 */
 	private async incrementShipmentsKolvo(izd: any, shipment: Shipments, action: string) {
-		if(izd.type == 'cbed') {
-			let izdels = await this.cbedService.findById(izd.obj.id, 'true') 
-			if(izdels) {
-				if(action == 'increment') shipment.$add('cbeds', izdels.id)
+		if (izd.type == 'cbed') {
+			const izdels = await this.cbedService.findById(izd.obj.id, 'true') 
+			if (izdels) {
+				if (action == 'increment') shipment.$add('cbeds', izdels.id)
 				else shipment.$remove('cbeds', izdels.id)
 				
 				await izdels.save();
 			}
-		} else if(izd.type == 'detal') {
-				let izdels = await this.detalService.findByIdDetal(izd.obj.id, 'true')
-				if(izdels) {
-					if(action == 'increment') shipment.$add('detals', izdels.id)
+		} else if (izd.type == 'detal') {
+				const izdels = await this.detalService.findByIdDetal(izd.obj.id, 'true')
+				if (izdels) {
+					if (action == 'increment') shipment.$add('detals', izdels.id)
 					else shipment.$remove('detals', izdels.id)
 
 					await izdels.save();
@@ -238,8 +239,8 @@ export class ShipmentsService {
 	}
 
 	async getAllShipments(light: string = 'false') {
-		if(light == 'false') return await this.shipmentsReprository.findAll({include: { all: true }});
-		if(light == 'true') return await this.shipmentsReprository.findAll({ attributes: ['id', 'number_order', 'date_shipments'], where: { status: {
+		if (light == 'false') return await this.shipmentsReprository.findAll({include: { all: true }});
+		if (light == 'true') return await this.shipmentsReprository.findAll({ attributes: ['id', 'number_order', 'date_shipments'], where: { status: {
 			[Op.not]: statusShipment.done
 		}} });
 	}
@@ -259,7 +260,6 @@ export class ShipmentsService {
 				}
 			}
 		});
-		console.log(shipments, folder);
 		if (!shipments) throw new HttpException('Не удалось получить заказы', HttpStatus.BAD_GATEWAY);
 
 		return shipments;
@@ -292,7 +292,7 @@ export class ShipmentsService {
 	}
 
 	async getAllShipmentsSclad(to_sclad: boolean) {
-		const result =  await this.shipmentsReprository.findAll({where: {to_sklad: to_sclad}, 
+		const result = await this.shipmentsReprository.findAll({where: {to_sklad: to_sclad}, 
 			include: [
 				{ all: true },
 				{ model: ShComplit, attributes: ['date_shipments_fakt', 'id'] }]});
@@ -301,9 +301,9 @@ export class ShipmentsService {
 
 	async changeShipmentToSclad(id: number) {
 		const shipments = await this.shipmentsReprository.findByPk(id);
-		if(shipments) {
-			shipments.to_sklad = !shipments.to_sklad
-			await shipments.save()
+		if (shipments) {
+			shipments.to_sklad = !shipments.to_sklad;
+			await shipments.save();
 			return shipments;
 		}
 	}
@@ -314,7 +314,7 @@ export class ShipmentsService {
 	}
 
 	async getById(id: number, light = 'false') {
-		if(light == 'false') return await this.shipmentsReprository.findByPk(id, {include: {all: true}})
+		if (light == 'false') return await this.shipmentsReprository.findByPk(id, {include: {all: true}})
 		return await this.shipmentsReprository.findByPk(id)
 	}
 
@@ -332,8 +332,8 @@ export class ShipmentsService {
 			attributes: light ? ['id', 'number_order', 'date_shipments'] : { exclude: ['updatedAt', 'createdAt']}
 		})
 		const assemble: any = []
-		for(let sh of shipments) {
-			if(sh.cbeds && sh.cbeds.length) assemble.push(sh)
+		for (const sh of shipments) {
+			if (sh.cbeds && sh.cbeds.length) assemble.push(sh)
 		}
 		
 		return assemble;
@@ -353,8 +353,8 @@ export class ShipmentsService {
 			attributes: light ? ['id', 'number_order', 'date_shipments'] : { exclude: ['updatedAt', 'createdAt']}
 		})
 		const metaloworking: any = []
-		for(let sh of shipments) {
-			if(sh.detals && sh.detals.length) metaloworking.push(sh)
+		for (const sh of shipments) {
+			if (sh.detals && sh.detals.length) metaloworking.push(sh)
 		}
 
 		if(light == 'true') {
@@ -366,7 +366,7 @@ export class ShipmentsService {
 	}
 
 	async getAllShipmentsById(id: number, light: string = 'false') {
-		if(light == 'false') return await this.shipmentsReprository.findByPk(id, {include:[
+		if (light == 'false') return await this.shipmentsReprository.findByPk(id, {include:[
 			{all: true},
 			{
 				model: Cbed, 
@@ -390,7 +390,7 @@ export class ShipmentsService {
 			},
 			{ model: ShComplit, attributes: ['date_shipments_fakt', 'id'] },
 			'documents'
-		]})
+		]});
 	}
 
 	async getAtributeModelSh(id: number, dto: any) {
@@ -441,8 +441,8 @@ export class ShipmentsService {
 	}
 
 	async updateStatus(shipments: Array<Shipments>, new_status: string) {
-		for(let item of shipments) {
-			if(item.ban) continue;
+		for (const item of shipments) {
+			if (item.ban) continue;
 			item.status = new_status;
 
 			await item.save();

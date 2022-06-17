@@ -35,17 +35,17 @@ export class MetaloworkingService {
 				description: dto.description 
 			});
 	
-		if(!metaloworking)
+		if (!metaloworking)
 			throw new HttpException('Не удалось отправить в производство', HttpStatus.BAD_GATEWAY);
 
 		metaloworking.number_order = dto.number_order.trim() + "_" + String(metaloworking.id);
-		if(!dto.date_order) metaloworking.date_order = new Date().toLocaleString('ru-RU').split(',')[0];
+		if (!dto.date_order) metaloworking.date_order = new Date().toLocaleString('ru-RU').split(',')[0];
 
 		await metaloworking.save();
 
-		if(!dto.detal_id) return metaloworking;
+		if (!dto.detal_id) return metaloworking;
 		const detal = await this.detalService.findByIdDetal(dto.detal_id);
-		if(!detal) return metaloworking;
+		if (!detal) return metaloworking;
 
 		metaloworking.detal_id = detal.id
 		metaloworking.kolvo_shipments = dto.my_kolvo
@@ -56,20 +56,18 @@ export class MetaloworkingService {
 	}
 
 	async updateMetaloworking(dto: UpdateMetaloworkingDto) {
-		console.log(dto);
-		
 		const metal = await this.metaloworkingReprositroy.findByPk(dto.metal_id);
 		const detal = await this.detalService.findByIdDetal(dto.detal_id, 'true');
-		if(!metal || !detal)  
+		if (!metal || !detal)  
 			throw new HttpException('Не удалось найти Деталь или металлообработку', HttpStatus.BAD_REQUEST);
 
-		let differece = dto.kolvo_shipments - metal.kolvo_shipments ;
-		if(differece < 0)  {
-			if(detal.metalloworking_kolvo - differece < 0)
+		const differece = dto.kolvo_shipments - metal.kolvo_shipments ;
+		if (differece < 0)  {
+			if (detal.metalloworking_kolvo - differece < 0)
 				detal.metalloworking_kolvo = 0;
 			else detal.metalloworking_kolvo -= differece;
 		}
-		if(differece > 0) 
+		if (differece > 0) 
 			detal.metalloworking_kolvo += differece;
 		
 
@@ -84,14 +82,14 @@ export class MetaloworkingService {
 	// Delete Metalloworking
 	async deleteMetolloworking(id: number) {
 		const metalloworking = await this.metaloworkingReprositroy.findByPk(id, {include: {all: true}})
-		if(!metalloworking) throw new HttpException('Не удалось получить металообработки', HttpStatus.BAD_REQUEST);
-		if(!metalloworking.detal) throw new HttpException('Нет детали у металообработки', HttpStatus.BAD_REQUEST);
+		if (!metalloworking) throw new HttpException('Не удалось получить металообработки', HttpStatus.BAD_REQUEST);
+		if (!metalloworking.detal) throw new HttpException('Нет детали у металообработки', HttpStatus.BAD_REQUEST);
 
 		const detal = await this.detalService.findByIdDetal(metalloworking.detal.id, 'true')
-		if(!detal) throw new HttpException('Не удалось получить деталь у металлообработки', HttpStatus.BAD_REQUEST);
+		if (!detal) throw new HttpException('Не удалось получить деталь у металлообработки', HttpStatus.BAD_REQUEST);
 
 		metalloworking.ban = !metalloworking.ban;
-		if(!metalloworking.ban) {
+		if (!metalloworking.ban) {
 			metalloworking.status = StatusMetaloworking.ban;
 
 			detal.metalloworking_kolvo = detal.metalloworking_kolvo - metalloworking.kolvo_shipments < 0 
@@ -109,13 +107,13 @@ export class MetaloworkingService {
 	}
 
 	async combackMetolloworking(id: number) {
-		const metalloworking = await this.metaloworkingReprositroy.findByPk(id)
-		if(!metalloworking) throw new HttpException('Не удалось вернуть металообработки из архива', HttpStatus.BAD_REQUEST)
+		const metalloworking = await this.metaloworkingReprositroy.findByPk(id);
+		if (!metalloworking) throw new HttpException('Не удалось вернуть металообработки из архива', HttpStatus.BAD_REQUEST);
 
-		metalloworking.ban = false
-		metalloworking.status = StatusMetaloworking.performed
-		await metalloworking.save()
-		return id
+		metalloworking.ban = false;
+		metalloworking.status = StatusMetaloworking.performed;
+		await metalloworking.save();
+		return id;
 	}
 
 	async getMetolloworking(isBan: boolean = false) {
@@ -138,19 +136,19 @@ export class MetaloworkingService {
 			}
 		], where: {ban: isBan}})
 
-		for(let obj of metal) {
-			if(!obj.detal || !obj.detal.techProcesses || !obj.detal.techProcesses.operations.length) continue;
-			for(let i in obj.detal.techProcesses.operations) {
-				for(let j in obj.detal.techProcesses.operations) {
-					if(obj.detal.techProcesses.operations[i].id < obj.detal.techProcesses.operations[j].id) {
-						const ggg = obj.detal.techProcesses.operations[i]
-						obj.detal.techProcesses.operations[i] = obj.detal.techProcesses.operations[j]
-						obj.detal.techProcesses.operations[j] = ggg
+		for (const obj of metal) {
+			if (!obj.detal || !obj.detal.techProcesses || !obj.detal.techProcesses.operations.length) continue;
+			for (let i in obj.detal.techProcesses.operations) {
+				for (let j in obj.detal.techProcesses.operations) {
+					if (obj.detal.techProcesses.operations[i].id < obj.detal.techProcesses.operations[j].id) {
+						const ggg = obj.detal.techProcesses.operations[i];
+						obj.detal.techProcesses.operations[i] = obj.detal.techProcesses.operations[j];
+						obj.detal.techProcesses.operations[j] = ggg;
 					}
 				}
 			}
 		}
-		return metal
+		return metal;
 	}
 
 	async getOneMetaloworkingById(id: number) {
@@ -172,21 +170,21 @@ export class MetaloworkingService {
 	}
 
 	async getMetalloworkingByTypeOperation(op_id: number) {
-		const metaloworkings = await this.getMetolloworking()
-		const arr = []
-		for(let metal of metaloworkings) {
+		const metaloworkings = await this.getMetolloworking();
+		const arr = [];
+		for (const metal of metaloworkings) {
 			try {
-				if(!metal.detal || !metal.detal.techProcesses) continue
-				for(let operation of metal.detal.techProcesses.operations) {
-					if(operation.name == op_id) {
-						const operation_new = {operation, metal}
-						arr.push(operation_new)
+				if (!metal.detal || !metal.detal.techProcesses) continue;
+				for (let operation of metal.detal.techProcesses.operations) {
+					if (operation.name == op_id) {
+						const operation_new = {operation, metal};
+						arr.push(operation_new);
 					}
 				}
 			} catch (e) {console.error(e)}
 		}	
 
-		return arr
+		return arr;
 	}
 
 	/**
@@ -195,10 +193,10 @@ export class MetaloworkingService {
 
 	async createShapeBid(dto: Array<{name: string, id: number, kolvo: number}>) {
 		
-		if(!dto || !dto.length) 
+		if (!dto || !dto.length) 
 			throw new HttpException('Переданный массив пустой', HttpStatus.BAD_GATEWAY);
 		
-		let detals: Array<Object> = [];
+		const detals: Array<Object> = [];
 		const {archive, nameZip} = await this.filesService.createZipper();
 		let sheetsData: any = [
 			['Наименование', 'Номер чертежа', 'Имя чертежа', 'Материал', 'Толщина', 'Маршрут', 'Количество']
@@ -207,28 +205,28 @@ export class MetaloworkingService {
 			{wch: 30}, {wch: 10}, {wch: 40}, {wch: 30}
 		]};
 
-		for(const item of dto) {
-			if(!item.id) continue;
+		for (const item of dto) {
+			if (!item.id) continue;
 
 			const detal = await this.detalReprository.findByPk(item.id, {
 				include: ['documents'],
 				attributes: ['mat_zag', 'mat_zag_zam', 'thickness', 'DxL']
 			});
-			if(!detal)
+			if (!detal)
 				throw new HttpException('Переданный массив пустой', HttpStatus.BAD_GATEWAY);
 
 			const material = await this.materialReprository.findByPk(detal.mat_zag, {attributes: ['name']});
 			
 			let documents = detal.documents.filter(doc => (!doc.banned && doc.type.toLocaleUpperCase() == 'DXF'));
-			if(!documents.length)
+			if (!documents.length)
 				documents = detal.documents.filter(doc => (!doc.banned && doc.type.toLocaleUpperCase() == 'ЧЖ'));
 
 			documents = documents.sort((a, b) => b.version - a.version); // Сортируем по версии.
-			if(!documents.length) continue;
+			if (!documents.length) continue;
 	
 			const file = path.resolve(__dirname, '..', `static/${documents[0].path}`);
 			
-			if(!fs.existsSync(file)) continue; // Проверяем что файл существует.
+			if (!fs.existsSync(file)) continue; // Проверяем что файл существует.
 			await archive.append(fs.createReadStream(file), { name: documents[0].name });
 			
 			sheetsData.push([
