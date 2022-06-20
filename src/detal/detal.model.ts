@@ -1,10 +1,11 @@
 import { ApiProperty } from "@nestjs/swagger";
-import { Model, Column, DataType, Table, BelongsToMany, HasMany, ForeignKey, BelongsTo, HasOne } from "sequelize-typescript";
+import { Model, Column, DataType, Table, BelongsToMany, HasMany, ForeignKey, BelongsTo, HasOne, AfterFind } from "sequelize-typescript";
 import { Actions } from "src/actions/actions.model";
 import { CbedDetals } from "src/cbed/cbed-detals.model";
 import { Cbed } from "src/cbed/cbed.model";
 import { DocumentsDetal } from "src/documents/documents-detal.model";
 import { Documents } from "src/documents/documents.model";
+import { statusShipment } from "src/files/enums";
 import { Metaloworking } from "src/metaloworking/metaloworking.model";
 import { ProductDetal } from "src/product/product-detal.model";
 import { Product } from "src/product/product.model";
@@ -155,4 +156,21 @@ export class Detal extends Model<Detal, DetalCreationAttrs> {
 
     @BelongsToMany(() => Shipments, () => ShipmentsDetal)
     shipments: Shipments[];
+
+    @AfterFind
+    static async checkOverbye(detal: Array<Detal>) {
+        if (!detal.length) return;
+        for (const item of detal) {
+            Detal.findByPk(item.id, { include: ['shipments'] }).then(res => {
+                if (res.shipments.length) {
+                    for (const sh of res.shipments) {
+                        if (sh.status == statusShipment.done) {
+                            res.$remove('shipments', sh.id);
+                            console.log(sh.status)
+                        }
+                    }
+                }
+            })
+        }
+    }
 }     

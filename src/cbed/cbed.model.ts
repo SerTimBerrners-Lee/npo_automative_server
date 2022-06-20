@@ -1,5 +1,5 @@
 import { ApiProperty } from "@nestjs/swagger";
-import { Model, Column, DataType, Table, BelongsToMany, HasMany, ForeignKey, BelongsTo, HasOne } from "sequelize-typescript";
+import { Model, Column, DataType, Table, BelongsToMany, HasMany, ForeignKey, BelongsTo, HasOne, AfterFind } from "sequelize-typescript";
 import { Actions } from "src/actions/actions.model";
 import { Assemble } from "src/assemble/assemble.model";
 import { BuyerCbed } from "src/buyer/buyer-cbed.model";
@@ -8,6 +8,7 @@ import { Detal } from "src/detal/detal.model";
 import { TechProcess } from "src/detal/tech-process.model";
 import { DocumentsCbed } from "src/documents/documents-cbed.model";
 import { Documents } from "src/documents/documents.model";
+import { statusShipment } from "src/files/enums";
 import { ProductCbed } from "src/product/product-cbed.model";
 import { Product } from "src/product/product.model";
 import { Sebestoim } from "src/sebestoim/sebestoim.model";
@@ -131,5 +132,23 @@ export class Cbed extends Model<Cbed, CbedCreationAttrs> {
     buers: Buyer[];
 
     @BelongsToMany(() => Shipments, () => ShipmentsCbed)
-    shipments: Shipments[]; 
+    shipments: Shipments[];
+    
+
+    @AfterFind
+    static async checkOverbye(cbeds: Array<Cbed>) {
+        if (!cbeds.length) return;
+        for (const item of cbeds) {
+            Cbed.findByPk(item.id, { include: ['shipments'] }).then(res => {
+                if (res.shipments.length) {
+                    for (const sh of res.shipments) {
+                        if (sh.status == statusShipment.done) {
+                            res.$remove('shipments', sh.id);
+                            console.log(sh.status)
+                        }
+                    }
+                }
+            })
+        }
+    }
 }     

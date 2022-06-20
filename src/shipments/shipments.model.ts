@@ -132,5 +132,5 @@ export class Shipments extends Model<Shipments, ShipmentsAttrCreate> {
           }; // Статус Отгружено - пропускаем
         }
       }
-  }
+    }
 }  
