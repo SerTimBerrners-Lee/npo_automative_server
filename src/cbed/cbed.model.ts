@@ -133,22 +133,4 @@ export class Cbed extends Model<Cbed, CbedCreationAttrs> {
 
     @BelongsToMany(() => Shipments, () => ShipmentsCbed)
     shipments: Shipments[];
-    
-
-    @AfterFind
-    static async checkOverbye(cbeds: Array<Cbed>) {
-        if (!cbeds.length) return;
-        for (const item of cbeds) {
-            Cbed.findByPk(item.id, { include: ['shipments'] }).then(res => {
-                if (res.shipments.length) {
-                    for (const sh of res.shipments) {
-                        if (sh.status == statusShipment.done) {
-                            res.$remove('shipments', sh.id);
-                            console.log(sh.status)
-                        }
-                    }
-                }
-            })
-        }
-    }
 }     

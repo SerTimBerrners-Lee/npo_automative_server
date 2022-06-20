@@ -120,21 +120,4 @@ export class Product extends Model<Product, ProductCreationAttrs> {
 
     @HasMany(() => Shipments)
     shipments: Shipments[];
-
-    @AfterFind
-    static async checkOverbye(products: Array<Product>) {
-        if (!products.length) return;
-        for (const item of products) {
-            Product.findByPk(item.id, { include: ['shipments'] }).then(res => {
-                if (res.shipments.length) {
-                    for (const sh of res.shipments) {
-                        if (sh.status == statusShipment.done) {
-                            res.$remove('shipments', sh.id);
-                            console.log(sh.status)
-                        }
-                    }
-                }
-            })
-        }
-    }
 }     

@@ -156,21 +156,4 @@ export class Detal extends Model<Detal, DetalCreationAttrs> {
 
     @BelongsToMany(() => Shipments, () => ShipmentsDetal)
     shipments: Shipments[];
-
-    @AfterFind
-    static async checkOverbye(detal: Array<Detal>) {
-        if (!detal.length) return;
-        for (const item of detal) {
-            Detal.findByPk(item.id, { include: ['shipments'] }).then(res => {
-                if (res.shipments.length) {
-                    for (const sh of res.shipments) {
-                        if (sh.status == statusShipment.done) {
-                            res.$remove('shipments', sh.id);
-                            console.log(sh.status)
-                        }
-                    }
-                }
-            })
-        }
-    }
 }     

@@ -261,7 +261,7 @@ export class ScladService {
         let shipments_kolvo = 0;
 
         for (const item of shipments) {
-            if (item.status == statusShipment.order) continue;
+            if (item.status == statusShipment.done) continue;
             
             let arr = [];
             if (item.list_cbed_detal) arr = JSON.parse(item.list_cbed_detal);
