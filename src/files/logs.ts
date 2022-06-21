@@ -17,7 +17,7 @@ class Loggus {
   private str: string;
   private args: any;
   private buffer: Buffer;
-  public title: string;
+  private title: string;
 
   constructor(title: any = 'Логирование', ...args: any) {
     this.dat = new DateMethods();
@@ -43,7 +43,7 @@ class Loggus {
     const newBuffer = new Buffer('', 'utf-8');
 
     fs.writeSync(fd, newBuffer, 0, newBuffer.length, 0);
-    fs.close(fd);
+    this._close(fd);
   }
 
   public append() {
@@ -51,7 +51,7 @@ class Loggus {
     
     fs.writeSync(fd, this.buffer, 0, this.buffer.length, 0);
     fs.writeSync(fd, data, 0, data.length, this.buffer.length);
-    fs.close(fd);
+    this._close(fd);
   }
 
   private _open() {
@@ -59,6 +59,11 @@ class Loggus {
     const fd = fs.openSync(this.file, 'w+');
 
     return { data, fd }
+  }
+
+  private _close(fd: any) {
+    console.log(this.str);
+    fs.close(fd);
   }
 }
 

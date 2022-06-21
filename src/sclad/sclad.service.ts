@@ -10,6 +10,7 @@ import { Operation } from 'src/detal/operation.model';
 import { TechProcess } from 'src/detal/tech-process.model';
 import { TypeOperation } from 'src/detal/type-operation.model';
 import { EZ_KOLVO, KOLVO, StatusAssemble, StatusMetaloworking, statusShipment } from 'src/files/enums';
+import { logs } from 'src/files/logs';
 import { Metaloworking } from 'src/metaloworking/metaloworking.model';
 import { MetaloworkingService } from 'src/metaloworking/metaloworking.service';
 import { Product } from 'src/product/product.model';
@@ -98,13 +99,13 @@ export class ScladService {
         for (const oper of tp.operations) {
             let kol = 0;
             for (const mark of oper.marks) {
-                kol = kol + mark.kol;
+                kol += mark.kol;
             }
             if (objects.kolvo_shipments <= kol) create_marks++;
         }
         if (create_marks >= tp.operations.length) {
-            if (dto.assemble_id) objects.status = StatusAssemble[1];
-            if (dto.metaloworking_id) objects.status = StatusMetaloworking[1];
+            if (dto.assemble_id) objects.status = StatusAssemble.done;
+            if (dto.metaloworking_id) objects.status = StatusMetaloworking.done;
         }
         await objects.save();
     }

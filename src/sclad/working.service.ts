@@ -13,10 +13,10 @@ import { Working } from './working.model';
 @Injectable()
 export class WorkingService {
   constructor(
-      @InjectModel(Working) private workingReprository: typeof Working,
-      private assembleService: AssembleService,
-      private metaloworkingService: MetaloworkingService,
-      ) {}
+    @InjectModel(Working) private workingReprository: typeof Working,
+    private assembleService: AssembleService,
+    private metaloworkingService: MetaloworkingService,
+    ) {}
 
   async getCountWorking() {
       return await this.workingReprository.findAndCountAll()
@@ -24,16 +24,16 @@ export class WorkingService {
 
   async bannedOneWorking(id: number) {
     const working = await this.workingReprository.findByPk(id, {include: { all:true }});
-    if(!working) 
+    if (!working) 
       throw new HttpException('Не удалось найти Рабочий сектор', HttpStatus.BAD_GATEWAY);
 
     working.ban = !working.ban;
-    if(working.type == WorkingType.ass) {
-      for(const item of working.assemble) {
+    if (working.type == WorkingType.ass) {
+      for (const item of working.assemble) {
         await this.assembleService.deleteAssembly(item.id);
       }
     } else if(working.type == WorkingType.metall) {
-      for(const item of working.metall) {
+      for (const item of working.metall) {
         await this.metaloworkingService.deleteMetolloworking(item.id);
       }
     }
