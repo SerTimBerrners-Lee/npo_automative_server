@@ -16,14 +16,14 @@ export class UsersService {
         private documentService: DocumentsService) {}
 
     async createUser(dto: CreateUserDto, files?: any) {
-        const tabel     =   await this.userRepository.findOne({where: { tabel: dto.tabel }})
-        if(tabel) 
+        const tabel = await this.userRepository.findOne({where: { tabel: dto.tabel }})
+        if (tabel) 
             throw new HttpException("Табельный номер не может повторяться", HttpStatus.BAD_REQUEST)
         const hashPassword  =   await bcrypt.hash(dto.password, 5);
         const user          =   await this.userRepository
             .create({...dto, password: hashPassword});
      
-        if(dto.roles != 'null') {
+        if (dto.roles != 'null') {
             const roles = await this.rolesService.getRoleByPk(dto.roles)
             if(roles) {
                 user.rolesId = roles.id
@@ -31,56 +31,55 @@ export class UsersService {
             }
         }
 
-        if(files.image)  {
+        if (files.image)  {
             const ava = await this.saveImage(files)
-            if(typeof ava == 'object') {
+            if (typeof ava == 'object') {
                 user.image = ava.dataValues.path
                 await user.$add('document', ava.id)
             }
         }
         
-        if(files.document) {
-            for(let file of files.document) {
+        if (files.document) {
+            for (const file of files.document) {
                 const docks = await this.documentService.saveDocument(file, 'p') 
-                if(docks) await user.$add('document', docks.id)
+                if (docks) await user.$add('document', docks.id)
             }
         }
 
-        if(dto.fileArrModal) {
-            let fa = JSON.parse(dto.fileArrModal)
-            if(fa.length) {
-                for(let f of fa) {
-                    let fls = await this.documentService.getFileById(f.id)
-                    if(fls) {
-                        fls.nameInstans = 'p'
-                        await fls.save()
-                        await user.$add('document', f.id)
+        if (dto.fileArrModal) {
+            const fa = JSON.parse(dto.fileArrModal)
+            if (fa.length) {
+                for (const f of fa) {
+                    const fls = await this.documentService.getFileById(f.id)
+                    if (fls) {
+                        fls.nameInstans = 'p';
+                        await fls.save();
+                        await user.$add('document', f.id);
                     }
                     
                 }
             }
         }
-        await user.save()
+        await user.save();
         
-        return user  
+        return user;
     }
 
     async updateUser(dto: CreateUserDto, files: any) {
         const user = await this.userRepository.findByPk(Number(dto.id))
-        if(!user)
+        if (!user)
             throw new HttpException('Пользователь или роль не найдены ', HttpStatus.NOT_FOUND)
 
         const tabel = await this.userRepository.findOne({where: { tabel: dto.tabel }})
-        if(tabel && tabel.id != user.id) 
+        if (tabel && tabel.id != user.id) 
             throw new HttpException("Табельный номер не может повторяться", HttpStatus.EXPECTATION_FAILED)
         
-        if(files.image) {
-            const ava = await this.saveImage(files)
-            if(typeof ava == 'object') {
-                user.image = ava.dataValues.path
-                await user.$add('document', ava.id)
-            } else 
-                user.image = ava
+        if (files.image) {
+            const ava = await this.saveImage(files);
+            if (typeof ava == 'object') {
+                user.image = ava.dataValues.path;
+                await user.$add('document', ava.id);
+            } else user.image = ava;
         }
 
         if(dto.fileArrModal) {
@@ -99,14 +98,14 @@ export class UsersService {
 
         await user.save()
 
-        if(dto.password && dto.password.length < 15) {
+        if (dto.password && dto.password.length < 15) {
             const hashPassword  = await bcrypt.hash(dto.password, 5);
             user.password       = hashPassword
         }
 
-        if(dto.roles != 'null') {
+        if (dto.roles != 'null') {
             const roles =  await this.rolesService.getRoleByPk(dto.roles)
-            if(roles) {
+            if (roles) {
                 user.rolesId = roles.id
                 await user.save()
             }
@@ -186,8 +185,7 @@ export class UsersService {
 
     async getUserByPk(id: number) {
         const user = await this.userRepository.findByPk(id, {include: ['role', 'documents']})
-
-        return user
+        return user;
     }
 
     async removUserById(id: number) {
@@ -200,14 +198,14 @@ export class UsersService {
     }
 
     async getUserByLogin(login: string) {
-        const user = await this.userRepository.findOne({where: {login}})
+        const user = await this.userRepository.findOne({where: {login}, include: ['role']})
         return user
     }
 
     async addRole(dto: AddRoleDto) {
         const user = await this.userRepository.findByPk(dto.userId);
         const role = await this.rolesService.getRoleByValue(dto.value);
-        if(role && user) {
+        if (role && user) {
             await user.$add('role', role.id);
             return dto;
         }
@@ -217,9 +215,8 @@ export class UsersService {
 
     async ban(dto: BanUserDto){
         const user = await this.userRepository.findByPk(dto.userId);
-        if(!user) {
-            throw new HttpException('Пользователь не найден', HttpStatus.NOT_FOUND)
-        }
+        if (!user)
+            throw new HttpException('Пользователь не найден', HttpStatus.NOT_FOUND);
         
         user.banned = !user.banned;
         user.banReason = dto.banReason; 
@@ -229,16 +226,16 @@ export class UsersService {
 
     async deleteFiles(dto: any) {
         const files = await this.documentService.getFileById(dto.fileId);
-        if(files) {
+        if (files) {
             const user = await this.userRepository.findByPk(dto.userId, {include: {all: true}});
-            if(user) {
-                if(user.documents && user.documents.length) {
-                    for(let doc of user.documents) {
+            if (user) {
+                if (user.documents && user.documents.length) {
+                    for (const doc of user.documents) {
                         if(doc.id == files.id) {
-                            files.nameInstans = ''
-                            await files.save()
-                            await user.$remove('document', files.id)
-                            return true
+                            files.nameInstans = '';
+                            await files.save();
+                            await user.$remove('document', files.id);
+                            return true;
                         }
                     }
                 }
@@ -247,12 +244,10 @@ export class UsersService {
     }
 
     async attachFileToUser(user_id: number, file_id: number) {
-        const user = await this.userRepository.findByPk(user_id)
-        const file = await this.documentService.getFileById(file_id)
+        const user = await this.userRepository.findByPk(user_id);
+        const file = await this.documentService.getFileById(file_id);
   
-        if(user && file) 
-            user.$add('documents', file.id)
-  
-        return file
+        if(user && file) user.$add('documents', file.id);
+        return file;
     }
 }

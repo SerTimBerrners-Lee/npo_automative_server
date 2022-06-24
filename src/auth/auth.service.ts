@@ -13,23 +13,26 @@ export class AuthService {
         private jwtService: JwtService) {}
 
     async login(dto: AuthUserDto) {
-       if(!dto.login || !dto.password)
-            throw new UnauthorizedException({message: 'Пароль или логин небыли введены' })
+       if (!dto.login || !dto.password)
+            throw new UnauthorizedException({message: 'Пароль или логин небыли введены' });
         
-        const user = await this.userService.getUserByLogin(dto.login)
-        if(!user)
-            throw new UnauthorizedException({message: 'Некорректный логин' })
+        const user = await this.userService.getUserByLogin(dto.login);
+        if (!user)
+            throw new UnauthorizedException({message: 'Некорректный логин' });
 
-        const passwordEquals = await bcrypt.compare(dto.password, user.password)
+        const passwordEquals = await bcrypt.compare(dto.password, user.password);
 
-        if(!passwordEquals)
-            throw new UnauthorizedException({message: 'Некорректный пароль' })
-        return user
+        if (!passwordEquals)
+            throw new UnauthorizedException({message: 'Некорректный пароль' });
+
+        const data: any = user.toJSON();
+        data.token = await this.generateToken(user);
+        return data;
     }
 
     async registration( userDto: CreateUserDto) {
         const candidate = await this.userService.getUserByEmail(userDto.email);
-        if(candidate) {
+        if (candidate) {
             throw new HttpException(
                 'Пользователь с таким email уже существует', 
                 HttpStatus.BAD_REQUEST)
@@ -41,9 +44,7 @@ export class AuthService {
     }
 
     private async generateToken(user: User) {
-        const payload = {email: user.email, id: user.id, roles: user.role} 
-        return {
-            token: this.jwtService.sign(payload)
-        } 
+        const payload = { email: user.email, id: user.id, roles: user.rolesId, login: user.login } 
+        return this.jwtService.sign(payload);
     }
 }
