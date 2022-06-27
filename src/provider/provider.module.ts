@@ -1,5 +1,7 @@
 import { forwardRef, Module } from '@nestjs/common';
 import { SequelizeModule } from '@nestjs/sequelize';
+import { Cbed } from 'src/cbed/cbed.model';
+import { Detal } from 'src/detal/detal.model';
 import { DocumentsProviders } from 'src/documents/documents-providers.model';
 import { Documents } from 'src/documents/documents.model';
 import { DocumentsModule } from 'src/documents/documents.module';
@@ -39,7 +41,9 @@ import { Waybill } from './waybill.model';
             Equipment,
             Inventary,
             Deliveries,
-            Waybill
+            Waybill,
+            Detal,
+            Cbed,
         ]),
         DocumentsModule,
         SettingsModule,

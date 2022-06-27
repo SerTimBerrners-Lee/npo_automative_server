@@ -6,6 +6,7 @@ import { Providers } from "./provider.model";
 
 interface WatbillCreateAttr {
   readonly name: string;
+  readonly type_сoming: string;
 }
 
 @Table({tableName: 'waylbill'})
@@ -19,10 +20,13 @@ export class Waybill extends Model<Waybill, WatbillCreateAttr> {
     name: string;
 
     @Column({type: DataType.TEXT})
-    product: any;   
+    product: any;
 
     @Column({type: DataType.STRING})
     description: string;
+
+    @Column({type: DataType.STRING})
+    type_сoming: string;
 
     @ForeignKey(() => Providers)
     @Column({type: DataType.INTEGER})

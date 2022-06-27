@@ -5,4 +5,6 @@ export class CreateWaybillDto {
   readonly product_list:  any;
   readonly docs:          string;
   readonly description:   string;
+  readonly sclad:         boolean;
+  readonly typeComing:    string;
 }

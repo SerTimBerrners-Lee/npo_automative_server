@@ -1,5 +1,8 @@
 import { forwardRef, HttpException, HttpStatus, Inject, Injectable } from '@nestjs/common';
 import { InjectModel } from '@nestjs/sequelize';
+import { Sequelize } from 'sequelize-typescript';
+import { Cbed } from 'src/cbed/cbed.model';
+import { Detal } from 'src/detal/detal.model';
 import { Documents } from 'src/documents/documents.model';
 import { DocumentsService } from 'src/documents/documents.service';
 import { Equipment } from 'src/equipment/equipment.model';
@@ -21,84 +24,86 @@ import { Waybill } from './waybill.model';
 @Injectable()
 export class ProviderService {
     constructor(@InjectModel(Providers) private providersReprository: typeof Providers,
-            @InjectModel(Documents) private documentsReprository: typeof Documents,
             @InjectModel(PodPodMaterial) private podPodMaterialReprository: typeof PodPodMaterial,
             @InjectModel(NameInstrument) private instrumentReprository: typeof NameInstrument,
             @InjectModel(Equipment) private equipmentReprository: typeof Equipment,
             @InjectModel(Inventary) private inventaryReprository: typeof Inventary,
             @InjectModel(Deliveries) private deliveriesReprository: typeof Deliveries,
             @InjectModel(Waybill) private waybillReprository: typeof Waybill,
+            @InjectModel(Detal) private detalReprository: typeof Waybill,
+            @InjectModel(Cbed) private cbedReprository: typeof Waybill,
             private settingsService: SettingsService,
             private documentService: DocumentsService,
             private equipmentService: EquipmentService,
             private instrumentService: InstrumentService,
             @Inject(forwardRef(() => InventaryService))
-            private inventaryService: InventaryService
+            private inventaryService: InventaryService,
+            private sequelize: Sequelize
     ) {}
 
     async createProvider(dto: CreateProviderDto, files: any) {
         let providers: any
-        if(Number(dto.id)) 
+        if (Number(dto.id)) 
             providers = await this.providersReprository.findByPk(Number(dto.id), {include: {all: true}})
         else {
             const new_provider = await this.providersReprository.create({ name: dto.name})
             providers = await this.providersReprository.findByPk(new_provider.id, {include: {all: true}})
         }
-        if(!providers)
+        if (!providers)
             throw new HttpException('Произошла ошибка при добавлении пользователя', HttpStatus.NOT_FOUND)
             
         providers.name = dto.name
         
-        if(dto.rekvisit != 'null') 
+        if (dto.rekvisit != 'null') 
             providers.rekvisit = dto.rekvisit;
         else
             providers.rekvisit = ''
-        if(dto.contacts != 'null') 
+        if (dto.contacts != 'null') 
             providers.contacts = dto.contacts;
         else
             providers.contacts = '';
-        if(dto.inn != 'null') 
+        if (dto.inn != 'null') 
             providers.inn = dto.inn;
         else
             providers.inn =''
-        if(dto.cpp != 'null') 
+        if (dto.cpp != 'null') 
             providers.cpp = dto.cpp;
         else
             providers.cpp = '';
-        if(dto.description != 'null') 
+        if (dto.description != 'null') 
             providers.description = dto.description 
         else
             providers.description = '';
         await providers.save();
         providers.attention = dto.attention;
         
-        if(dto.docs, files.document) 
+        if (dto.docs, files.document) 
             await this.documentService.attachDocumentForObject(providers, dto, files);
 
-        if(providers.equipments && providers.equipments.length) {
-            for(let eq of providers.equipments) {
+        if (providers.equipments && providers.equipments.length) {
+            for (const eq of providers.equipments) {
                 providers.$remove('equipments', eq.id);
             }
         }
 
-        if(dto.equipmentListId) {
+        if (dto.equipmentListId) {
             try {
-                const id_list = JSON.parse(dto.equipmentListId)
-                if(id_list.length)
-                    for(let eq of id_list) {
-                        const equipment = await this.equipmentService.getOneEquipment(eq)
-                        if(equipment) providers.$add('equipments', equipment.id)
+                const id_list = JSON.parse(dto.equipmentListId);
+                if (id_list.length)
+                    for (const eq of id_list) {
+                        const equipment = await this.equipmentService.getOneEquipment(eq);
+                        if (equipment) providers.$add('equipments', equipment.id);
                     }
             } catch (e) {console.error(e)}
         }
 
-        if(providers.nameInstans && providers.nameInstans.length) {
-            for(let instr of providers.nameInstans) {
-                providers.$remove('nameInstans', instr.id)
+        if (providers.nameInstans && providers.nameInstans.length) {
+            for (let instr of providers.nameInstans) {
+                providers.$remove('nameInstans', instr.id);
             }
         }
 
-        if(dto.toolListId) {
+        if (dto.toolListId) {
             try {
                 const id_list = JSON.parse(dto.toolListId)
                 if(id_list.length)
@@ -109,20 +114,18 @@ export class ProviderService {
             } catch (e) {console.error(e)}
         }
         
-        if(dto.materialList) { 
-            let mat = JSON.parse(dto.materialList)
-            if(mat.length) {
-                for(let m of mat) {
-                    let check = await this.podPodMaterialReprository.findByPk(m)
-                    if(check) 
-                        await providers.$add('materials', check.id)
+        if (dto.materialList) { 
+            const mat = JSON.parse(dto.materialList);
+            if (mat.length) {
+                for (const m of mat) {
+                    let check = await this.podPodMaterialReprository.findByPk(m);
+                    if (check) await providers.$add('materials', check.id);
                 }
             }
         }
 
-        await providers.save()
-
-        return providers
+        await providers.save();
+        return providers;
     
     }
 
@@ -137,7 +140,7 @@ export class ProviderService {
             end_deliveries.id + 1 : 1;
         const dm = new DateMethods().date();
 
-        if(!dto.number_check || !dto.provider_id || !dto.position_lists) 
+        if (!dto.number_check || !dto.provider_id || !dto.position_lists) 
             throw new HttpException('Пустое тело запроса', HttpStatus.BAD_REQUEST);
 
         let deliveries = await this.deliveriesReprository.create({name: numberEndDeliveries, date_create: dm});
@@ -177,32 +180,32 @@ export class ProviderService {
         else deliveries.description = '';
 
         const provider = await this.providersReprository.findByPk(dto.provider_id);
-        if(provider) {
+        if (provider) {
             deliveries.provider_id = provider.id;
             await deliveries.save();
         }
 
-        if(deliveries.materials && deliveries.materials.length) {
+        if (deliveries.materials && deliveries.materials.length) {
             for(let mat of deliveries.materials) {
                 deliveries.$remove('materials', mat.id);
             }
         }
  
-        if(dto.position_lists) {
+        if (dto.position_lists) {
             const positions = JSON.parse(dto.position_lists);
-            if(positions.length) {
+            if (positions.length) {
                 const include = [{
                     model: Deliveries
                 }];
 
-                for(let pos of positions) {
+                for (let pos of positions) {
                     let object: PodPodMaterial | Inventary | Equipment | NameInstrument;
                     const pos_obj = { id: pos, type: pos.type };
 
                     switch (positions.type) {
                         case 'mat':
                             object = await this.podPodMaterialReprository.findByPk(pos.id, { include: include });
-                            if(object) {
+                            if (object) {
                                 if (is_update && dto.id)
                                     pos = countUp(object.deliveries, pos_obj, dto.id, pos);
                                 
@@ -214,7 +217,7 @@ export class ProviderService {
                             }
                         case 'tools':
                             object = await this.instrumentReprository.findByPk(pos.id, { include: include });
-                            if(object) {
+                            if (object) {
                                 if(is_update && dto.id) pos = countUp(object.deliveries, pos_obj, dto.id, pos);
                                 await deliveries.$add('tools', object.id);
                                 object.instrument_kolvo += pos;
@@ -222,16 +225,16 @@ export class ProviderService {
                             }
                         case 'eq':
                             object = await this.equipmentReprository.findByPk(pos.id, { include: include });
-                            if(object) {
-                                if(is_update && dto.id) pos = countUp(object.deliveries, pos_obj, dto.id, pos);
+                            if (object) {
+                                if (is_update && dto.id) pos = countUp(object.deliveries, pos_obj, dto.id, pos);
                                 await deliveries.$add('equipments', object.id);
                                 object.equipment_kolvo += pos;
                                 await object.save();
                             }
                         case 'inventary':
                             object = await this.inventaryReprository.findByPk(pos.id, { include: include });
-                            if(object) {
-                                if(is_update && dto.id) pos = countUp(object.deliveries, pos_obj, dto.id, pos);
+                            if (object) {
+                                if (is_update && dto.id) pos = countUp(object.deliveries, pos_obj, dto.id, pos);
                                 await deliveries.$add('inventary', object.id);
                                 object.inventary_kolvo += pos;
                                 await object.save();
@@ -305,34 +308,31 @@ export class ProviderService {
     async getAllDeliveriedComing() {
         const deliveries = await this.deliveriesReprository.findAll({include: {all: true}})
         
-        if(!deliveries)
+        if (!deliveries)
             throw new HttpException('Поставок не найдено', HttpStatus.BAD_REQUEST)
 
-        let new_dev_arr = []
-        const comparison = new DateMethods().comparison
+        let new_dev_arr = [];
+        const comparison = new DateMethods().comparison;
 
-        for(let dev of deliveries) {
-            if(comparison(dev.date_shipments, undefined, '<=')) 
-                new_dev_arr.push(dev)
+        for (const dev of deliveries) {
+            if (comparison(dev.date_shipments, undefined, '<=')) new_dev_arr.push(dev);
         }
-
-        return new_dev_arr
+        return new_dev_arr;
     }
 
     // Проверка заказа удаление из заказа
     private async checkDeliveroedComing(product: any, coming: Array<Deliveries>) {
-        for(let com of coming) {
+        for (const com of coming) {
             try {
                 let pars = JSON.parse(com.product)
-                for(let inx = 0; inx < pars.length; inx++) {
-                    if(pars[inx].art == product.art && pars[inx].id == product.id) {
-                        pars = pars.slice(inx, 0)
-                    }
+                for (let inx = 0; inx < pars.length; inx++) {
+                    if(pars[inx].art == product.art && pars[inx].id == product.id)
+                        pars = pars.slice(inx, 0);
                 }
-                com.product = JSON.stringify(pars)
-                await com.save()
+                com.product = JSON.stringify(pars);
+                await com.save();
             } catch(e) {
-                console.error(e)
+                console.error(e);
             }
         }
     }
@@ -344,81 +344,98 @@ export class ProviderService {
      * @returns 
      */
     async createWaybill(dto: CreateWaybillDto, files: any) {
-        const dm = new DateMethods();
-		const endShipments = await this.waybillReprository.findOne(
-			{
-				order: [
-					['id', 'DESC']
-				],
-				limit: 1
-			});
-		const numberEndShipments = endShipments && endShipments.id ?  
-			`№ ${endShipments.id + 1} от ${dm.date()}` : `№ 1 от ${dm.date()}`;
+        const t = await this.sequelize.transaction();
+        const transactionHost = { transaction: t };
 
-        if(!dto.product_list) 
-            throw new HttpException('Пустое тело запроса', HttpStatus.BAD_REQUEST) ;
+        try {
+            console.log(dto);
+            const dm = new DateMethods();
+            const endShipments = await this.waybillReprository.findOne(
+                {
+                    order: [
+                        ['id', 'DESC']
+                    ],
+                    limit: 1
+                });
+            const numberEndShipments = endShipments && endShipments.id ?  
+                `№ ${endShipments.id + 1} от ${dm.date()}` : `№ 1 от ${dm.date()}`;
 
-        const waybill = await this.waybillReprository.create({name: numberEndShipments});
+            if (!dto.product_list) 
+                throw new HttpException('Пустое тело запроса', HttpStatus.BAD_REQUEST);
 
-        if(dto.product_list) {
-            const comings = await this.getAllDeliveriedComing();
-            try {
-                const pars = JSON.parse(dto.product_list);
-                waybill.product = dto.product_list;
-                for(let product of pars) {
-                    this.checkDeliveroedComing(product, comings);
-                    let object: any
-                    if(product.type == 'mat')
-                        object = await this.settingsService.getOnePPT(product.id);
-                    if(product.type == 'tools') 
-                        object = await this.instrumentService.getNameInstrument(product.id);
-                    if(product.type == 'eq')
-                        object = await this.equipmentService.getOneEquipment(product.id);
-                    if(product.type == 'inventary')
-                        object = await this.inventaryService.getInventaryById(product.id);
-                    if(object) {
-                        object.shipments_kolvo - product.kol <= 0 ? object.shipments_kolvo = 0 :
-                            object.shipments_kolvo  = object.shipments_kolvo - product.kol;
-                        if(product.type == 'tools')
-                            object.material_kolvo = object.instrument_kolvo + product.kol;
-                        if(product.type == 'eq')
-                            object.material_kolvo = object.equipment_kolvo + product.kol;
-                        if(product.type == 'inventary')
-                            object.material_kolvo = object.inventary_kolvo + product.kol;
-                        object.price = product.sum ? product.sum : 0
+            const waybill = await this.waybillReprository.create({name: numberEndShipments, type_сoming: dto.typeComing}, transactionHost);
+            console.log('waybill', waybill);
 
-                        if(product.type == 'mat') {
-                            object.material_kolvo = object.material_kolvo + product.kol;
-                            const ez_pos = this.parseMaterialEz(product.ez);
-                            await this.editPositionEz(object, ez_pos, product.kol, 1);
-                            await this.editPositionEz(object, ez_pos, product.kol, 4);
+            if (dto.product_list) {
+                const comings = await this.getAllDeliveriedComing();
+                try {
+                    const pars = JSON.parse(dto.product_list);
+                    console.log(pars, ' :pars');
+                    waybill.product = dto.product_list;
+                    for (const product of pars) {
+                        if (dto.typeComing == 'Поставщик') this.checkDeliveroedComing(product, comings);
+                        let object: any
+                        if (product.type == 'mat')
+                            object = await this.settingsService.getOnePPT(product.id);
+                        if (product.type == 'tools') 
+                            object = await this.instrumentService.getNameInstrument(product.id);
+                        if (product.type == 'eq')
+                            object = await this.equipmentService.getOneEquipment(product.id);
+                        if (product.type == 'inventary')
+                            object = await this.inventaryService.getInventaryById(product.id);
+
+                        if (dto.typeComing == 'Металлообработка') {
+                            object = await this.detalReprository.findByPk(product.id);
+                            object.detal_kolvo += Number(product.kol);
+                        } else if (dto.typeComing == 'Сборка'){
+                            object = await this.cbedReprository.findByPk(product.id);
+                            object.cbed_kolvo += Number(product.kol);
                         }
-                        await object.save()
+                        if (object) {
+                            if (dto.typeComing == 'Поставщик') object.shipments_kolvo - product.kol <= 0 ? object.shipments_kolvo = 0 :
+                                object.shipments_kolvo  = object.shipments_kolvo - product.kol;
+                            if (product.type == 'tools')
+                                object.material_kolvo = object.instrument_kolvo + product.kol;
+                            if (product.type == 'eq')
+                                object.material_kolvo = object.equipment_kolvo + product.kol;
+                            if (product.type == 'inventary')
+                                object.material_kolvo = object.inventary_kolvo + product.kol;
+                            object.price = product.sum ? product.sum : 0
+
+                            if (product.type == 'mat') {
+                                object.material_kolvo = object.material_kolvo + product.kol;
+                                const ez_pos = this.parseMaterialEz(product.ez);
+                                await this.editPositionEz(object, ez_pos, product.kol, 1);
+                                await this.editPositionEz(object, ez_pos, product.kol, 4);
+                            }
+                            await object.save();
+                        }
                     }
-                }
-            } catch (e) { console.error(e) }
-            await waybill.save();
-            return waybill;
-        }
-
-        if(dto.provider_id) {
-            const provider = await this.providersReprository.findByPk(dto.provider_id)
-            if(provider) {
-                waybill.provider_id = provider.id;
-                await waybill.save();
+                } catch (e) { console.error(e) }
             }
-        }
 
-        if(dto.description != 'null')
-            waybill.description = dto.description;
+            if(dto.provider_id && dto.provider_id !== 'null') {
+                const provider = await this.providersReprository.findByPk(dto.provider_id);
+                if (provider)   waybill.provider_id = provider.id;
+            }
+
+            if(dto.description != 'null')
+                waybill.description = dto.description;
             else waybill.description = '';
 
-        if(dto.docs, files.document) 
-            await this.documentService.attachDocumentForObject(waybill, dto, files);
+            if(dto.docs, files.document) 
+                await this.documentService.attachDocumentForObject(waybill, dto, files);
 
 
-        await waybill.save()
-        return waybill
+            console.log('SAVE');
+            await waybill.save(transactionHost);
+            await t.commit();
+            return waybill;
+        } catch(err) {
+            console.error(err);
+            await t.rollback();
+            throw new HttpException('Ошибка с сохранением прихода на склад', HttpStatus.BAD_GATEWAY)
+        }
     }
 
     // Возвращаем в строке позицию матерала
