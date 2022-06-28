@@ -1,5 +1,5 @@
 import { ApiProperty } from "@nestjs/swagger";
-import { Model, Column, DataType, Table, BelongsTo, ForeignKey, BelongsToMany, HasMany } from "sequelize-typescript";
+import { Model, Column, DataType, Table, BelongsToMany, HasMany } from "sequelize-typescript";
 import { MatPodMat } from "./mat-pod-mat.model";
 import { Material } from "./material.model";
 import { PodPodMaterial } from "./pod-pod-material.model";
@@ -26,6 +26,10 @@ export class PodMaterial extends Model<PodMaterial, PodMaterialCreationAttrs> {
     @ApiProperty({example: 1, description: 'К какой инстанции относится под тип'})
     @Column({type: DataType.STRING, allowNull: false, defaultValue: 1})
     instansMaterial: number;
+
+    @ApiProperty({example: true, description: 'Добавляем в архив'})
+    @Column({type: DataType.BOOLEAN, defaultValue: false})
+    ban: boolean; 
     
     @HasMany(() => PodPodMaterial)
     podPodMaterials: PodPodMaterial[];

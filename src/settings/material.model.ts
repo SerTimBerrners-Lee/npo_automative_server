@@ -29,7 +29,11 @@ export class Material extends Model<Material, MaterialCreationAttrs> {
 
     @ApiProperty({example: '{edizmId: 10, znach: 2}', description: 'Запись значений'})
     @Column({type: DataType.STRING, allowNull: true})
-    height: any;   
+    height: any;
+
+    @ApiProperty({example: true, description: 'Добавляем в архив'})
+    @Column({type: DataType.BOOLEAN, defaultValue: false})
+    ban: boolean; 
 
     @ApiProperty({example: '{edizmId: 10, znach: 2}', description: 'Запись значений'})
     @Column({type: DataType.STRING, allowNull: true})
