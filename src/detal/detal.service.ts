@@ -58,43 +58,19 @@ export class DetalService {
         return detal;
     }
 
-    async createNewDetal(dto: CreateDetalDto, files: any, authID: any) {
+    async createNewDetal(dto: CreateDetalDto, files: any) {
         let detal = await this.detalReprository.create({name: dto.name})
         if(!detal)
             throw new HttpException('Не удалось создать деталь', HttpStatus.BAD_REQUEST)
         detal = await this.detalReprository.findByPk(detal.id, {include: {all: true}})
-        
-        const action = await this.actionsReprository.create({action: "Добавил детать"})
-        let user: any
-        if(authID)
-            user = await this.userRepository.findByPk(authID)
-        if(action) {
-            action.detalId = detal.id
-            if(user)
-                action.responsibleId = user.id
-            await action.save()
-        }
 
         return await this.upCreateDetal(dto, files, detal)
     }
 
-    async removeDeleteById(id: number, authId: any) {
+    async removeDeleteById(id: number) {
         const detal = await this.detalReprository.findByPk(id)
         if(!detal) 
             throw new HttpException('Не удалось обновить деталь', HttpStatus.BAD_REQUEST)
-
-        const action = await this.actionsReprository
-            .create({action: detal.ban ? "Вернул деталь из арзива" : "Занес деталь в архив"})
-
-        let user: any
-        if(authId)
-            user = await this.userRepository.findByPk(authId)
-        if(action) {
-            action.detalId = detal.id
-            if(user)
-                action.responsibleId = user.id
-            await action.save()
-        }
             
         detal.ban = !detal.ban
         await detal.save()
@@ -133,21 +109,10 @@ export class DetalService {
         return await this.detalReprository.findAll({attributes: ['articl']})
     }
 
-    async updateDetal(dto: UpdateDetalDto, files: any, authID: any) {
+    async updateDetal(dto: UpdateDetalDto, files: any) {
         const detal = await this.detalReprository.findByPk(dto.id, {include: {all: true}})
         if (!detal)
             throw new HttpException('Не удалосьм обновить деталь', HttpStatus.BAD_REQUEST)
-
-        const action = await this.actionsReprository.create({action: "Внес изменения в детать"})
-        let user: any
-        if (authID)
-            user = await this.userRepository.findByPk(authID)
-        if (action) {
-            action.detalId = detal.id
-            if (user)
-                action.responsibleId = user.id
-            await action.save()
-        }
         
         detal.name = dto.name
         await detal.save()

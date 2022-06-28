@@ -1,4 +1,4 @@
-import { Body, Controller, Delete, Get, HttpException, HttpStatus, Param, Post, Request, UploadedFiles, UseInterceptors } from '@nestjs/common';
+import { Body, Controller, Delete, Get, Param, Post, UploadedFiles, UseInterceptors } from '@nestjs/common';
 import { FileFieldsInterceptor } from '@nestjs/platform-express';
 import { ApiOperation, ApiTags } from '@nestjs/swagger';
 import { RemoveDocumentDto } from 'src/files/dto/remove-document.dto';
@@ -49,13 +49,9 @@ export class DetalController {
     ])) 
     @Post('/')
     createNewDetal(
-        @Request() req: any, 
         @Body() dto: CreateDetalDto, 
         @UploadedFiles() files: { document?: Express.Multer.File[]} ) {
-        const authHeader = req.headers.authorization;
-        if(!authHeader)
-            throw new  HttpException('Пользователь не зарегестрирован', HttpStatus.BAD_REQUEST)
-        return this.detalService.createNewDetal(dto, files, authHeader)
+        return this.detalService.createNewDetal(dto, files)
     }
 
     @ApiOperation({summary: 'Обновляем деталь'})
@@ -64,13 +60,9 @@ export class DetalController {
     ]))
     @Post('/update')
     updateDetal(
-        @Request() req: any, 
         @Body() dto: UpdateDetalDto, 
         @UploadedFiles() files: { document?: Express.Multer.File[]} ) {
-        const authHeader = req.headers.authorization;
-        if(!authHeader)
-            throw new  HttpException('Пользователь не зарегестрирован', HttpStatus.BAD_REQUEST)
-        return this.detalService.updateDetal(dto, files, authHeader)
+        return this.detalService.updateDetal(dto, files)
     }
 
     @ApiOperation({summary: 'Добавляем файлы к детали'})
@@ -87,11 +79,8 @@ export class DetalController {
 
     @ApiOperation({summary: 'Remove detal by id '})
     @Delete('/:id')
-    removeDeleteById(@Request() req: any, @Param('id') id: number, ) {
-        const authHeader = req.headers.authorization;
-        if(!authHeader)
-            throw new  HttpException('Пользователь не зарегестрирован', HttpStatus.BAD_REQUEST)
-        return this.detalService.removeDeleteById(id, authHeader)
+    removeDeleteById(@Param('id') id: number, ) {
+        return this.detalService.removeDeleteById(id)
     }
 
     @ApiOperation({summary: 'Get detal by id '})
