@@ -47,10 +47,11 @@ export class MetaloworkingService {
 		const detal = await this.detalService.findByIdDetal(dto.detal_id);
 		if (!detal) return metaloworking;
 
-		metaloworking.detal_id = detal.id
-		metaloworking.kolvo_shipments = dto.my_kolvo
-		detal.metalloworking_kolvo += dto.my_kolvo
-		await metaloworking.save()
+		metaloworking.detal_id = detal.id;
+		metaloworking.kolvo_shipments = dto.my_kolvo;
+		detal.metalloworking_kolvo += dto.my_kolvo;
+		await detal.save();
+		await metaloworking.save();
 
 		return metaloworking
 	}
@@ -94,10 +95,12 @@ export class MetaloworkingService {
 
 			detal.metalloworking_kolvo = detal.metalloworking_kolvo - metalloworking.kolvo_shipments < 0 
 			? 0 : detal.metalloworking_kolvo - metalloworking.kolvo_shipments;
+			await detal.$remove('metaloworking', metalloworking.id);
 		}
 		else {
 			metalloworking.status = StatusMetaloworking.performed; // Сделать проверку на просрочку!
 			detal.metalloworking_kolvo += metalloworking.kolvo_shipments;
+			await detal.$add('metaloworking', metalloworking.id);
 		}
 
 		await detal.save();
