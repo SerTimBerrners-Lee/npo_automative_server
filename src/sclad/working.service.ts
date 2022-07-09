@@ -99,25 +99,28 @@ export class WorkingService {
     const workers_data = dto.workers_data;
     const workers_complect = dto.workers_complect;
 
-    if(!workers_complect.length)
+    console.log('\n\n\n', dto.workers_data);
+
+    if (!workers_complect.length)
       throw new HttpException("Нет заказов", HttpStatus.BAD_REQUEST);
 
     const workers = await this.workingReprository.create();
-    if(!workers)
+    if (!workers)
       throw new HttpException("No Create Workers", HttpStatus.BAD_REQUEST);
 
     workers.number_order = workers_data.number_order;
     workers.date_order = workers_data.date_order;
+    workers.date_shipments = workers_data.date_shipments;
 
-    if(workers_data.type == 'det')
+    if (workers_data.type == 'det')
       workers.type = WorkingType.metall;
     else workers.type = WorkingType.ass;
 
     workers.description = workers_data.description;
     await workers.save();
 
-    for(const item of workers_complect) {
-      if(workers_data.type == 'det') {
+    for (const item of workers_complect) {
+      if (workers_data.type == 'det') {
         const metall = await this.metaloworkingService.createMetaloworking({
           ...workers_data,
           detal_id: item.detal_id,

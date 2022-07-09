@@ -9,6 +9,7 @@ interface WData {
   date_order:         string;
   number_order: 			string;
   description : 			string;
+  date_shipments: 	  string;
   type: 							string;
 }
 
