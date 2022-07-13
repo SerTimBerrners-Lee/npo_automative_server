@@ -1,4 +1,4 @@
-import { Body, Controller, Delete, Get, Param, Post } from '@nestjs/common';
+import { Body, Controller, Delete, Get, Param, Post, Put } from '@nestjs/common';
 import { ApiOperation } from '@nestjs/swagger';
 import { CreateWorkingDto } from './dto/create-working.dto';
 import { WorkingService } from './working.service';
@@ -12,6 +12,12 @@ export class WorkingController {
     @Get('/one/:id')
     getOneWorking(@Param('id') id: number) {
         return this.workindService.getOneWorking(id);
+    }
+
+    @ApiOperation({summary: 'Обновление Рабочие зоны'})
+    @Put('/update/:id')
+    update(@Param('id') id: number, @Body() dto: any) {
+        return this.workindService.update(id, dto);
     }
 
     @ApiOperation({summary: 'Кидаем или заюираем из Архива'})

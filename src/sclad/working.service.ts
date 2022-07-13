@@ -90,7 +90,7 @@ export class WorkingService {
         ]
       }
     ], where: { ban: archive }});
-    if(!workings)
+    if (!workings)
       throw new HttpException("Произошла ощибка с получением рабочих кластеров", HttpStatus.BAD_REQUEST)
     return workings;
   }
@@ -98,8 +98,6 @@ export class WorkingService {
   async createWorking(dto: CreateWorkingDto) {
     const workers_data = dto.workers_data;
     const workers_complect = dto.workers_complect;
-
-    console.log('\n\n\n', dto.workers_data);
 
     if (!workers_complect.length)
       throw new HttpException("Нет заказов", HttpStatus.BAD_REQUEST);
@@ -139,6 +137,17 @@ export class WorkingService {
       }
     }
 
+    return workers;
+  }
+
+  async update(id: number, dto: any) {
+    const workers = await this.workingReprository.findByPk(id);
+    if (!workers)
+      throw new HttpException("Произошла ощибка с получением рабочих кластеров", HttpStatus.BAD_REQUEST)
+    
+    workers.date_shipments = dto.date_shipments;
+    workers.description = dto.description;
+    await workers.save();
     return workers;
   }
 }
