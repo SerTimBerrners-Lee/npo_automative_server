@@ -175,17 +175,48 @@ export class MetaloworkingService {
 	async getMetalloworkingByTypeOperation(op_id: number) {
 		const metaloworkings = await this.getMetolloworking();
 		const arr = [];
+		const dt = new DateMethods();
+
 		for (const metal of metaloworkings) {
 			try {
 				if (!metal.detal || !metal.detal.techProcesses) continue;
-				for (let operation of metal.detal.techProcesses.operations) {
+				for (const operation of metal.detal.techProcesses.operations) {
 					if (operation.name == op_id) {
-						const operation_new = {operation, metal};
+						const operation_new = { operation, metal };
+						let kol = 0;
+						let date_build_today = false;
+						for (const mark of operation.marks) {
+							kol += mark.kol;
+							if (dt.comparison(undefined, mark.date_build)) date_build_today = true;
+						}
+						if (metal.kolvo_shipments <= kol && !date_build_today) continue;
 						arr.push(operation_new);
 					}
 				}
 			} catch (e) {console.error(e)}
-		}	
+		}
+
+		return arr;
+	}
+
+	async getResultWorking() {
+		const metaloworkings = await this.getMetolloworking();
+		const arr = [];
+
+		for (const metal of metaloworkings) {
+			try {
+				if (!metal.detal || !metal.detal.techProcesses) continue;
+				for (const operation of metal.detal.techProcesses.operations) {
+					let operation_new = { operation, metal, mark: {} };
+					for (const mark of operation.marks) {
+						if (mark.kol) {
+							operation_new.mark = mark;	
+							arr.push(operation_new);
+						}
+					}
+				}
+			} catch (e) {console.error(e)}
+		}
 
 		return arr;
 	}

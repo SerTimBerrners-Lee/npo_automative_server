@@ -18,12 +18,12 @@ export class DateMethods {
 
 	// Сравнение дат
 	public comparison = (one_date: string = new Date().toLocaleDateString('ru-RU'), two_date: string = new Date().toLocaleDateString('ru-RU'), operation: string = '==') => {
-		let d1 = utfDate(one_date)
-		let d2 = utfDate(two_date)
+		let d1 = utfDate(one_date);
+		let d2 = utfDate(two_date);
 
 		function utfDate(d: string): string {
-			let ds = d.split('.').reverse().join('-') + 'T10:10:10Z'
-			return ds
+			let ds = d.split('.').reverse().join('-') + 'T10:10:10Z';
+			return ds;
 		}
 
 		let result: boolean
@@ -48,12 +48,12 @@ export class DateMethods {
 				break
 		}
 
-		return result
-
+		return result;
 	}
 
 	public dateDifference = (date_one = new Date().toLocaleString('ru-RU').split(',')[0], date_two: string) => {
-		if(!date_two) return 0
+		if(!date_two) return 0;
+		
 		const toFormatString = (date: any) => {
 			const spl = date.split('.')
 			return `${spl[2]}-${spl[1]}-${spl[0]}T10:20:30Z`

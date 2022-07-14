@@ -9,6 +9,12 @@ import { MetaloworkingService } from './metaloworking.service';
 export class MetaloworkingController {
 	constructor(private metaloworkingService: MetaloworkingService) {}
 
+	@ApiOperation({summary: 'Получить результаты выполненных работ по металлообработки'})
+	@Get('/resultworks/')
+	getResultWorking() {
+			return this.metaloworkingService.getResultWorking();
+	}
+
 	@ApiOperation({summary: 'Создаем Металообработку'})
 	@Post('/')
 	createMetaloworking(@Body() dto: CreateMetaloworkingDto) {
@@ -56,5 +62,6 @@ export class MetaloworkingController {
 	getMetalloworkingByTypeOperation(@Param('op_id') op_id: number) {
 			return this.metaloworkingService.getMetalloworkingByTypeOperation(op_id)
 	}
+
 }
    
