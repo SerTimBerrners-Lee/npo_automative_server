@@ -1,5 +1,5 @@
 import { ApiProperty } from "@nestjs/swagger";
-import { Model, Column, DataType, Table, ForeignKey, BelongsTo } from "sequelize-typescript";
+import { Model, Column, DataType, Table, ForeignKey, BelongsTo, BeforeFind } from "sequelize-typescript";
 import { Detal } from "src/detal/detal.model";
 import { StatusMetaloworking } from "src/files/enums";
 interface MetaloworkingAttrCreate {

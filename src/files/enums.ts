@@ -3,6 +3,7 @@ import 'dotenv/config';
 export enum StatusAssemble {
   performed = 'В процессе',
   done = 'Готово',
+  сonducted = 'Проведено',
   ban = 'В архиве',
   overbue = 'Просрочено' 
 }
@@ -10,6 +11,7 @@ export enum StatusAssemble {
 export enum StatusMetaloworking {
   performed = 'В процессе',
   done = 'Готово',
+  сonducted = 'Проведено',
   ban = 'В архиве',
   overbue = 'Просрочено' 
 }

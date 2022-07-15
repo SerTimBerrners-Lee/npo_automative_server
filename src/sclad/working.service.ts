@@ -63,7 +63,7 @@ export class WorkingService {
         ]
       }
     ]});
-    if(!working) 
+    if (!working) 
       throw new HttpException('Не удалось найти Рабочий сектор', HttpStatus.BAD_GATEWAY);
 
     return working;

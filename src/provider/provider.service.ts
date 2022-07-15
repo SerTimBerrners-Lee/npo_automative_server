@@ -8,10 +8,12 @@ import { DocumentsService } from 'src/documents/documents.service';
 import { Equipment } from 'src/equipment/equipment.model';
 import { EquipmentService } from 'src/equipment/equipment.service';
 import { DateMethods } from 'src/files/date.methods';
+import { StatusMetaloworking } from 'src/files/enums';
 import { InstrumentService } from 'src/instrument/instrument.service';
 import { NameInstrument } from 'src/instrument/name-instrument.model';
 import { Inventary } from 'src/inventary/inventary.model';
 import { InventaryService } from 'src/inventary/inventary.service';
+import { Metaloworking } from 'src/metaloworking/metaloworking.model';
 import { PodPodMaterial } from 'src/settings/pod-pod-material.model';
 import { SettingsService } from 'src/settings/settings.service';
 import { Deliveries } from './deliveries.model';
@@ -32,6 +34,7 @@ export class ProviderService {
             @InjectModel(Waybill) private waybillReprository: typeof Waybill,
             @InjectModel(Detal) private detalReprository: typeof Waybill,
             @InjectModel(Cbed) private cbedReprository: typeof Waybill,
+            @InjectModel(Metaloworking) private metalReprository: typeof Metaloworking,
             private settingsService: SettingsService,
             private documentService: DocumentsService,
             private equipmentService: EquipmentService,
@@ -364,7 +367,6 @@ export class ProviderService {
                 throw new HttpException('Пустое тело запроса', HttpStatus.BAD_REQUEST);
 
             const waybill = await this.waybillReprository.create({name: numberEndShipments, type_сoming: dto.typeComing}, transactionHost);
-            console.log('waybill', waybill);
 
             if (dto.product_list) {
                 const comings = await this.getAllDeliveriedComing();
@@ -387,6 +389,7 @@ export class ProviderService {
                         if (dto.typeComing == 'Металлообработка') {
                             object = await this.detalReprository.findByPk(product.id);
                             object.detal_kolvo += Number(product.kol);
+                            this.changeStatusMetall(product.worker_id, product.kol);
                         } else if (dto.typeComing == 'Сборка'){
                             object = await this.cbedReprository.findByPk(product.id);
                             object.cbed_kolvo += Number(product.kol);
@@ -414,16 +417,16 @@ export class ProviderService {
                 } catch (e) { console.error(e) }
             }
 
-            if(dto.provider_id && dto.provider_id !== 'null') {
+            if (dto.provider_id && dto.provider_id !== 'null') {
                 const provider = await this.providersReprository.findByPk(dto.provider_id);
                 if (provider)   waybill.provider_id = provider.id;
             }
 
-            if(dto.description != 'null')
+            if (dto.description != 'null')
                 waybill.description = dto.description;
             else waybill.description = '';
 
-            if(dto.docs, files.document) 
+            if (dto.docs, files.document) 
                 await this.documentService.attachDocumentForObject(waybill, dto, files);
 
 
@@ -431,11 +434,22 @@ export class ProviderService {
             await waybill.save(transactionHost);
             await t.commit();
             return waybill;
+
         } catch(err) {
             console.error(err);
             await t.rollback();
             throw new HttpException('Ошибка с сохранением прихода на склад', HttpStatus.BAD_GATEWAY)
         }
+    }
+
+
+    private async changeStatusMetall(met_id: number, kol: number) {
+        if (!met_id) return false;
+        const metalloworking = await this.metalReprository.findByPk(met_id);
+        if (!metalloworking) return false;
+        metalloworking.status = StatusMetaloworking.сonducted;
+        metalloworking.kolvo_create = kol || 1;
+        await metalloworking.save();
     }
 
     // Возвращаем в строке позицию матерала

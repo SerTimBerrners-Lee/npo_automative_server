@@ -11,6 +11,7 @@ import { InstrumentModule } from 'src/instrument/instrument.module';
 import { NameInstrument } from 'src/instrument/name-instrument.model';
 import { Inventary } from 'src/inventary/inventary.model';
 import { InventaryModule } from 'src/inventary/inventary.module';
+import { Metaloworking } from 'src/metaloworking/metaloworking.model';
 import { PodPodMaterial } from 'src/settings/pod-pod-material.model';
 import { SettingsModule } from 'src/settings/settings.module';
 import { DeliveriesEquipments } from './deliveries-equipments.model';
@@ -44,6 +45,7 @@ import { Waybill } from './waybill.model';
             Waybill,
             Detal,
             Cbed,
+            Metaloworking
         ]),
         DocumentsModule,
         SettingsModule,

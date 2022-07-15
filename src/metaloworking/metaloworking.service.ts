@@ -16,6 +16,7 @@ import { DateMethods } from 'src/files/date.methods';
 const xlsx = require('node-xlsx').default;
 import * as path from 'path';
 import * as fs from 'fs';
+import { Op } from 'sequelize';
 
 @Injectable()
 export class MetaloworkingService {
@@ -24,7 +25,6 @@ export class MetaloworkingService {
 		@InjectModel(PodPodMaterial) private materialReprository: typeof PodPodMaterial,
 		@InjectModel(Metaloworking) private metaloworkingReprositroy: typeof Metaloworking, 
 		@Inject(forwardRef(()=> ShipmentsService))
-		private shipmentsService: ShipmentsService, 
 		private filesService: FilesService,
 		private detalService: DetalService) {}
 
@@ -84,26 +84,31 @@ export class MetaloworkingService {
 	async deleteMetolloworking(id: number) {
 		const metalloworking = await this.metaloworkingReprositroy.findByPk(id, {include: {all: true}})
 		if (!metalloworking) throw new HttpException('Не удалось получить металообработки', HttpStatus.BAD_REQUEST);
-		if (!metalloworking.detal) throw new HttpException('Нет детали у металообработки', HttpStatus.BAD_REQUEST);
+		let detal: Detal;
+		if (metalloworking.detal) {
+			detal = await this.detalService.findByIdDetal(metalloworking.detal.id, 'true')
+			if (!detal) throw new HttpException('Не удалось получить деталь у металлообработки', HttpStatus.BAD_REQUEST);
+		}
 
-		const detal = await this.detalService.findByIdDetal(metalloworking.detal.id, 'true')
-		if (!detal) throw new HttpException('Не удалось получить деталь у металлообработки', HttpStatus.BAD_REQUEST);
 
 		metalloworking.ban = !metalloworking.ban;
 		if (!metalloworking.ban) {
 			metalloworking.status = StatusMetaloworking.ban;
-
-			detal.metalloworking_kolvo = detal.metalloworking_kolvo - metalloworking.kolvo_shipments < 0 
-			? 0 : detal.metalloworking_kolvo - metalloworking.kolvo_shipments;
-			await detal.$remove('metaloworking', metalloworking.id);
+			if (detal) {
+				detal.metalloworking_kolvo = detal.metalloworking_kolvo - metalloworking.kolvo_shipments < 0 
+				? 0 : detal.metalloworking_kolvo - metalloworking.kolvo_shipments;
+				await detal.$remove('metaloworking', metalloworking.id);
+			}
 		}
 		else {
 			metalloworking.status = StatusMetaloworking.performed; // Сделать проверку на просрочку!
-			detal.metalloworking_kolvo += metalloworking.kolvo_shipments;
-			await detal.$add('metaloworking', metalloworking.id);
+			if (detal) {
+				detal.metalloworking_kolvo += metalloworking.kolvo_shipments;
+				await detal.$add('metaloworking', metalloworking.id);
+			}
 		}
 
-		await detal.save();
+		if (detal) await detal.save();
 		await metalloworking.save();
 		
 		return metalloworking;
@@ -119,7 +124,9 @@ export class MetaloworkingService {
 		return id;
 	}
 
-	async getMetolloworking(isBan: boolean = false) {
+	async getMetolloworking(isBan: boolean = false, conducted: boolean = true) {
+		const conduct = conducted ? { [Op.ne]: '' } : { [Op.ne]: StatusMetaloworking.сonducted }
+
 		const metal = await this.metaloworkingReprositroy.findAll({include: [ {all: true}, {
 			model: Detal, 
 			include: ['documents', 'mat_za_obj', {
@@ -137,7 +144,7 @@ export class MetaloworkingService {
 					}]
 			}] 
 			}
-		], where: {ban: isBan}})
+		], where: {ban: isBan, status: conduct}})
 
 		for (const obj of metal) {
 			if (!obj.detal || !obj.detal.techProcesses || !obj.detal.techProcesses.operations.length) continue;
@@ -155,21 +162,24 @@ export class MetaloworkingService {
 	}
 
 	async getOneMetaloworkingById(id: number) {
-		return await this.metaloworkingReprositroy.findByPk(id, {include: [{all: true}, 
-			{
-				model: Detal, 
-				include: ['documents', 'mat_za_obj', {
-					model: Shipments, 
-					include: ['product']
-				}, {
-					model: TechProcess,
-						include: [{
-							model: Operation, 
-							include: ['marks']
-						}]
-				}] 
-			}
-		]})
+	 	await this.metaloworkingReprositroy.findByPk(id, {
+			include: [
+				{all: true}, 
+				{
+					model: Detal, 
+					include: ['documents', 'mat_za_obj', {
+						model: Shipments, 
+						include: ['product']
+					}, {
+						model: TechProcess,
+							include: [{
+								model: Operation, 
+								include: ['marks']
+							}]
+					}] 
+				}
+			]
+		})
 	}
 
 	async getMetalloworkingByTypeOperation(op_id: number) {

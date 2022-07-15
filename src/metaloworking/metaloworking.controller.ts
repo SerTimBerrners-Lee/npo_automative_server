@@ -45,6 +45,12 @@ export class MetaloworkingController {
 			return this.metaloworkingService.getMetolloworking(isBan)
 	}
 
+	@ApiOperation({summary: 'Получить всю не проведенную металлообработку'})
+	@Get('/allnocomducted/:isBan')
+	getMetolloworkingNoConducted(@Param('isBan') isBan: boolean = false) {
+			return this.metaloworkingService.getMetolloworking(isBan, false)
+	}
+
 	@ApiOperation({summary: 'Удалить Металлообработку'})
 	@Delete('/:id')
 	deleteMetolloworking(@Param('id') id: number) {
