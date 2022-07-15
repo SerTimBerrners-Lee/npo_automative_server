@@ -372,7 +372,6 @@ export class ProviderService {
                 const comings = await this.getAllDeliveriedComing();
                 try {
                     const pars = JSON.parse(dto.product_list);
-                    console.log(pars, ' :pars');
                     waybill.product = dto.product_list;
                     for (const product of pars) {
                         if (dto.typeComing == 'Поставщик') this.checkDeliveroedComing(product, comings);
@@ -389,6 +388,8 @@ export class ProviderService {
                         if (dto.typeComing == 'Металлообработка') {
                             object = await this.detalReprository.findByPk(product.id);
                             object.detal_kolvo += Number(product.kol);
+                            if (product.worker_id)
+                                object.$remove('metaloworking', product.worker_id);
                             this.changeStatusMetall(product.worker_id, product.kol);
                         } else if (dto.typeComing == 'Сборка'){
                             object = await this.cbedReprository.findByPk(product.id);
@@ -429,8 +430,6 @@ export class ProviderService {
             if (dto.docs, files.document) 
                 await this.documentService.attachDocumentForObject(waybill, dto, files);
 
-
-            console.log('SAVE');
             await waybill.save(transactionHost);
             await t.commit();
             return waybill;
