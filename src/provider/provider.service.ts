@@ -1,6 +1,7 @@
 import { forwardRef, HttpException, HttpStatus, Inject, Injectable } from '@nestjs/common';
 import { InjectModel } from '@nestjs/sequelize';
 import { Sequelize } from 'sequelize-typescript';
+import { Assemble } from 'src/assemble/assemble.model';
 import { Cbed } from 'src/cbed/cbed.model';
 import { Detal } from 'src/detal/detal.model';
 import { Documents } from 'src/documents/documents.model';
@@ -8,7 +9,7 @@ import { DocumentsService } from 'src/documents/documents.service';
 import { Equipment } from 'src/equipment/equipment.model';
 import { EquipmentService } from 'src/equipment/equipment.service';
 import { DateMethods } from 'src/files/date.methods';
-import { StatusMetaloworking } from 'src/files/enums';
+import { StatusAssemble, StatusMetaloworking } from 'src/files/enums';
 import { InstrumentService } from 'src/instrument/instrument.service';
 import { NameInstrument } from 'src/instrument/name-instrument.model';
 import { Inventary } from 'src/inventary/inventary.model';
@@ -32,8 +33,9 @@ export class ProviderService {
             @InjectModel(Inventary) private inventaryReprository: typeof Inventary,
             @InjectModel(Deliveries) private deliveriesReprository: typeof Deliveries,
             @InjectModel(Waybill) private waybillReprository: typeof Waybill,
-            @InjectModel(Detal) private detalReprository: typeof Waybill,
-            @InjectModel(Cbed) private cbedReprository: typeof Waybill,
+            @InjectModel(Detal) private detalReprository: typeof Detal,
+            @InjectModel(Cbed) private cbedReprository: typeof Cbed,
+            @InjectModel(Assemble) private assemblyReprository: typeof Assemble,
             @InjectModel(Metaloworking) private metalReprository: typeof Metaloworking,
             private settingsService: SettingsService,
             private documentService: DocumentsService,
@@ -388,12 +390,16 @@ export class ProviderService {
                         if (dto.typeComing == 'Металлообработка') {
                             object = await this.detalReprository.findByPk(product.id);
                             object.detal_kolvo += Number(product.kol);
-                            if (product.worker_id)
-                                object.$remove('metaloworking', product.worker_id);
                             this.changeStatusMetall(product.worker_id, product.kol);
-                        } else if (dto.typeComing == 'Сборка'){
-                            object = await this.cbedReprository.findByPk(product.id);
-                            object.cbed_kolvo += Number(product.kol);
+                        } else if (dto.typeComing == 'Сборка' && product.worker_id){
+                            const ass = await this.assemblyReprository.findByPk(product.worker_id);
+                            if (ass && ass.type_izd === 'cbed') {
+                                object = await this.cbedReprository.findByPk(product.id);
+                                if (object) {
+                                    object.cbed_kolvo += Number(product.kol);
+                                    this.changeStatusAss(ass, product.kol);
+                                }
+                            }
                         }
                         if (object) {
                             if (dto.typeComing == 'Поставщик') object.shipments_kolvo - product.kol <= 0 ? object.shipments_kolvo = 0 :
@@ -449,6 +455,14 @@ export class ProviderService {
         metalloworking.status = StatusMetaloworking.сonducted;
         metalloworking.kolvo_create = kol || 1;
         await metalloworking.save();
+    }
+
+    private async changeStatusAss(ass: Assemble, kol: number) {
+        if (!ass) return false;
+
+        ass.status = StatusAssemble.сonducted;
+        ass.kolvo_create = kol || 1;
+        await ass.save();
     }
 
     // Возвращаем в строке позицию матерала

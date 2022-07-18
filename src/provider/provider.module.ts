@@ -1,5 +1,6 @@
 import { forwardRef, Module } from '@nestjs/common';
 import { SequelizeModule } from '@nestjs/sequelize';
+import { Assemble } from 'src/assemble/assemble.model';
 import { Cbed } from 'src/cbed/cbed.model';
 import { Detal } from 'src/detal/detal.model';
 import { DocumentsProviders } from 'src/documents/documents-providers.model';
@@ -45,7 +46,8 @@ import { Waybill } from './waybill.model';
             Waybill,
             Detal,
             Cbed,
-            Metaloworking
+            Metaloworking,
+            Assemble
         ]),
         DocumentsModule,
         SettingsModule,

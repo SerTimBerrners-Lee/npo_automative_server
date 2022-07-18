@@ -22,6 +22,12 @@ export class AssembleController {
 	}
 
 	@ApiOperation({summary: 'Получить все Сборки'})
+	@Get('/allnocomducted/:isBan')
+	getAllAssNoComing(@Param('isBan') isBan: boolean = false) {
+			return this.assembleService.getAllAssemble(isBan, false)
+	}
+
+	@ApiOperation({summary: 'Получить все Сборки'})
 	@Get('/all/:isBan')
 	getAllAssemble(@Param('isBan') isBan: boolean = false) {
 			return this.assembleService.getAllAssemble(isBan)
