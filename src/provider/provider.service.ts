@@ -15,6 +15,7 @@ import { NameInstrument } from 'src/instrument/name-instrument.model';
 import { Inventary } from 'src/inventary/inventary.model';
 import { InventaryService } from 'src/inventary/inventary.service';
 import { Metaloworking } from 'src/metaloworking/metaloworking.model';
+import { Product } from 'src/product/product.model';
 import { PodPodMaterial } from 'src/settings/pod-pod-material.model';
 import { SettingsService } from 'src/settings/settings.service';
 import { Deliveries } from './deliveries.model';
@@ -37,6 +38,7 @@ export class ProviderService {
             @InjectModel(Cbed) private cbedReprository: typeof Cbed,
             @InjectModel(Assemble) private assemblyReprository: typeof Assemble,
             @InjectModel(Metaloworking) private metalReprository: typeof Metaloworking,
+            @InjectModel(Product) private productReprository: typeof Product,
             private settingsService: SettingsService,
             private documentService: DocumentsService,
             private equipmentService: EquipmentService,
@@ -399,6 +401,12 @@ export class ProviderService {
                                     object.cbed_kolvo += Number(product.kol);
                                     this.changeStatusAss(ass, product.kol);
                                 }
+                            } else if (ass && ass.type_izd === 'prod') {
+                                object = await this.productReprository.findByPk(product.id);
+                                if (object) {
+                                    object.product_kolvo += Number(product.kol);
+                                    this.changeStatusAss(ass, product.ko);
+                                }
                             }
                         }
                         if (object) {
@@ -448,20 +456,20 @@ export class ProviderService {
     }
 
 
-    private async changeStatusMetall(met_id: number, kol: number) {
+    private async changeStatusMetall(met_id: number, kol: number = 1) {
         if (!met_id) return false;
         const metalloworking = await this.metalReprository.findByPk(met_id);
         if (!metalloworking) return false;
         metalloworking.status = StatusMetaloworking.сonducted;
-        metalloworking.kolvo_create = kol || 1;
+        metalloworking.kolvo_create = kol;
         await metalloworking.save();
     }
 
-    private async changeStatusAss(ass: Assemble, kol: number) {
+    private async changeStatusAss(ass: Assemble, kol: number = 1) {
         if (!ass) return false;
 
         ass.status = StatusAssemble.сonducted;
-        ass.kolvo_create = kol || 1;
+        ass.kolvo_create = kol;
         await ass.save();
     }
 
