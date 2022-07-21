@@ -24,6 +24,7 @@ class Loggus {
     this.file = `${STATIC_DIR}logs.log`;
     this.title = title;
     this.args = args;
+    console.log('\n\n\n', args, '\n\n\n');
     this.str = `
     \n
     -------------------------------------------
@@ -62,7 +63,6 @@ class Loggus {
   }
 
   private _close(fd: any) {
-    console.log(this.str);
     fs.close(fd);
   }
 }

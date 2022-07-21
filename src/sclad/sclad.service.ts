@@ -88,9 +88,9 @@ export class ScladService {
             throw new HttpException('Произошла ошибка при добавлении отметки2.', HttpStatus.BAD_REQUEST);
 
         if (dto.assemble_id) 
-            if(objects.cbed && objects.cbed.techProcesses) tp = objects.cbed.techProcesses;
+            if (objects.cbed && objects.cbed.techProcesses) tp = objects.cbed.techProcesses;
         if (dto.metaloworking_id) 
-            if(objects.detal && objects.detal.techProcesses) tp = objects.detal.techProcesses;
+            if (objects.detal && objects.detal.techProcesses) tp = objects.detal.techProcesses;
             
         if (!tp || !tp.operations || !tp.operations.length) 
             throw new HttpException('Произошла ошибка при добавлении отметки.', HttpStatus.BAD_REQUEST);
@@ -163,6 +163,14 @@ export class ScladService {
         });
     }
 
+    /**
+     * 
+     * Дефициты
+     * Получаем все объекты, потом подсчитываем и сохраняем минимальный остаток
+     * Сохраняем все
+     * Вытаскиваем дифицит по параметрам сново 
+     */
+
     async getAllDeficitCbed() {
 		const cbeds = await this.cbedReprository.findAll({
             attributes: {exclude: ['attention', 'haracteriatic', 'parametrs', 'description']},
@@ -173,11 +181,12 @@ export class ScladService {
         });
 
         for (let inx in cbeds) {
-            const remaining = await this.minRemainder(cbeds[inx], 'cbed');
+            const { remainder, remainderMinCol } = await this.minRemainder(cbeds[inx], 'cbed');
             const shipments_kolvo = await this.getIzdInShipmentsList(cbeds[inx].shipments, cbeds[inx].id, 'cbed');
 
-            cbeds[inx].min_remaining = remaining;
+            cbeds[inx].min_remaining = remainder;
             cbeds[inx].shipments_kolvo = shipments_kolvo;
+            cbeds[inx].deficit = remainderMinCol;
             await cbeds[inx].save();
         }
 
@@ -206,6 +215,14 @@ export class ScladService {
         return deficitCbed;
 	}
 
+    /**
+     * 
+     * Дефициты
+     * Получаем все объекты, потом подсчитываем и сохраняем минимальный остаток
+     * Сохраняем все
+     * Вытаскиваем дифицит по параметрам сново 
+     */
+
     async getAllDeficitDetal() {
         const detals = await this.detalReprository.findAll({
             attributes: {exclude: ['attention', 'haracteriatic', 'parametrs', 'description']},
@@ -216,12 +233,13 @@ export class ScladService {
         }) 
 
         for (let inx in detals) {
-            const remaining = await this.minRemainder(detals[inx], 'detal')
+            const { remainder, remainderMinCol } = await this.minRemainder(detals[inx], 'detal');
             const shipments_kolvo = await this.getIzdInShipmentsList(detals[inx].shipments, detals[inx].id, 'detal');
             
-            detals[inx].min_remaining = remaining
+            detals[inx].min_remaining = remainder;
             detals[inx].shipments_kolvo = shipments_kolvo;
-            await detals[inx].save()
+            detals[inx].deficit = remainderMinCol;
+            await detals[inx].save();
         }
 
 		const deficitDetal = await this.detalReprository.findAll({include: [
@@ -233,7 +251,7 @@ export class ScladService {
                         {
                             model: TypeOperation
                         }
-                    ], 
+                    ],
                     attributes: ['id']
                 }]
             },
@@ -276,13 +294,18 @@ export class ScladService {
         return shipments_kolvo;
     }
 
-    async minRemainder(izd: Cbed | Detal, type: string): Promise<number> {
-        let remainder = 0;
+    /**
+     * Возврашает минимальный остаток
+     * @param izd 
+     * @param type 
+     * @returns 
+     */
+    async minRemainder(izd: Cbed | Detal, type: string) {
         let list_id_arr = [];
         let listType = 'listCbed'
         let keyList = 'cb'
         let query = {}
-        if(type == 'detal') {
+        if (type == 'detal') {
             listType = 'listDetal'
             keyList = 'det'
             query['include']= [{
@@ -292,35 +315,38 @@ export class ScladService {
                 }
             }]
         }
-        if(type == 'cbed') {
+        if (type == 'cbed') {
             try {
                 const cbeds = JSON.parse(izd.cbed)
-                for(const cb of cbeds) {
+                for (const cb of cbeds) {
                     list_id_arr.push(cb.id)
                 }
                 query['where'] = { id: list_id_arr }
             } catch(err) {console.error(err)}   
         }
 
-        query['attributes'] = ['id', listType]
-        const getCbeds = await this.cbedReprository.findAll(query)
+        query['attributes'] = ['id', 'cbed_kolvo', listType]
+        const getCbeds = await this.cbedReprository.findAll(query);
+        
+        const prodRM = await this.getMinProductRemain(izd.id, 0, listType, type, keyList);
+        let remainder = prodRM.remainder || 0
+        let remainderMinCol = prodRM.remainderMinCol || 0;
 
-        remainder += await this.getMinProductRemain(izd.id, remainder, listType, type, keyList)
-
-        for(const cb of getCbeds) {
+        for (const cb of getCbeds) {
             try {
-                if(!cb[listType]) continue;
+                if (!cb[listType]) continue;
                 const listIzd = JSON.parse(cb[listType])
-                for(const item of listIzd) {
+                for (const item of listIzd) {
                     const parent_kol = Number(item.kol);
-                    if(item[keyList].id == izd.id && parent_kol) {
+                    if (item[keyList].id == izd.id && parent_kol) {
                         const min_of_parent = await this.getMinProductRemain(cb.id, 0, 'listCbed', 'cbed', 'cb')
-                        remainder += (parent_kol * min_of_parent)
+                        remainder += (parent_kol * min_of_parent.remainder);
+                        remainderMinCol += remainder - cb.cbed_kolvo;
                     }
                 }
             } catch(err) {this.logger.error("\n\n\nISERROR\n\n\n", err)}
         }
-        return remainder;
+        return { remainder, remainderMinCol };
     }
 
     /**
@@ -332,7 +358,8 @@ export class ScladService {
      * @param keyList cb | det
      * @returns 
      */
-    async getMinProductRemain(izd_id: number, remainder: number, listType: string, type: string, keyList: string): Promise<number> {
+    async getMinProductRemain(izd_id: number, remainder: number, listType: string, type: string, keyList: string) {
+        let remainderMinCol = 0;
         const product = await this.productReprository.findAll({
             include: [
                 {
@@ -343,23 +370,25 @@ export class ScladService {
                     }
                 }
             ],
-            attributes: ['haracteriatic', listType]
+            attributes: ['haracteriatic', 'product_kolvo', listType]
         })
 
-        if(!product.length) return remainder
+        if (!product.length) return {remainder, remainderMinCol};
 
-        for(const item of product) {
+        for (const prod of product) {
             try {
-                const haracteriatic = Number(JSON.parse(item.haracteriatic)[1].znach);
-                const listIzd = JSON.parse(item[listType])
-                for(const item of listIzd) {
-                    if(item[keyList].id == izd_id && haracteriatic > 0)
-                        remainder += (Number(item.kol) * haracteriatic)
+                const haracteriatic = Number(JSON.parse(prod.haracteriatic)[1].znach);
+                const listIzd = JSON.parse(prod[listType])
+                for (const item of listIzd) {
+                    if (item[keyList].id == izd_id && haracteriatic > 0) {
+                        remainder += (Number(item.kol) * haracteriatic);
+                        remainderMinCol += remainder - item.product_kolvo;
+                    }
                 }
             } catch(e) {console.error(e)}
         }
 
-        return remainder
+        return {remainder, remainderMinCol};
     }
 
     // return object in list  
