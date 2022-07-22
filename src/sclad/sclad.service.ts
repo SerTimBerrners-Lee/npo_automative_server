@@ -1,5 +1,6 @@
 import { HttpException, HttpStatus, Injectable, Logger } from '@nestjs/common';
 import { InjectModel } from '@nestjs/sequelize';
+import sequelize from 'sequelize';
 import { Op } from 'sequelize';
 import { Sequelize } from 'sequelize';
 import { Assemble } from 'src/assemble/assemble.model';
@@ -11,6 +12,7 @@ import { TechProcess } from 'src/detal/tech-process.model';
 import { TypeOperation } from 'src/detal/type-operation.model';
 import { EZ_KOLVO, KOLVO, StatusAssemble, StatusMetaloworking, statusShipment } from 'src/files/enums';
 import { logs } from 'src/files/logs';
+import { moreMinusNum } from 'src/files/methods';
 import { Metaloworking } from 'src/metaloworking/metaloworking.model';
 import { MetaloworkingService } from 'src/metaloworking/metaloworking.service';
 import { Product } from 'src/product/product.model';
@@ -156,7 +158,7 @@ export class ScladService {
                         Sequelize.col('product_kolvo'), '<', Sequelize.col('min_remaining')
                     ),
                     Sequelize.where(
-                        Sequelize.col('min_remaining'), '<', Sequelize.col('shipments_kolvo') 
+                        Sequelize.col('product_kolvo'), '<', Sequelize.col('shipments_kolvo') 
                     )
                 ]
             }
@@ -186,6 +188,7 @@ export class ScladService {
 
             cbeds[inx].min_remaining = remainder;
             cbeds[inx].shipments_kolvo = shipments_kolvo;
+            logs('', remainderMinCol);
             cbeds[inx].deficit = remainderMinCol;
             await cbeds[inx].save();
         }
@@ -206,7 +209,7 @@ export class ScladService {
                         Sequelize.col('cbed_kolvo'), '<', Sequelize.col('min_remaining')
                     ),
                     Sequelize.where(
-                        Sequelize.col('min_remaining'), '<', Sequelize.col('shipments_kolvo') 
+                        Sequelize.col('cbed_kolvo'), '<', Sequelize.col('shipments_kolvo') 
                     )
                 ]
             }
@@ -267,9 +270,9 @@ export class ScladService {
                         Sequelize.col('detal_kolvo'), '<', Sequelize.col('min_remaining') 
                     ),
                     Sequelize.where(
-                        Sequelize.col('min_remaining'), '<', Sequelize.col('shipments_kolvo') 
+                        Sequelize.col('detal_kolvo'), '<', Sequelize.col('shipments_kolvo') 
                     ),
-                ]
+                ],
             }
         });
 
@@ -328,9 +331,9 @@ export class ScladService {
         query['attributes'] = ['id', 'cbed_kolvo', listType]
         const getCbeds = await this.cbedReprository.findAll(query);
         
-        const prodRM = await this.getMinProductRemain(izd.id, 0, listType, type, keyList);
-        let remainder = prodRM.remainder || 0
-        let remainderMinCol = prodRM.remainderMinCol || 0;
+        const prodRM = await this.getMinProductRemain(izd.id, 0, listType, type, keyList, 0);
+        let remainder = moreMinusNum(prodRM.remainder);
+        let remainderMinCol = moreMinusNum(prodRM.remainderMinCol);
 
         for (const cb of getCbeds) {
             try {
@@ -339,9 +342,9 @@ export class ScladService {
                 for (const item of listIzd) {
                     const parent_kol = Number(item.kol);
                     if (item[keyList].id == izd.id && parent_kol) {
-                        const min_of_parent = await this.getMinProductRemain(cb.id, 0, 'listCbed', 'cbed', 'cb')
+                        const min_of_parent = await this.getMinProductRemain(cb.id, 0, 'listCbed', 'cbed', 'cb', 0)
                         remainder += (parent_kol * min_of_parent.remainder);
-                        remainderMinCol += remainder - cb.cbed_kolvo;
+                        remainderMinCol += moreMinusNum(min_of_parent.remainder - cb.cbed_kolvo);
                     }
                 }
             } catch(err) {this.logger.error("\n\n\nISERROR\n\n\n", err)}
@@ -358,8 +361,7 @@ export class ScladService {
      * @param keyList cb | det
      * @returns 
      */
-    async getMinProductRemain(izd_id: number, remainder: number, listType: string, type: string, keyList: string) {
-        let remainderMinCol = 0;
+    async getMinProductRemain(izd_id: number, remainder: number, listType: string, type: string, keyList: string, remainderMinCol: number) {
         const product = await this.productReprository.findAll({
             include: [
                 {
@@ -382,7 +384,7 @@ export class ScladService {
                 for (const item of listIzd) {
                     if (item[keyList].id == izd_id && haracteriatic > 0) {
                         remainder += (Number(item.kol) * haracteriatic);
-                        remainderMinCol += remainder - item.product_kolvo;
+                        remainderMinCol += moreMinusNum(remainder - prod.product_kolvo);
                     }
                 }
             } catch(e) {console.error(e)}

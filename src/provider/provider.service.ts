@@ -392,7 +392,7 @@ export class ProviderService {
 
                         if (dto.typeComing == 'Металлообработка') {
                             object = await this.detalReprository.findByPk(product.id);
-                            object.metalloworking_kolvo = moreMinusNum(object.metalloworking_kolvo, product.kol);
+                            object.metalloworking_kolvo = moreMinusNum(object.metalloworking_kolvo - product.kol);
                             object.detal_kolvo += Number(product.kol);
                             this.changeStatusMetall(product.worker_id, product.kol);
                         } else if (dto.typeComing == 'Сборка' && product.worker_id){
@@ -400,14 +400,14 @@ export class ProviderService {
                             if (ass && ass.type_izd === 'cbed') {
                                 object = await this.cbedReprository.findByPk(product.id);
                                 if (object) {
-                                    object.assemble_kolvo = moreMinusNum(object.assemble_kolvo, Number(product.kol));
+                                    object.assemble_kolvo = moreMinusNum(object.assemble_kolvo - Number(product.kol));
                                     object.cbed_kolvo += Number(product.kol);
                                     this.changeStatusAss(ass, product.kol);
                                 }
                             } else if (ass && ass.type_izd === 'prod') {
                                 object = await this.productReprository.findByPk(product.id);
                                 if (object) {
-                                    object.assemble_kolvo = moreMinusNum(object.assemble_kolvo, Number(product.kol));
+                                    object.assemble_kolvo = moreMinusNum(object.assemble_kolvo - Number(product.kol));
                                     object.product_kolvo += Number(product.kol);
                                     this.changeStatusAss(ass, product.ko);
                                 }
