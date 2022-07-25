@@ -4,12 +4,12 @@ import { Sequelize } from 'sequelize-typescript';
 import { Assemble } from 'src/assemble/assemble.model';
 import { Cbed } from 'src/cbed/cbed.model';
 import { Detal } from 'src/detal/detal.model';
-import { Documents } from 'src/documents/documents.model';
 import { DocumentsService } from 'src/documents/documents.service';
 import { Equipment } from 'src/equipment/equipment.model';
 import { EquipmentService } from 'src/equipment/equipment.service';
 import { DateMethods } from 'src/files/date.methods';
 import { StatusAssemble, StatusMetaloworking } from 'src/files/enums';
+import { logs } from 'src/files/logs';
 import { moreMinusNum } from 'src/files/methods';
 import { InstrumentService } from 'src/instrument/instrument.service';
 import { NameInstrument } from 'src/instrument/name-instrument.model';
@@ -356,7 +356,6 @@ export class ProviderService {
         const transactionHost = { transaction: t };
 
         try {
-            console.log(dto);
             const dm = new DateMethods();
             const endShipments = await this.waybillReprository.findOne(
                 {
@@ -392,26 +391,23 @@ export class ProviderService {
 
                         if (dto.typeComing == 'Металлообработка') {
                             object = await this.detalReprository.findByPk(product.id);
-                            object.metalloworking_kolvo = moreMinusNum(object.metalloworking_kolvo - product.kol);
+                            if (product.worker_id) 
+                                object.metalloworking_kolvo = moreMinusNum(object.metalloworking_kolvo - product.kol);
                             object.detal_kolvo += Number(product.kol);
                             this.changeStatusMetall(product.worker_id, product.kol);
-                        } else if (dto.typeComing == 'Сборка' && product.worker_id){
-                            const ass = await this.assemblyReprository.findByPk(product.worker_id);
-                            if (ass && ass.type_izd === 'cbed') {
+                        } else if (dto.typeComing == 'Сборка') {
+                            if (product.type == 'cbed') {
                                 object = await this.cbedReprository.findByPk(product.id);
-                                if (object) {
-                                    object.assemble_kolvo = moreMinusNum(object.assemble_kolvo - Number(product.kol));
+                                if (object)
                                     object.cbed_kolvo += Number(product.kol);
-                                    this.changeStatusAss(ass, product.kol);
-                                }
-                            } else if (ass && ass.type_izd === 'prod') {
+                            } else if (product.type == 'prod') {
                                 object = await this.productReprository.findByPk(product.id);
-                                if (object) {
-                                    object.assemble_kolvo = moreMinusNum(object.assemble_kolvo - Number(product.kol));
+                                if (object)
                                     object.product_kolvo += Number(product.kol);
-                                    this.changeStatusAss(ass, product.ko);
-                                }
                             }
+                            if (object && product.worker_id) 
+                                object.assemble_kolvo = moreMinusNum(object.assemble_kolvo - Number(product.kol));
+                            this.changeStatusAss(product.worker_id, product.kol);
                         }
                         if (object) {
                             if (dto.typeComing == 'Поставщик') object.shipments_kolvo - product.kol <= 0 ? object.shipments_kolvo = 0 :
@@ -464,15 +460,20 @@ export class ProviderService {
         if (!met_id) return false;
         const metalloworking = await this.metalReprository.findByPk(met_id);
         if (!metalloworking) return false;
-        metalloworking.status = StatusMetaloworking.сonducted;
+
         metalloworking.kolvo_create = kol;
+        if (metalloworking.kolvo_create >= metalloworking.kolvo_shipments)
+            metalloworking.status = StatusMetaloworking.сonducted;
         await metalloworking.save();
     }
 
-    private async changeStatusAss(ass: Assemble, kol: number = 1) {
+    private async changeStatusAss(ass_id: number, kol: number = 1) {
+        if (!ass_id) return false;
+        const ass = await this.assemblyReprository.findByPk(ass_id)
         if (!ass) return false;
 
-        ass.status = StatusAssemble.сonducted;
+        if (ass.kolvo_create >= ass.kolvo_shipments)
+            ass.status = StatusAssemble.сonducted;
         ass.kolvo_create = kol;
         await ass.save();
     }
