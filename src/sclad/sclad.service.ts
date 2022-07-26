@@ -1,6 +1,5 @@
 import { HttpException, HttpStatus, Injectable, Logger } from '@nestjs/common';
 import { InjectModel } from '@nestjs/sequelize';
-import sequelize from 'sequelize';
 import { Op } from 'sequelize';
 import { Sequelize } from 'sequelize';
 import { Assemble } from 'src/assemble/assemble.model';

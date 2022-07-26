@@ -30,7 +30,7 @@ export class ShipmentsController {
 	]))
   @Post('/shcheck')
 	shComplitCreate(
-		@Body() dto: ShCheckDto, 
+		@Body() dto: ShCheckDto,
 		@UploadedFiles() files: { document?: Express.Multer.File[]} ) {
 		return this.shComplitSettings.create(dto, files);
 	}

@@ -7,6 +7,7 @@ import { DocumentsService } from 'src/documents/documents.service';
 import { DateMethods } from 'src/files/date.methods';
 import { statusShipment } from 'src/files/enums';
 import { logs } from 'src/files/logs';
+import { Op } from 'sequelize';
 import { Product } from 'src/product/product.model';
 import { User } from 'src/users/users.model';
 import { ShCheckDto } from './dto/sh-check.dto';
@@ -120,7 +121,10 @@ export class ShComplitService {
     async getAll() {
       const sh_complits = await this.shComplitReprository.findAll({
         where: {
-          ban: false
+          ban: false,
+          number_complit: {
+            [Op.ne]: null,
+          },
         },
         include: [
           { all: true },
@@ -140,7 +144,9 @@ export class ShComplitService {
       ]});
       if (!sh_complits) throw new HttpException('Не удалось получить список отгрузок', HttpStatus.BAD_REQUEST);
 
-      return sh_complits;
+      const sorted = sh_complits.filter(sh => sh.shipments.length);
+
+      return sorted;
     }
 
     async getById(id: number) {
