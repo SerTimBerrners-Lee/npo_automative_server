@@ -4,7 +4,7 @@ import { Detal } from 'src/detal/detal.model';
 import { DetalService } from 'src/detal/detal.service';
 import { Operation } from 'src/detal/operation.model';
 import { TechProcess } from 'src/detal/tech-process.model';
-import { StatusMetaloworking, statusShipment } from 'src/files/enums';
+import { StatusMetaloworking } from 'src/files/enums';
 import { PodPodMaterial } from 'src/settings/pod-pod-material.model';
 import { Shipments } from 'src/shipments/shipments.model';
 import { ShipmentsService } from 'src/shipments/shipments.service';

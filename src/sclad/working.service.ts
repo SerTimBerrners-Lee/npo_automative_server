@@ -5,8 +5,10 @@ import { AssembleService } from 'src/assemble/assemble.service';
 import { Cbed } from 'src/cbed/cbed.model';
 import { Detal } from 'src/detal/detal.model';
 import { WorkingType } from 'src/files/enums';
+import { copyObject } from 'src/files/methods';
 import { Metaloworking } from 'src/metaloworking/metaloworking.model';
 import { MetaloworkingService } from 'src/metaloworking/metaloworking.service';
+import { Shipments } from 'src/shipments/shipments.model';
 import { CreateWorkingDto } from './dto/create-working.dto';
 import { Working } from './working.model';
 
@@ -70,13 +72,21 @@ export class WorkingService {
   }
 
   async getAllWorking(archive: string) {
+    const includesShipemnts = [
+      {
+        model: Shipments,
+        attributes: ['id', 'date_shipments']
+      }
+    ];
+
     const workings = await this.workingReprository.findAll({include: [
       {
         model: Assemble,
         include: [
           {
             model: Cbed,
-            attributes: ['id', 'articl', 'name']
+            attributes: ['id', 'articl', 'name'],
+            include: includesShipemnts,
           }
         ]
       },
@@ -85,14 +95,34 @@ export class WorkingService {
         include: [
           {
             model: Detal,
-            attributes: ['id', 'articl', 'name']
+            attributes: ['id', 'articl', 'name'],
+            include: includesShipemnts,
           }
         ]
       }
     ], where: { ban: archive }});
+
     if (!workings)
-      throw new HttpException("Произошла ощибка с получением рабочих кластеров", HttpStatus.BAD_REQUEST)
-    return workings;
+      throw new HttpException("Произошла ощибка с получением рабочих кластеров", HttpStatus.BAD_REQUEST);
+
+    const sorted = [];
+    for (const work of workings) {
+      const { assemble, metall } = copyObject(work);
+      let shipments = [];
+      const typeWorking = metall.concat(assemble);
+
+      for (const tw of typeWorking) {
+        if (tw?.detal && tw.detal?.shipments?.length) shipments = shipments.concat(tw.detal.shipments);
+        if (tw?.cbed && tw.cbed?.shipments?.length) shipments = shipments.concat(tw.cbed.shipments);
+      }
+
+      const obj = copyObject(work);
+
+      sorted.push({
+        ...obj, shipments
+      })
+    }
+    return sorted;
   }
 
   async createWorking(dto: CreateWorkingDto) {
