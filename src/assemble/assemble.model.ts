@@ -2,6 +2,7 @@ import { ApiProperty } from "@nestjs/swagger";
 import { Model, Column, DataType, Table, ForeignKey, BelongsTo, BelongsToMany} from "sequelize-typescript";
 import { Cbed } from "src/cbed/cbed.model";
 import { StatusAssemble } from "src/files/enums";
+import { Product } from "src/product/product.model";
 import { WorkingAssemble } from "src/sclad/working-assemble.model";
 import { Working } from "src/sclad/working.model";
 
@@ -63,4 +64,11 @@ export class Assemble extends Model<Assemble, AssembleAttrCreate> {
 
   @BelongsTo(() => Cbed)
   cbed: Cbed;
+
+  @ForeignKey(() => Product)
+  @Column({type: DataType.INTEGER})
+  product_id: number;
+
+  @BelongsTo(() => Product)
+  product: Product;
 }  

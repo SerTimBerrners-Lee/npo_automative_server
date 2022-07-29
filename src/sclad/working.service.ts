@@ -128,6 +128,7 @@ export class WorkingService {
   async createWorking(dto: CreateWorkingDto) {
     const workers_data = dto.workers_data;
     const workers_complect = dto.workers_complect;
+    console.log(workers_complect, workers_data)
 
     if (!workers_complect.length)
       throw new HttpException("Нет заказов", HttpStatus.BAD_REQUEST);

@@ -6,6 +6,7 @@ import { CbedService } from 'src/cbed/cbed.service';
 import { Operation } from 'src/detal/operation.model';
 import { TechProcess } from 'src/detal/tech-process.model';
 import { StatusAssemble, statusShipment } from 'src/files/enums';
+import { copyObject } from 'src/files/methods';
 import { Product } from 'src/product/product.model';
 import { Working } from 'src/sclad/working.model';
 import { Shipments } from 'src/shipments/shipments.model';
@@ -24,6 +25,17 @@ export class AssembleService {
 
 	// Добавляем сборку
 	async createAssemble(dto: CreateAssembleDto) {
+		console.log(dto);
+		if (!dto.cbed_id)
+			throw new HttpException('Не удалось отправить в производство', HttpStatus.BAD_GATEWAY);
+
+		let cbedOrProduct: Cbed | Product;
+		if (dto.type === 'prod')
+			cbedOrProduct = await this.productReprostory.findByPk(dto.cbed_id);
+		else cbedOrProduct = await this.cbedService.findById(dto.cbed_id, 'true')	;
+		if (!cbedOrProduct)
+			throw new HttpException('Не удалось отправить в производство', HttpStatus.BAD_GATEWAY);
+
 		const assemble = await this.assembleReprository
 			.create({
 				date_order: dto.date_order,
@@ -36,20 +48,15 @@ export class AssembleService {
 		assemble.number_order = dto.number_order.trim() + "_" + String(assemble.id);
 		if (!dto.date_order) assemble.date_order = new Date().toLocaleString('ru-RU').split(',')[0];
 
-		await assemble.save();
+		if (cbedOrProduct.id && dto.type === 'prod')
+			assemble.product_id = cbedOrProduct.id;
+		else if (cbedOrProduct.id && dto.type === 'cbed')
+			assemble.cbed_id = cbedOrProduct.id;
 
-		if (!dto.cbed_id) return assemble;
-		let cbed: Cbed | Product;
-		if (dto.type == 'prod') 
-			cbed = await this.productReprostory.findByPk(dto.cbed_id);
-		else cbed = await this.cbedService.findById(dto.cbed_id, 'true')	;
-		if (!cbed) return assemble;
-
-		assemble.cbed_id = cbed.id;
 		assemble.kolvo_shipments = dto.my_kolvo;
-		cbed.assemble_kolvo += dto.my_kolvo;
+		cbedOrProduct.assemble_kolvo += dto.my_kolvo;
 		await assemble.save();
-		await cbed.save();
+		await cbedOrProduct.save();
 
 		return assemble;
 	}
@@ -84,7 +91,7 @@ export class AssembleService {
 	async getAllAssemble(isBan: boolean = false, conducted: boolean = true) {
 		const conduct = conducted ? { [Op.ne]: '' } : { [Op.ne]: StatusAssemble.сonducted }
 
-		const assembly = await this.assembleReprository.findAll({include: [ {all: true}, 
+		const getAssembly = await this.assembleReprository.findAll({include: [ {all: true}, 
 			{
 				model: Cbed, 
 				include: ['documents', 
@@ -99,10 +106,31 @@ export class AssembleService {
 						include: ['marks']
 						}]
 					}]
+			},
+			{
+				model: Product, 
+				include: ['documents', 
+					{
+					model: Shipments, 
+					include: ['product'],
+					}, 
+					{
+					model: TechProcess,
+					include: [{
+						model: Operation, 
+						include: ['marks']
+						}]
+					}]
 			}
-		], where: {ban: isBan, status: conduct}})
+		], where: {ban: isBan, status: conduct}});
+
+		const assembly = copyObject(getAssembly);
 		// Фильтрация по операциям
 		for (const obj of assembly) {
+			if (obj.type_izd === 'prod') {
+				obj.cbed = obj.product;
+				obj.cbed_id = obj.product_id;
+			}
 			if (!obj.cbed || !obj.cbed.techProcesses || !obj.cbed.techProcesses.operations.length) continue;
 			for (let i in obj.cbed.techProcesses.operations) {
 				for (let j in obj.cbed.techProcesses.operations) {
