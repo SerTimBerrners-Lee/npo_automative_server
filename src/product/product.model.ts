@@ -1,6 +1,7 @@
 import { ApiProperty } from "@nestjs/swagger";
 import { Model, Column, DataType, Table, BelongsToMany, HasMany, ForeignKey, BelongsTo, HasOne } from "sequelize-typescript";
 import { Actions } from "src/actions/actions.model";
+import { Assemble } from "src/assemble/assemble.model";
 import { Cbed } from "src/cbed/cbed.model";
 import { Detal } from "src/detal/detal.model";
 import { TechProcess } from "src/detal/tech-process.model";
@@ -119,4 +120,7 @@ export class Product extends Model<Product, ProductCreationAttrs> {
 
     @HasMany(() => Shipments)
     shipments: Shipments[];
+
+    @HasMany(() => Assemble)
+    assemble: Assemble[];
 }     
